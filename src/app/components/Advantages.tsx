@@ -48,17 +48,10 @@ export default function Advantages() {
       />
       <Image
         src="/advantages-photo.svg"
-        alt="decor 3"
-        width={300}
-        height={300}
-        className="absolute xl:bottom-20 rotate-80 xl:left-10 opacity-70 hidden xl:block"
-      />
-      <Image
-        src="/advantages-photo.svg"
         alt="decor 4"
         width={300}
         height={300}
-        className="absolute 2xl:-bottom-10 rotate-20 2xl:left-140 opacity-70 hidden 2xl:block"
+        className="absolute xl:-bottom-10 rotate-20 xl:left-30 2xl:left-70 opacity-70 hidden xl:block"
       />
       <Image
         src="/advantages-photo.svg"
