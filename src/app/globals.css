@@ -3,3 +3,28 @@
 * {
   box-sizing: border-box;
 }
+
+.figure {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  background: rgba(0, 0, 0, 0.7);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  backdrop-filter: blur(10px);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.figure::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  clip-path: inherit;
+  border: 3px solid #ff6600;
+  box-shadow: 0 0 30px #ff6600;
+  z-index: -1;
+}
