@@ -1,4 +1,4 @@
-<svg width="1920" height="1186" viewBox="-35 0 2000 1186" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1920" height="1150" viewBox="0 0 1920 1186" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <!-- фильтр для внутренней тени (оранжевая) -->
     <filter id="inner-shadow" x="0" y="0" width="200%" height="200%">

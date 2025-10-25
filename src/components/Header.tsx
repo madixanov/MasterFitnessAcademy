@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import MainContainer from "./MainContainer";
@@ -6,26 +6,42 @@ import Menu from "./UI/Menu";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20); // активируем эффект после 20px скролла
+      const currentScroll = window.scrollY;
+
+      // Эффект при скролле > 20px
+      setIsScrolled(currentScroll > 20);
+
+      // Проверяем направление скролла
+      if (currentScroll > lastScrollY && currentScroll > 100) {
+        // Скролл вниз → скрываем
+        setIsVisible(false);
+      } else {
+        // Скролл вверх → показываем
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScroll);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
 
   return (
     <header
       className={`
         fixed top-0 left-0 right-0 z-[99]
-        transition-[background-color,backdrop-filter] duration-500
-        will-change-[backdrop-filter,background-color]
+        transition-all duration-500
         ${isScrolled
           ? "backdrop-blur-md bg-white/10 border-b border-white/20 shadow-[0_0_25px_rgba(255,255,255,0.1)]"
-          : "bg-white/0"
+          : "bg-white/0 border-white/0"
         }
+        ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}
       `}
     >
       <MainContainer>
@@ -56,7 +72,7 @@ export default function Header() {
 
           {/* PROFILE LINK */}
           <div className="relative hidden w-10 h-10 cursor-pointer lg:flex flex-col gap-1 items-center justify-center group">
-            <div className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]"></div>
+            <div className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]" />
             <div className="w-[35px] h-[15px] border-2 border-white rounded-b-md rounded-t-xl transition-all duration-300 group-hover:border-[#FF6600]" />
           </div>
 

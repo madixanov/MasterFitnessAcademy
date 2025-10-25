@@ -6,11 +6,11 @@ export default function Advantages() {
     <div className="relative flex justify-center items-center mb-10 bg-[url('/figure.svg')] w-full bg-center bg-cover xl:bg-none">
       {/* Ромб-контейнер */}
       <div
-        className="xl:bg-[url('/figure.svg')] bg-center bg-contain bg-no-repeat overflow-visible text-white w-full h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-50"
+        className="xl:bg-[url('/figure.svg')] bg-center bg-cover bg-no-repeat overflow-hidden text-white w-[1920px] h-[800px] md:h-[1000px] lg:h-[1130px] xl:h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-30 xl:pt-50"
       >
         <MainContainer>
           <div className="flex flex-col justify-center items-center">
-            <h2 className="text-3xl font-bold mb-6 md:text-5xl md:mb-10 lg:mb-2">ПОЧЕМУ ВЫБИРАЮТ НАС?</h2>
+            <h2 className="text-3xl font-bold mb-6 md:text-5xl md:mb-10 lg:mb-10">ПОЧЕМУ ВЫБИРАЮТ НАС?</h2>
             <div className="flex max-w-[1000px] flex-wrap gap-6 text-sm mx-auto justify-center items-center">
               <div className="flex flex-col justify-center items-center">
                 <div className="w-20 h-23 relative md:w-30 md:h-33">
