@@ -3,10 +3,10 @@ import Image from "next/image";
 
 export default function Advantages() {
   return (
-    <div className="relative flex justify-center items-center mb-10 bg-[url('/figure.svg')] w-full bg-center bg-cover 3xl:bg-none">
+    <div className="relative flex justify-center items-center mb-10 bg-[url('/figure.svg')] w-full bg-center bg-cover xl:bg-none">
       {/* Ромб-контейнер */}
       <div
-        className="3xl:bg-[url('/figure.svg')] bg-center bg-contain bg-no-repeat overflow-visible text-white w-full h-[1078px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-50"
+        className="xl:bg-[url('/figure.svg')] bg-center bg-contain bg-no-repeat overflow-visible text-white w-full h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-50"
       >
         <MainContainer>
           <div className="flex flex-col justify-center items-center">
