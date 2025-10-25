@@ -76,7 +76,7 @@ export default function Advantages() {
       />
       {/* Ромб-контейнер */}
       <div
-        className="xl:bg-[url('/figure.svg')] bg-center bg-cover bg-no-repeat overflow-hidden text-white w-[1920px] h-[800px] md:h-[1000px] lg:h-[1130px] xl:h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-30 xl:pt-50"
+        className="xl:bg-[url('/figure.svg')] bg-center bg-cover bg-no-repeat overflow-hidden text-white w-[1920px] h-[1186px] md:h-[1000px] lg:h-[1130px] xl:h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-30 xl:pt-50"
       >
         <MainContainer>
           <div className="flex flex-col justify-center items-center">
@@ -85,13 +85,13 @@ export default function Advantages() {
               {advantagesList.map((item, i) => (
                   <div
                     key={i}
-                    className="flex flex-col items-center text-center max-w-[250px] lg:h-[344px]"
+                    className="flex flex-col items-center text-center w-full md:max-w-[250px] lg:h-[344px]"
                   >
-                    <div className="relative w-full h-20 md:w-full md:h-28 mb-4">
+                    <div className="relative w-20 h-20 md:w-full md:h-28 mb-0 md:mb-4">
                       <Image src={item.icon} alt={item.title || "icon"} fill className="object-contain" />
                     </div>
                     {item.title && <p className="text-3xl font-bold md:text-5xl">{item.title}</p>}
-                    <p className="text-center w-50 lg:w-65 text-lg font-semibold lg:text-3xl">{item.text}</p>
+                    <p className="text-center w-full lg:w-65 text-lg font-semibold lg:text-3xl">{item.text}</p>
                   </div>
                 ))}
             </div>
