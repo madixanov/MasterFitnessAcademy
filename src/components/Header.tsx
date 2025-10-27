@@ -38,7 +38,7 @@ export default function Header() {
         fixed top-0 left-0 right-0 z-99
         transition-all duration-300 transform-gpu
         ${isScrolled
-          ? "backdrop-blur-sm bg-black/25 border border-white/10 shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.4),_0_8px_20px_rgba(0,0,0,0.3)]"
+          ? "backdrop-blur-sm bg-black/25 border border-white/10 shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_12px_rgba(0,0,0,0.4),_0_8px_20px_rgba(0,0,0,0.3)]"
           : "bg-white/0 border-white/0"
         }
         ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"}

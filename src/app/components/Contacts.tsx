@@ -49,8 +49,13 @@ export default function Contacts() {
         </div>
       </MainContainer>
 
-      <div className="w-full h-full absolute -z-10 top-10 left-0 right-0 scale-200 rotate-90 md:rotate-0 opacity-80">
-        <Image src="/bg-figure.svg" alt="bg-image" fill className="object-contain"/>
+      <div className="absolute w-full inset-0 -z-10 h-full overflow-hidden">
+        <Image
+          src="/bg-figure.svg"
+          alt="bg-image"
+          fill
+          className="object-contain opacity-80 rotate-90 md:rotate-0 scale-130 md:scale-120"
+        />
       </div>
     </div>
   )
