@@ -3,8 +3,9 @@ import Image from "next/image";
 
 export default function Contacts() {
   return (
-    <div className="relative">
+    <div className="relative mb-15">
       <MainContainer>
+        <h1 className="uppercase text-center font-semibold text-3xl md:text-5xl lg:text-7xl mb-13 ">Филиал</h1>
         <div className="mb-10 flex flex-col md:flex-row justify-between gap-5 relative">
           <div className="relative w-full lg:w-[445px] flex flex-col justify-center items-start border-2 p-8 gap-5 lg:gap-10 backdrop-blur-md bg-black/10 border-white/10 rounded-xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.5),_0_8px_20px_rgba(0,0,0,0.3)]">
             <div className="relative z-10 text-white text-lg flex flex-col items-start">

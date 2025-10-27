@@ -16,7 +16,7 @@ export default function Footer() {
           </nav>
 
           <div className="relative flex-2 flex justify-center items-center flex-col">
-            <div className="flex justify-between items-center gap-5">
+            <div className="flex justify-between items-center gap-5 mb-3">
               <div className="w-[45px] h-[45px] relative cursor-pointer transition-all duration-300 hover:scale-110">
                 <Image src="/tg.svg" alt="telegram icon" fill className="object-contain"/>
               </div>
