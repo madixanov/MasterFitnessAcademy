@@ -41,7 +41,6 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col justify-center items-center gap-3">
-            <span className="uppercase font-bold text-base underline text-[rgba(255,255,255,0.5)]">Powered by jann design</span>
             <span className="uppercase font-bold text-base underline text-center text-[rgba(255,255,255,0.5)]">Master Fitness Academy <br /> since 2025</span>
           </div>
         </div>

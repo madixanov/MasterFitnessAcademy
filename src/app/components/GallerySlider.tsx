@@ -18,7 +18,7 @@ const gallery = [
 export default function GallerySlider() {
   return (
     <MainContainer>
-      <section className="relative w-full flex flex-col justify-center py-20 mb-10 lg:mb-25">
+      <section className="relative w-full flex flex-col justify-center mb-5 lg:mb-25">
         <h1 className="uppercase text-center font-semibold text-3xl md:text-5xl lg:text-7xl mb-13 ">Чемпионы</h1>
         <Swiper
           modules={[Pagination]}
@@ -47,7 +47,7 @@ export default function GallerySlider() {
           ))}
         </Swiper>
       </section>
-      <div className="absolute w-full inset-0 -z-10 top-10 h-full overflow-hidden hidden lg:block lg:-left-150">
+      <div className="absolute w-full inset-0 -z-10 top-10 h-full overflow-hidden hidden xl:block lg:-left-150">
                 <Image
                   src="/bg-figure.svg"
                   alt="bg-image"
@@ -55,7 +55,7 @@ export default function GallerySlider() {
                   className="object-contain opacity-80 rotate-90 scale-100 xl:scale-80"
                 />
         </div>
-        <div className="absolute w-full inset-0 -z-10 top-10 h-full overflow-hidden hidden lg:block lg:left-150">
+        <div className="absolute w-full inset-0 -z-10 top-10 h-full overflow-hidden hidden xl:block lg:left-150">
                 <Image
                   src="/bg-figure.svg"
                   alt="bg-image"
