@@ -10,6 +10,15 @@ export default function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hideTitle, setHideTitle] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // --- Определяем мобильный экран ---
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize(); // сразу проверка
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // --- Логика для скрытия хедера при скролле ---
   useEffect(() => {
@@ -30,17 +39,16 @@ export default function Header() {
 
   // --- Таймер скрытия названия через 3 секунды ---
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setHideTitle(true);
-    }, 3000);
+    const timer = setTimeout(() => setHideTitle(true), 3000);
     return () => clearTimeout(timer);
   }, []);
 
-  // --- Если наведён курсор на логотип — показываем обратно ---
+  // --- Наведение на логотип ---
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
 
-  const shouldShowTitle = !hideTitle || isHovered;
+  // --- Показываем название всегда на мобильных ---
+  const shouldShowTitle = isMobile || !hideTitle || isHovered;
 
   return (
     <header
@@ -82,7 +90,10 @@ export default function Header() {
           <nav
             className={`
               hidden lg:flex transition-all duration-700
-              ${!shouldShowTitle ? "absolute left-1/3 translate-x-0" : "absolute lg:left-60 xl:left-75  translate-x-1/2"}
+              ${!shouldShowTitle
+                ? "absolute left-1/3 translate-x-0"
+                : "absolute lg:left-60 xl:left-75 translate-x-1/2"
+              }
             `}
           >
             <ul className="flex justify-center items-center gap-4">
