@@ -8,29 +8,39 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [hideTitle, setHideTitle] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
+  // --- Логика для скрытия хедера при скролле ---
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-
-      // Эффект при скролле > 20px
       setIsScrolled(currentScroll > 20);
-
-      // Проверяем направление скролла
       if (currentScroll > lastScrollY && currentScroll > 100) {
-        // Скролл вниз → скрываем
         setIsVisible(false);
       } else {
-        // Скролл вверх → показываем
         setIsVisible(true);
       }
-
       setLastScrollY(currentScroll);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+
+  // --- Таймер скрытия названия через 3 секунды ---
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHideTitle(true);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // --- Если наведён курсор на логотип — показываем обратно ---
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => setIsHovered(false);
+
+  const shouldShowTitle = !hideTitle || isHovered;
 
   return (
     <header
@@ -45,19 +55,36 @@ export default function Header() {
       `}
     >
       <MainContainer>
-        <div className="flex justify-between items-center py-4">
-          {/* LOGO */}
-          <div className="flex gap-3 justify-center items-center cursor-pointer">
+        <div className="flex justify-between items-center py-4 transition-all duration-700">
+          {/* LOGO + TITLE */}
+          <div
+            className="flex gap-3 justify-center items-center cursor-pointer transition-all duration-700"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <div className="relative w-[70px] h-[70px]">
               <Image src="/logo.svg" alt="logo" fill className="object-contain" />
             </div>
-            <span className="font-semibold text-xl text-white md:text-xl lg:text-2xl xl:text-4xl">
+
+            {/* НАЗВАНИЕ */}
+            <span
+              className={`
+                font-semibold text-xl text-white md:text-xl lg:text-2xl xl:text-4xl
+                transition-all duration-700
+                ${shouldShowTitle ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}
+              `}
+            >
               Master <span className="text-[#FF6600]">Fitness</span> Academy
             </span>
           </div>
 
-          {/* NAV LINKS */}
-          <nav className="hidden lg:flex">
+          {/* NAVIGATION */}
+          <nav
+            className={`
+              hidden lg:flex transition-all duration-700
+              ${!shouldShowTitle ? "absolute left-1/3 translate-x-0" : "absolute lg:left-60 xl:left-75  translate-x-1/2"}
+            `}
+          >
             <ul className="flex justify-center items-center gap-4">
               {["Главная", "О нас", "Курсы", "Чемпионы", "Контакты"].map((item) => (
                 <li

@@ -18,7 +18,7 @@ const gallery = [
 export default function GallerySlider() {
   return (
     <MainContainer>
-      <section className="relative w-full flex flex-col justify-center mb-5 lg:mb-25">
+      <section className="relative w-full flex flex-col justify-center mb-5 lg:pb-30 lg:pt-5">
         <h1 className="uppercase text-center font-semibold text-3xl md:text-5xl lg:text-7xl mb-13 ">Чемпионы</h1>
         <Swiper
           modules={[Pagination]}
