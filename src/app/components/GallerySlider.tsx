@@ -31,11 +31,12 @@ export default function GallerySlider() {
           slidesPerView={1.3}
           spaceBetween={20}
           className="carousel w-full max-w-[1320px] h-[400px] md:h-[600px] xl:h-[800px]"
+          speed={5000}
           autoplay={{
-            delay: 2500, // ⏱️ время между слайдами (в мс)
+            delay: 0, // ⏱️ время между слайдами (в мс)
             disableOnInteraction: false, // не останавливать при клике
-            pauseOnMouseEnter: true, // ⏸️ пауза при наведении
           }}
+          allowTouchMove={false}
           breakpoints={{
             768: { slidesPerView: 1.6, spaceBetween: 40 },
             1024: { slidesPerView: 1.8, spaceBetween: 60 },
