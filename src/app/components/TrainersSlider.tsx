@@ -52,7 +52,7 @@ export default function TrainersSlider() {
           slidesPerView={1}
           navigation={true}
           pagination={{ clickable: true }}
-          className="w-full !pb-7 lg:!pb-16 relative overflow-visible flex justify-center items-center"
+          className="w-full !pb-7 relative overflow-visible flex justify-center items-center"
         >
           {trainers.map((trainer) => (
             <SwiperSlide key={trainer.id} className="flex justify-center items-center">
