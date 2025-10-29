@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import MainContainer from "./MainContainer";
 import Menu from "./UI/Menu";
+import Link from "next/link";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -65,26 +66,28 @@ export default function Header() {
       <MainContainer>
         <div className="flex justify-between items-center py-4 transition-all duration-700">
           {/* LOGO + TITLE */}
-          <div
-            className="flex gap-3 justify-center items-center cursor-pointer transition-all duration-700"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div className="relative w-[70px] h-[70px]">
-              <Image src="/logo.svg" alt="logo" fill className="object-contain" />
-            </div>
-
-            {/* НАЗВАНИЕ */}
-            <span
-              className={`
-                font-semibold text-xl text-white md:text-xl lg:text-2xl xl:text-4xl
-                transition-all duration-700
-                ${shouldShowTitle ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}
-              `}
+          <Link href="/">
+            <div
+              className="flex gap-3 justify-center items-center cursor-pointer transition-all duration-700"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
-              Master <span className="text-[#FF6600]">Fitness</span> Academy
-            </span>
-          </div>
+              <div className="relative w-[70px] h-[70px]">
+                <Image src="/logo.svg" alt="logo" fill className="object-contain" />
+              </div>
+
+              {/* НАЗВАНИЕ */}
+              <span
+                className={`
+                  font-semibold text-xl text-white md:text-xl lg:text-2xl xl:text-4xl
+                  transition-all duration-700
+                  ${shouldShowTitle ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}
+                `}
+              >
+                Master <span className="text-[#FF6600]">Fitness</span> Academy
+              </span>
+            </div>
+          </Link>
 
           {/* NAVIGATION */}
           <nav
@@ -97,14 +100,21 @@ export default function Header() {
             `}
           >
             <ul className="flex justify-center items-center gap-4">
-              {["Главная", "О нас", "Курсы", "Чемпионы", "Контакты"].map((item) => (
-                <li
-                  key={item}
-                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl"
-                >
-                  {item}
+              <Link href="/">
+                <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+                  Главная
                 </li>
-              ))}
+              </Link>
+              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+                  О нас
+              </li>
+              <Link href="/catalog">
+                <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+                  Курсы
+                </li>
+              </Link>
+              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Чемпионы</li>
+              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Контакты</li>
             </ul>
           </nav>
 
