@@ -30,26 +30,26 @@ export default function Courses() {
                 {/* Контент */}
                 <article className="absolute inset-0 flex flex-col items-center justify-end text-white transition-all duration-500 ease-out group-hover:justify-center">
                   {/* Полоса под словом “Курс” */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-40 lg:h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
 
                   {/* Текст поверх затемнения */}
-                  <div className="relative z-10 flex flex-col-reverse group-hover:flex-col items-center">
+                  <div className="relative z-10 flex flex-col lg:flex-col-reverse group-hover:flex-col items-center pb-2">
                     <h3
-                      className="text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
+                      className="hidden lg:block text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
                                   group-hover:-translate-y-5 group-hover:text-[#FF6600]"
                     >
                       Курс
                     </h3>
 
                     <p
-                      className="opacity-0 max-w-[80%] text-center font-semibold text-4xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
+                      className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
                                   group-hover:opacity-100 group-hover:translate-y-0"
                     >
                       Инструктор Тренажерного зала
                     </p>
 
                     <div
-                      className="opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
+                      className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
                                   animate-[wiggleRight_1.5s_ease-in-out_infinite]"
                     >
                       <ArrowRight className="w-10 h-10 text-[#FF6600]" />
@@ -64,26 +64,26 @@ export default function Courses() {
                 {/* Контент */}
                 <article className="absolute inset-0 flex flex-col items-center justify-end text-white transition-all duration-500 ease-out group-hover:justify-center">
                   {/* Полоса под словом “Курс” */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-40 lg:h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
 
                   {/* Текст поверх затемнения */}
-                  <div className="relative z-10 flex flex-col-reverse group-hover:flex-col items-center">
+                  <div className="relative z-10 flex flex-col lg:flex-col-reverse group-hover:flex-col items-center pb-2">
                     <h3
-                      className="text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
+                      className="hidden lg:block text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
                                   group-hover:-translate-y-5 group-hover:text-[#FF6600]"
                     >
                       Курс
                     </h3>
 
                     <p
-                      className="opacity-0 max-w-[80%] text-center font-semibold text-4xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
+                      className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
                                   group-hover:opacity-100 group-hover:translate-y-0"
                     >
                       Инструктор по бодибилдингу и фитнесу
                     </p>
 
                     <div
-                      className="opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
+                      className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
                                   animate-[wiggleRight_1.5s_ease-in-out_infinite]"
                     >
                       <ArrowRight className="w-10 h-10 text-[#FF6600]" />
@@ -100,26 +100,26 @@ export default function Courses() {
                 {/* Контент */}
                 <article className="absolute inset-0 flex flex-col items-center justify-end text-white transition-all duration-500 ease-out group-hover:justify-center">
                   {/* Полоса под словом “Курс” */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-40 lg:h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
 
                   {/* Текст поверх затемнения */}
-                  <div className="relative z-10 flex flex-col-reverse group-hover:flex-col items-center">
+                  <div className="relative z-10 flex flex-col lg:flex-col-reverse group-hover:flex-col items-center pb-2">
                     <h3
-                      className="text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
+                      className="hidden lg:block text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
                                   group-hover:-translate-y-5 group-hover:text-[#FF6600]"
                     >
                       Курс
                     </h3>
 
                     <p
-                      className="opacity-0 max-w-[80%] text-center font-semibold text-4xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
+                      className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
                                   group-hover:opacity-100 group-hover:translate-y-0"
                     >
                       Инструктор оздоровительной физкультуры
                     </p>
 
                     <div
-                      className="opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
+                      className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
                                   animate-[wiggleRight_1.5s_ease-in-out_infinite]"
                     >
                       <ArrowRight className="w-10 h-10 text-[#FF6600]" />
@@ -136,26 +136,26 @@ export default function Courses() {
                 {/* Контент */}
                 <article className="absolute inset-0 flex flex-col items-center justify-end text-white transition-all duration-500 ease-out group-hover:justify-center">
                   {/* Полоса под словом “Курс” */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-40 lg:h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
 
                   {/* Текст поверх затемнения */}
-                  <div className="relative z-10 flex flex-col-reverse group-hover:flex-col items-center">
+                  <div className="relative z-10 flex flex-col lg:flex-col-reverse group-hover:flex-col items-center pb-2">
                     <h3
-                      className="text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
+                      className="hidden lg:block text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
                                   group-hover:-translate-y-5 group-hover:text-[#FF6600]"
                     >
                       Курс
                     </h3>
 
                     <p
-                      className="opacity-0 max-w-[80%] text-center font-semibold text-4xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
+                      className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
                                   group-hover:opacity-100 group-hover:translate-y-0"
                     >
                       Инструктор по групповым занятиям
                     </p>
 
                     <div
-                      className="opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
+                      className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
                                   animate-[wiggleRight_1.5s_ease-in-out_infinite]"
                     >
                       <ArrowRight className="w-10 h-10 text-[#FF6600]" />
@@ -170,26 +170,26 @@ export default function Courses() {
                 {/* Контент */}
                 <article className="absolute inset-0 flex flex-col items-center justify-end text-white transition-all duration-500 ease-out group-hover:justify-center">
                   {/* Полоса под словом “Курс” */}
-                  <div className="absolute bottom-0 left-0 right-0 h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-40 lg:h-24 bg-black/70 transition-all duration-500 ease-out group-hover:h-full"></div>
 
                   {/* Текст поверх затемнения */}
-                  <div className="relative z-10 flex flex-col-reverse group-hover:flex-col items-center">
+                  <div className="relative z-10 flex flex-col lg:flex-col-reverse group-hover:flex-col items-center pb-2">
                     <h3
-                      className="text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
+                      className="hidden lg:block text-5xl lg:text-3xl xl:text-5xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out 
                                   group-hover:-translate-y-5 group-hover:text-[#FF6600]"
                     >
                       Курс
                     </h3>
 
                     <p
-                      className="opacity-0 max-w-[80%] text-center font-semibold text-4xl lg:text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
+                      className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl xl:text-4xl mt-4 transition-all duration-500 ease-out 
                                   group-hover:opacity-100 group-hover:translate-y-0"
                     >
                       Практический Нутрициолог
                     </p>
 
                     <div
-                      className="opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
+                      className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out
                                   animate-[wiggleRight_1.5s_ease-in-out_infinite]"
                     >
                       <ArrowRight className="w-10 h-10 text-[#FF6600]" />
