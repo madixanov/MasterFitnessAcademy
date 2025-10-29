@@ -31,7 +31,7 @@ export default function Catalog() {
                                 group-hover:scale-100 group-hover:opacity-100
                                 transition-all duration-500 ease-out"
                     ></span>
-                    <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300" />
+                    <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300 group-hover:animate-[wiggleRight_1.5s_ease-in-out_infinite]" />
                   </div>
                 </article>
               </div>
@@ -50,7 +50,7 @@ export default function Catalog() {
                               group-hover:scale-100 group-hover:opacity-100
                               transition-all duration-500 ease-out"
                   ></span>
-                  <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300" />
+                  <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300 group-hover:animate-[wiggleRight_1.5s_ease-in-out_infinite]" />
                 </div>
               </article>
             </div>
