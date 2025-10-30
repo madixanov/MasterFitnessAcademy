@@ -15,7 +15,7 @@ const seminars = [
 
 export default function Seminars() {
   return (
-    <main className="flex justify-center items-center relative bg-[url('/courses/bg-photo.jpg')] bg-center bg-cover bg-no-repeat py-25 lg:py-20 xl:py-40 min-h-[calc(100vh-140px)] w-full">
+    <main className="flex justify-center items-center relative bg-[url('/courses/bg-photo.jpg')] bg-center bg-cover bg-no-repeat py-25 lg:py-30 xl:py-40 min-h-[calc(100vh-140px)] w-full">
       <div className="absolute inset-0 bg-black/60"></div>
 
       <MainContainer>
