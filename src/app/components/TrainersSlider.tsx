@@ -57,20 +57,21 @@ export default function TrainersSlider() {
           {trainers.map((trainer) => (
             <SwiperSlide key={trainer.id} className="flex justify-center items-center">
               <div className="w-full flex justify-center items-center h-full">
-                <div className="flex flex-col lg:flex-row justify-between items-center gap-10 bg-black/10 border border-white/10 rounded-2xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.9),_0_8px_20px_rgba(0,0,0,0.5)] p-8 w-full lg:max-w-[800px] xl:max-w-[1100px]">
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-10 bg-black/10 border border-white/10 rounded-2xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.9),_0_8px_20px_rgba(0,0,0,0.5)] p-8 w-full md:max-w-[600px] lg:max-w-[800px] xl:max-w-[950px] 2xl:max-w-[1100px]">
                   {/* Фото тренера */}
-                  <div className="relative w-[280px] h-[280px] lg:w-[330px] xl:w-[500px] lg:h-[330px] xl:h-[500px] rounded-full shrink-0">
+                  <div className="relative w-[280px] h-[280px] 2xl:w-[500px] 2xl:h-[500px] rounded-full shrink-0">
                     <Image
                       src={trainer.img}
                       alt={trainer.name}
                       fill
+                      priority
                       className="object-cover object-center rounded-full"
                     />
                   </div>
 
                   {/* Описание */}
                   <article className="flex flex-col flex-1 text-center md:text-left">
-                    <h1 className="font-semibold text-4xl md:text-6xl mb-4 text-white">
+                    <h1 className="font-semibold text-4xl lg:text-5xl 2xl:text-6xl mb-4 text-white">
                       {trainer.name}
                     </h1>
                     <p className="text-lg md:text-2xl font-medium leading-relaxed text-white/80">
