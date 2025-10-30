@@ -6,7 +6,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay } from "swiper/modules";
 import MainContainer from "@/components/MainContainer";
-import "./gallery.css"; // создадим стили чуть ниже
+import "../../styles/gallery.css"; // создадим стили чуть ниже
 
 const gallery = [
   { id: 1, title: "photo1", url: "/gallery/photo1.jpg" },

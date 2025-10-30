@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Catalog() {
   return (
-    <div className="relative bg-[url('/catalog/bg-photo.png')] bg-center bg-cover bg-no-repeat py-25 lg:py-0">
+    <main className="relative bg-[url('/catalog/bg-photo.png')] bg-center bg-cover bg-no-repeat py-25 lg:py-0">
       {/* Затемнение фона */}
       <div className="absolute inset-0 bg-black/60" />
 
@@ -59,6 +59,6 @@ export default function Catalog() {
           </div>
         </section>
       </MainContainer>
-    </div>
+    </main>
   );
 }

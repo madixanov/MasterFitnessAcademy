@@ -10,8 +10,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Master Fitness Academy",
-  description: "РАЗВИВАЙ ТЕЛО.ПРОКАЧИВАЙ ХАРАКТЕР.",
+  title: "Главная | Master Fitness Academy",
+  description: "Лучшие тренеры и курсы по нутрициологии. Обучение от профессионалов.",
 };
 
 export default function RootLayout({
