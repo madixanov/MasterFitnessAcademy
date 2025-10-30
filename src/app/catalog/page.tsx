@@ -38,22 +38,24 @@ export default function Catalog() {
             </Link>
 
             {/* Карточка 2 */}
-            <div className="group w-full lg:flex-1 relative bg-[url('/catalog/seminars.jpg')] bg-cover bg-no-repeat h-100 flex items-end rounded-3xl overflow-hidden transition-transform duration-500 ease-out hover:scale-105">
-              <article className="w-full h-20 bg-black/70 flex justify-center items-center overflow-hidden transition-all duration-500 ease-out rounded-b-3xl">
-                <span className="font-bold text-3xl uppercase transition-transform duration-500 ease-out group-hover:-translate-x-24">
-                  Семинары
-                </span>
+            <Link href="/catalog/seminars" className="group w-full lg:flex-1">
+              <div className="group w-full lg:flex-1 relative bg-[url('/catalog/seminars.jpg')] bg-cover bg-no-repeat h-100 flex items-end rounded-3xl overflow-hidden transition-transform duration-500 ease-out hover:scale-105">
+                <article className="w-full h-20 bg-black/70 flex justify-center items-center overflow-hidden transition-all duration-500 ease-out rounded-b-3xl">
+                  <span className="font-bold text-3xl uppercase transition-transform duration-500 ease-out group-hover:-translate-x-24">
+                    Семинары
+                  </span>
 
-                <div className="relative flex items-center justify-center transition-transform duration-500 ease-out group-hover:translate-x-24">
-                  <span
-                    className="absolute w-16 h-16 rounded-full bg-[#FF6600]/30 scale-0 opacity-0
-                              group-hover:scale-100 group-hover:opacity-100
-                              transition-all duration-500 ease-out"
-                  ></span>
-                  <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300 group-hover:animate-[wiggleRight_1.5s_ease-in-out_infinite]" />
-                </div>
-              </article>
-            </div>
+                  <div className="relative flex items-center justify-center transition-transform duration-500 ease-out group-hover:translate-x-24">
+                    <span
+                      className="absolute w-16 h-16 rounded-full bg-[#FF6600]/30 scale-0 opacity-0
+                                group-hover:scale-100 group-hover:opacity-100
+                                transition-all duration-500 ease-out"
+                    ></span>
+                    <ArrowRight className="relative z-10 w-8 h-8 text-white transition-transform duration-300 group-hover:animate-[wiggleRight_1.5s_ease-in-out_infinite]" />
+                  </div>
+                </article>
+              </div>
+            </Link>
           </div>
         </section>
       </MainContainer>
