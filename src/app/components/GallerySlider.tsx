@@ -62,6 +62,7 @@ export default function GallerySlider() {
             src="/bg-figure.svg"
             alt="bg-image"
             fill
+            preload
             className="object-contain opacity-80 rotate-90 scale-100 xl:scale-80"
           />
         </div>
@@ -70,6 +71,7 @@ export default function GallerySlider() {
             src="/bg-figure.svg"
             alt="bg-image"
             fill
+            preload
             className="object-contain opacity-80 rotate-90 scale-100 xl:scale-80"
           />
         </div>

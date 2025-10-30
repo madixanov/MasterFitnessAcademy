@@ -37,6 +37,7 @@ export default function Advantages() {
         alt="decor 1"
         width={300}
         height={300}
+        preload
         className="absolute 2xl:top-[-20] rotate-40  2xl:left-130 opacity-70 hidden 2xl:block"
       />
       <Image
@@ -44,6 +45,7 @@ export default function Advantages() {
         alt="decor 2"
         width={300}
         height={300}
+        preload
         className="absolute xl:top-20 xl:left-10 -rotate-40 opacity-70 hidden xl:block"
       />
       <Image
@@ -51,6 +53,7 @@ export default function Advantages() {
         alt="decor 4"
         width={300}
         height={300}
+        preload
         className="absolute xl:-bottom-10 rotate-20 xl:left-30 2xl:left-70 opacity-70 hidden xl:block"
       />
       <Image
@@ -58,6 +61,7 @@ export default function Advantages() {
         alt="decor 5"
         width={300}
         height={300}
+        preload
         className="absolute xl:top-10 xl:right-30 rotate-120 opacity-70 hidden xl:block"
       />
       <Image
@@ -65,6 +69,7 @@ export default function Advantages() {
         alt="decor 4"
         width={300}
         height={300}
+        preload
         className="absolute xl:bottom-30 rotate-160 xl:right-40 opacity-70 hidden xl:block"
       />
       <Image
@@ -72,6 +77,7 @@ export default function Advantages() {
         alt="decor 4"
         width={300}
         height={300}
+        preload
         className="absolute 2xl:bottom-0 rotate-250 2xl:right-120 opacity-70 hidden 2xl:block"
       />
       {/* Ромб-контейнер */}

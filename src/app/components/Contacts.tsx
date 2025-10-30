@@ -55,6 +55,7 @@ export default function Contacts() {
           src="/bg-figure.svg"
           alt="bg-image"
           fill
+          preload
           className="object-contain opacity-80 rotate-90 md:rotate-0 scale-130 md:scale-120"
         />
       </div>
