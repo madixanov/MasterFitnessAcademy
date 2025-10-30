@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import Link from "next/link"
 
 export default function Menu() {
   const [openMenu, setOpenMenu] = useState(false)
@@ -38,15 +39,52 @@ export default function Menu() {
           "
         >
           <nav>
-            <ul className="flex flex-col items-center gap-4 mb-4">
-              {["Главная", "О нас", "Курсы", "Чемпионы", "Контакты"].map((item) => (
-                <li
-                  key={item}
-                  className="text-white text-lg cursor-pointer transition-all duration-300 hover:text-[#FF6600]"
+            <ul className="flex flex-col gap-4 mb-4">
+              <li>
+                <Link
+                  href="/"
+                  aria-label="Главная страница"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
                 >
-                  {item}
-                </li>
-              ))}
+                  Главная
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/catalog"
+                  aria-label="Курсы"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Курсы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  aria-label="О нас"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  О нас
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/champions"
+                  aria-label="Чемпионы"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Чемпионы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contacts"
+                  aria-label="Контакты"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Контакты
+                </Link>
+              </li>
             </ul>
 
             <div className="relative flex flex-col gap-1 items-center justify-center cursor-pointer group">

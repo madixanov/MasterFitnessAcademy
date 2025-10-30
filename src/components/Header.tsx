@@ -114,11 +114,51 @@ export default function Header() {
             `}
           >
             <ul className="flex gap-4">
-              <Link href="/"><li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Главная</li></Link>
-              <Link href="/catalog"><li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Курсы</li></Link>
-              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">О нас</li>
-              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Чемпионы</li>
-              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Контакты</li>
+              <li>
+                <Link
+                  href="/"
+                  aria-label="Главная страница"
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Главная
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/catalog"
+                  aria-label="Курсы"
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Курсы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  aria-label="О нас"
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  О нас
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/champions"
+                  aria-label="Чемпионы"
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Чемпионы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contacts"
+                  aria-label="Контакты"
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Контакты
+                </Link>
+              </li>
             </ul>
           </nav>
 

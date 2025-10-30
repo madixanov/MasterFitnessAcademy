@@ -1,5 +1,6 @@
 import Image from "next/image";
 import MainContainer from "./MainContainer";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -7,11 +8,52 @@ export default function Footer() {
       <MainContainer>
         <div className="flex flex-col lg:flex-row justify-between items-center gap-10 lg:gap-0">
           <nav className="flex-1 w-full lg:min-w-[400px]">
-            <ul className="flex items-center justify-evenly gap-3">
-              <li className=" font-bold text-xl md:text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Главная</li>
-              <li className=" font-bold text-xl md:text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">О нас</li>
-              <li className=" font-bold text-xl md:text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Курсы</li>
-              <li className=" font-bold text-xl md:text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Чемпионы</li>
+            <ul className="flex items-center justify-evenly gap-2">
+              <li>
+                <Link
+                  href="/"
+                  aria-label="Главная страница"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Главная
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/catalog"
+                  aria-label="Курсы"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Курсы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  aria-label="О нас"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  О нас
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/champions"
+                  aria-label="Чемпионы"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Чемпионы
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contacts"
+                  aria-label="Контакты"
+                  className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+                >
+                  Контакты
+                </Link>
+              </li>
             </ul>
           </nav>
 
