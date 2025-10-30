@@ -53,6 +53,7 @@ export default function Header() {
 
   return (
     <header
+      data-component="Header"
       className={`
         fixed top-0 left-0 right-0 z-99
         transition-all duration-300 transform-gpu
@@ -64,21 +65,23 @@ export default function Header() {
       `}
     >
       <MainContainer>
-        <div className="flex justify-between items-center py-4 transition-all duration-700">
+        <div data-section="Header Grid" className="flex justify-between items-center py-4 transition-all duration-700">
           {/* LOGO + TITLE */}
-          <Link href="/">
+          <Link href="/" data-section="Home Page Link">
             <div
+              data-section="Home Page Link Div"
               className="flex gap-3 justify-center items-center cursor-pointer transition-all duration-700"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-              <div className="relative w-[70px] h-[70px]">
+              <div data-section="Logo Div" className="relative w-[70px] h-[70px]">
                 <Image src="/logo.svg" alt="logo" fill className="object-contain" />
               </div>
 
               {/* НАЗВАНИЕ */}
               <span
                 className={`
+                  data-section="Website Name"
                   font-semibold text-xl text-white md:text-xl lg:text-2xl xl:text-4xl
                   transition-all duration-700
                   ${shouldShowTitle ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"}
@@ -91,6 +94,7 @@ export default function Header() {
 
           {/* NAVIGATION */}
           <nav
+            data-section="Navigation Bar"
             className={`
               hidden lg:flex transition-all duration-700
               ${!shouldShowTitle
@@ -99,22 +103,22 @@ export default function Header() {
               }
             `}
           >
-            <ul className="flex justify-center items-center gap-4">
-              <Link href="/">
-                <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+            <ul data-section="Navigation Links List" className="flex justify-center items-center gap-4">
+              <Link href="/" data-section="Navigation Links">
+                <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
                   Главная
                 </li>
               </Link>
-              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
                   О нас
               </li>
-              <Link href="/catalog">
-                <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+              <Link href="/catalog" data-section="Navigation Links">
+                <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
                   Курсы
                 </li>
               </Link>
-              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Чемпионы</li>
-              <li className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Контакты</li>
+              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Чемпионы</li>
+              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Контакты</li>
             </ul>
           </nav>
 
@@ -122,9 +126,9 @@ export default function Header() {
           <Menu />
 
           {/* PROFILE LINK */}
-          <div className="relative hidden w-10 h-10 cursor-pointer lg:flex flex-col gap-1 items-center justify-center group">
-            <div className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]" />
-            <div className="w-[35px] h-[15px] border-2 border-white rounded-b-md rounded-t-xl transition-all duration-300 group-hover:border-[#FF6600]" />
+          <div data-section="Profile Page Link" className="relative hidden w-10 h-10 cursor-pointer lg:flex flex-col gap-1 items-center justify-center group">
+            <div data-section="Profile Page Link component" className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]" />
+            <div data-section="Profile Page Link component" className="w-[35px] h-[15px] border-2 border-white rounded-b-md rounded-t-xl transition-all duration-300 group-hover:border-[#FF6600]" />
           </div>
         </div>
       </MainContainer>
