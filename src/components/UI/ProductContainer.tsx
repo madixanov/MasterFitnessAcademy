@@ -24,7 +24,7 @@ export default function ProductContainer({ key, title, description, image }: Pro
               {title}
             </h3>
 
-            <p className="opacity-100 lg:opacity-0 max-w-[80%] text-center font-semibold text-2xl xl:text-2xl mt-4 transition-all duration-500 ease-out  group-hover:opacity-100 group-hover:translate-y-0">
+            <p className="opacity-100 lg:opacity-0 w-full text-wrap px-2 text-center font-semibold text-2xl xl:text-2xl mt-4 transition-all duration-500 ease-out  group-hover:opacity-100 group-hover:translate-y-0">
               {description}
             </p>
             <div className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out

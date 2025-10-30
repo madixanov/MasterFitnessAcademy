@@ -99,26 +99,26 @@ export default function Header() {
               hidden lg:flex transition-all duration-700
               ${!shouldShowTitle
                 ? "absolute left-1/3 translate-x-0"
-                : "absolute lg:left-60 xl:left-75 translate-x-1/2"
+                : "absolute lg:left-35 xl:left-75 translate-x-1/2"
               }
             `}
           >
             <ul data-section="Navigation Links List" className="flex justify-center items-center gap-4">
               <Link href="/" data-section="Navigation Links">
-                <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+                <li data-section="Navigation Links" className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">
                   Главная
                 </li>
               </Link>
-              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+              <li data-section="Navigation Links" className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">
                   О нас
               </li>
               <Link href="/catalog" data-section="Navigation Links">
-                <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">
+                <li data-section="Navigation Links" className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">
                   Курсы
                 </li>
               </Link>
-              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Чемпионы</li>
-              <li data-section="Navigation Links" className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] md:text-lg xl:text-2xl">Контакты</li>
+              <li data-section="Navigation Links" className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Чемпионы</li>
+              <li data-section="Navigation Links" className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]">Контакты</li>
             </ul>
           </nav>
 
