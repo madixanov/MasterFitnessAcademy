@@ -134,7 +134,7 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href="/"
                   aria-label="О нас"
                   className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
                 >
@@ -143,7 +143,7 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  href="/champions"
+                  href="/"
                   aria-label="Чемпионы"
                   className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
                 >
@@ -152,7 +152,7 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  href="/contacts"
+                  href="/"
                   aria-label="Контакты"
                   className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
                 >
