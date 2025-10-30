@@ -6,12 +6,12 @@ import Link from "next/link";
 
 export default function Catalog() {
   return (
-    <main className="relative bg-[url('/catalog/bg-photo.png')] bg-center bg-cover bg-no-repeat py-25 lg:py-0">
+    <main className="relative bg-[url('/catalog/bg-photo.png')] bg-center bg-cover bg-no-repeat py-25 lg:py-30 xl:py-40 min-h-[calc(100svh-140px)] lg:min-h-[calc(100vh-140px)] flex justify-center items-center">
       {/* Затемнение фона */}
       <div className="absolute inset-0 bg-black/60" />
 
       <MainContainer>
-        <section className="relative z-10 flex flex-col justify-center items-center gap-11 min-h-[calc(100svh-140px)] lg:min-h-[calc(100vh-140px)] text-white">
+        <section className="relative z-10 flex flex-col  gap-11 text-white">
           <h1 className="uppercase text-4xl lg:text-5xl xl:text-7xl font-bold text-center">
             КУРСЫ И СЕМИНАРЫ
           </h1>
