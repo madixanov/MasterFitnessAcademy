@@ -2,7 +2,7 @@ import { Calendar, Clock } from "lucide-react";
 
 export default function LatestLesson() {
   return (
-    <div aria-label="Ближайший урок" className="bg-[linear-gradient(180deg,#FF7A0033_20%,#FF7A000D_80%)] border border-[#834002] rounded-lg p-5">
+    <div aria-label="Ближайший урок" className="mb-10 bg-[linear-gradient(180deg,#FF7A0033_20%,#FF7A000D_80%)] border border-[#834002] rounded-lg p-5">
       <article className="flex flex-col">
         <div className="flex mb-6 items-center">
           <Calendar className="w-5 h-5 text-[#FF7A00] mr-2"/>

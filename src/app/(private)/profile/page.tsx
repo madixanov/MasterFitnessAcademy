@@ -1,4 +1,5 @@
 import LatestLesson from "./components/LatestLessons";
+import LessonseList from "./components/LessonsList";
 
 export default function Profile() {
   return (
@@ -9,6 +10,7 @@ export default function Profile() {
       </div>
 
       <LatestLesson />
+      <LessonseList />
     </main>
   )
 }
