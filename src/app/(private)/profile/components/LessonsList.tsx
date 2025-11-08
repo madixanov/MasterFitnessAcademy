@@ -1,4 +1,4 @@
-import { CircleCheckBig, Clock } from "lucide-react";
+import { CircleCheckBig, CircleAlert } from "lucide-react";
 
 const lessons = [
   {
@@ -53,7 +53,7 @@ export default function LessonseList() {
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-2 text-[#FDC700] bg-[#F0B100]/20 px-4 py-1 rounded-xl text-xs font-medium border border-[#F0B100]/30">
-                      <Clock className="w-4 h-4" /> Ожидает
+                      <CircleAlert className="w-4 h-4" /> Ожидает
                     </span>
                   )}
                 </td>
@@ -82,7 +82,7 @@ export default function LessonseList() {
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2 text-[#FDC700] bg-[#F0B100]/20 px-3 py-1 rounded-xl text-xs font-medium border border-[#F0B100]/30">
-                  <Clock className="w-4 h-4" /> Ожидает
+                  <CircleAlert className="w-4 h-4" /> Ожидает
                 </span>
               )}
             </div>
