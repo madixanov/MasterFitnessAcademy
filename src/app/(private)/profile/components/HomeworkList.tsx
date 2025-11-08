@@ -9,7 +9,7 @@ const homeworks = [
 export default function HomeworkList() {
   return (
     <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg">
-      <h2 className="mb-5">Домашние задания</h2>
+      <h2 className="mb-5 text-lg font-semibold">Домашние задания</h2>
       <div className="flex flex-col gap-3">
         {homeworks.map((hw, index) => (
           <div key={index} className="w-full flex flex-col p-3 bg-[#2A2A2A] rounded-md">

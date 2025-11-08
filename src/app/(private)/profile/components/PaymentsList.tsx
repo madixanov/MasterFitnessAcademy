@@ -9,7 +9,7 @@ const payments = [
 export default function PaymentsList() {
   return (
     <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg">
-      <h2 className="mb-5">Платежи</h2>
+      <h2 className="mb-5 text-lg font-semibold">Платежи</h2>
       <div className="flex flex-col gap-3">
         {payments.map((payment, index) => (
           <div key={index} className="flex justify-between items-center w-full p-3 bg-[#2A2A2A] rounded-md">
