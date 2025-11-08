@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 import Image from "next/image";
-import "../../styles/slider.css"
+import "../../../styles/slider.css"
 
 const trainers = [
   { 
