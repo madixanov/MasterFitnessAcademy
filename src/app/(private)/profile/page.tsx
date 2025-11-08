@@ -1,5 +1,7 @@
+import HomeworkList from "./components/HomeworkList";
 import LatestLesson from "./components/LatestLessons";
 import LessonseList from "./components/LessonsList";
+import PaymentsList from "./components/PaymentsList";
 
 export default function Profile() {
   return (
@@ -11,6 +13,11 @@ export default function Profile() {
 
       <LatestLesson />
       <LessonseList />
+
+      <div className="flex flex-col lg:flex-row gap-10">
+        <HomeworkList />
+        <PaymentsList />
+      </div>
     </main>
   )
 }
