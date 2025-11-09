@@ -9,7 +9,7 @@ import { Menu, X, House, BookOpen, FileText, CreditCard, User, LogOut } from "lu
 const menu = [
   { name: "Главная", href: "/profile", icon: House },
   { name: "Уроки", href: "/profile/lessons", icon: BookOpen },
-  { name: "Домашние Задания", href: "/profile/homeworks", icon: FileText },
+  { name: "Домашние Задания", href: "/profile/homework", icon: FileText },
   { name: "Платежи", href: "/profile/payments", icon: CreditCard },
   { name: "Профиль", href: "/profile/settings", icon: User },
 ];
@@ -60,7 +60,7 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="flex justify-center items-center w-full">
-            <h2 className="text-lg font-semibold text-white text-center w-full">
+            <h2 className="text-2xl font-semibold text-white text-center w-full">
               <span className="text-orange-500 text-center">Master Fitness</span><br />Academy
             </h2>
           </Link>

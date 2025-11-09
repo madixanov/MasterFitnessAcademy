@@ -10,10 +10,10 @@ export default function UpcomingLessons() {
   return (
     <div className="flex flex-col gap-5 w-full">
       {lessons.map((lesson, index) => (
-        <div key={index} className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-3 rounded-lg">
+        <div key={index} className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-1">
-              <span className="px-2 text-sm lg:text-md lg:px-5 bg-[#FF7A00] rounded-lg">{lesson.subject}</span>
+            <div className="flex gap-3 items-stretch">
+              <span className="px-2 text-sm lg:text-md lg:px-5 bg-[#FF7A00] rounded-lg flex justify-center items-center">{lesson.subject}</span>
               <span className="text-sm lg:text-md inline-flex items-center gap-1 lg:gap-3 text-[#FDC700] bg-[#F0B100]/20 px-2 lg:px-4 py-1 rounded-lg font-medium border border-[#F0B100]/30">
                 <CircleAlert className="w-4 h-4" /> {lesson.status}
               </span>

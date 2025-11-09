@@ -7,8 +7,8 @@ export default function Profile() {
   return (
     <main className="flex flex-col">
       <div className="flex flex-col mb-10">
-        <h1 className="text-4xl font-medium">Главная</h1>
-        <p className="text-[#999999] text-xl mt-2">Добро пожаловать в Личный Кабинет</p>
+        <h1 className="text-4xl font-medium pl-15 lg:pl-0 mb-3">Главная</h1>
+        <p className="text-sm text-[#999] lg:text-lg">Добро пожаловать в Личный Кабинет</p>
       </div>
 
       <LatestLesson />
