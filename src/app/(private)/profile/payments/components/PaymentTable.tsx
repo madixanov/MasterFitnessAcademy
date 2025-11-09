@@ -70,7 +70,7 @@ const payments = [
 
 export default function PaymentTable() {
   return (
-    <section className="md:bg-[#1A1A1A] md:border md:border-[#2A2A2A] rounded-md md:p-10">
+    <div className="md:bg-[#1A1A1A] md:border md:border-[#2A2A2A] rounded-md md:p-10">
       <h2 className="text-lg font-semibold mb-4">История платежей</h2>
 
       {/* TABLE for sm and up */}
@@ -155,6 +155,6 @@ export default function PaymentTable() {
           </article>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

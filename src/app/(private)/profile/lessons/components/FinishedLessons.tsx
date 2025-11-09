@@ -12,7 +12,7 @@ export default function FinishedLessons() {
       {lessons.map((lesson, index) => (
         <div key={index} className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col">
           <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center gap-5">
+            <div className="flex items-center flex-col md:flex-row gap-5">
               <span className="px-5 bg-[#FF7A00] rounded-lg">{lesson.subject}</span>
               <span className="inline-flex items-center gap-2 text-[#05DF72] bg-[#00C950]/20 px-4 py-1 rounded-xl text-xs font-medium border border-[#00C950]/30">
                 <CircleCheckBig className="w-4 h-4" /> {lesson.status}
