@@ -1,5 +1,5 @@
 import PasswordField from "./PasswordField"
-import {LogIn} from "lucide-react"
+import {UserPlus} from "lucide-react"
 
 export default function SignupForm() {
   return (
@@ -49,7 +49,7 @@ export default function SignupForm() {
 
 
       <button className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7">
-        <LogIn className="w-5 h-5 mr-4" /> Войти
+        <UserPlus className="w-5 h-5 mr-4" /> Зарегистрироваться
       </button>
     </form>
   )

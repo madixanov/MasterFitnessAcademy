@@ -1,3 +1,4 @@
+import Link from "next/link"
 import PasswordField from "./PasswordField"
 import {LogIn} from "lucide-react"
 
@@ -29,7 +30,9 @@ export default function LoginForm() {
           />
           Запомнить меня
         </label>
-        <p className="text-[#FF7A00] cursor-pointer">Забыли пароль?</p>
+        <Link href="/auth/reset-password">
+          <p className="text-[#FF7A00] cursor-pointer">Забыли пароль?</p>
+        </Link>
       </div>
 
       <button className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7">
