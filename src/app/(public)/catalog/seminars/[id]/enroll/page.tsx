@@ -17,8 +17,8 @@ export default function EnrollPage({ params }: EnrollPageProps) {
   return (
     <main className="my-30">
       <MainContainer>
-        <Link className="mb-10" href={`/catalog/courses/info?id=${id}`}>
-          <button className="px-4 flex justify-center items-center bg-[#0A0A0A] border border-[#2A2A2A] py-2 rounded-lg mb-10 "><ArrowLeft className="w-5 h-5 mr-6" /> Назад к курсу</button>
+        <Link className="mb-10" href={`/catalog/seminars/info?id=${id}`}>
+          <button className="px-4 flex justify-center items-center bg-[#0A0A0A] border border-[#2A2A2A] py-2 rounded-lg mb-10"><ArrowLeft className="w-5 h-5 mr-6" /> Назад к курсу</button>
         </Link>
         <article>
           <h1 className="text-3xl mb-3">Запись на курс</h1>

@@ -1,6 +1,7 @@
 import MainContainer from "@/components/MainContainer";
 import ProductContainer from "@/components/UI/ProductContainer";
 import Head from "next/head";
+import Link from "next/link";
 
 const seminars = [
   {id: 1, name: "ТЕКСТ", image: "/seminars/seminar1.jpg"},
@@ -32,7 +33,9 @@ export default function Seminars() {
         <MainContainer>
           <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {seminars.map((seminar) => (
-              <ProductContainer key={seminar.id} title="Семинары" description={seminar.name} image={seminar.image} />
+              <Link  href={`/catalog/seminars/info?id=${seminar.id}`}>
+                <ProductContainer key={seminar.id} title="Семинары" description={seminar.name} image={seminar.image} />
+              </Link>
             ))}
           </section>
         </MainContainer>
