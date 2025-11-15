@@ -1,6 +1,10 @@
+"use client"
+
 import MainContainer from "@/components/MainContainer";
 import LessonModules from "./components/LessonModulesList";
 import { CircleCheckBig, Clock, BookOpen, Users, ChartColumn } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const modules = [
   {
@@ -34,6 +38,12 @@ const advantages = [
 ];
 
 export default function CourseInfoPage() {
+  const params = useSearchParams();
+  console.log(params)
+  const id = params.get("id");
+
+  const router = useRouter();
+
   return (
     <main className="my-30">
       <MainContainer>
@@ -83,7 +93,10 @@ export default function CourseInfoPage() {
         </div>
 
         <div className="flex justify-center items-center w-full mt-20">
-          <button className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer">
+          <button
+            onClick={() => router.push(`/catalog/courses/${id}/enroll`)}
+            className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer"
+          >
             Записаться на курс
           </button>
         </div>

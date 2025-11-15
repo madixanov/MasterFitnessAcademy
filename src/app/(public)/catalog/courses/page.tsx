@@ -42,7 +42,7 @@ export default function Courses() {
         <MainContainer>
             <section className="relative z-20   grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
               {courses.map((course) => (
-                <Link href={`/catalog/courses/${course.id}`}>
+                <Link href={`/catalog/courses/info?id=${course.id}`} key={course.id}>
                   <ProductContainer key={course.id} title={course.title} description={course.name} image={course.image} />
                 </Link>
               ))}
