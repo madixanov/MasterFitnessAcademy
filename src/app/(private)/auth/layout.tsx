@@ -11,7 +11,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Профиль | Master Fitness Academy",
+  title: "Вход | Master Fitness Academy",
   description: "Лучшие тренеры и курсы по нутрициологии. Обучение от профессионалов.",
 };
 
