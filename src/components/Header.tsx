@@ -5,6 +5,7 @@ import Image from "next/image";
 import MainContainer from "./MainContainer";
 import Menu from "./UI/Menu";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Header() {
   const [state, setState] = useState({
@@ -14,7 +15,18 @@ export default function Header() {
     isHovered: false,
     isMobile: false,
     lastScrollY: 0,
-  });
+  })
+
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const scrollOrRedirect = (id: string) => {
+    if (pathname !== "/") {
+      router.push(`/?scroll=${id}`);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   // --- Определяем мобильный экран ---
   useEffect(() => {
@@ -132,32 +144,31 @@ export default function Header() {
                   Курсы
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/"
-                  aria-label="О нас"
-                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
-                >
-                  О нас
-                </Link>
+              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md">
+                   <button
+                    onClick={() =>
+                     scrollOrRedirect("advantages")
+                    }
+                    className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]"
+                  >
+                    О нас
+                  </button>
               </li>
-              <li>
-                <Link
-                  href="/"
-                  aria-label="Чемпионы"
-                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md">
+                <button
+                  onClick={() => scrollOrRedirect("gallery")}
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]"
                 >
                   Чемпионы
-                </Link>
+                </button>
               </li>
-              <li>
-                <Link
-                  href="/"
-                  aria-label="Контакты"
-                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
+              <li className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md">
+                <button
+                  onClick={() => scrollOrRedirect("contacts")}
+                  className="text-white text-2xl cursor-pointer transition-all duration-300 hover:text-[#FF6600]"
                 >
                   Контакты
-                </Link>
+                </button>
               </li>
             </ul>
           </nav>
