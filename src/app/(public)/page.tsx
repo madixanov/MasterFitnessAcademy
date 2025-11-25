@@ -1,35 +1,23 @@
 "use client";
 
-import { Suspense, lazy } from "react";
 import WelcomingContainer from "./components/Welcoming";
 import Advantages from "./components/Advantages";
 import Contacts from "./components/Contacts";
 import Loader from "@/components/Loader";
-import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import ScrollHandler from "@/components/ScrollHandler";
+import { Suspense, lazy } from "react";
 
 const TrainersSlider = lazy(() => import("./components/TrainersSlider"));
 const GallerySlider = lazy(() => import("./components/GallerySlider"));
 
 export default function Home() {
-  const params = useSearchParams();
-  const scrollTo = params.get("scroll");
-
-  useEffect(() => {
-    if (!scrollTo) return;
-
-    const timeout = setTimeout(() => {
-      const element = document.getElementById(scrollTo);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 200); // оптимальное время 100–300мс
-
-    return () => clearTimeout(timeout);
-  }, [scrollTo]);
-
   return (
     <main>
+      {/* Вставляем внутри Suspense */}
+      <Suspense>
+        <ScrollHandler />
+      </Suspense>
+
       <section aria-label="Приветствие" id="welcoming">
         <WelcomingContainer />
       </section>
