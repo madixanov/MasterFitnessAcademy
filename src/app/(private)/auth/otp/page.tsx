@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signupStep2, resendOtp } from "@/services/auth/auth.api";
 import { useRouter } from "next/navigation";
+import { signupStep2, resendOtp } from "@/services/auth/auth.api";
+import Cookies from "js-cookie";
 import { Button } from "@/components/UI/button";
 
 export default function OTPPage() {
@@ -10,28 +11,46 @@ export default function OTPPage() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [contact, setContact] = useState("");
+
+  const [contact, setContact] = useState<string | null>(null);
   const [type, setType] = useState<"email" | "sms">("email");
 
   useEffect(() => {
-    setContact(localStorage.getItem("otpContact") || "");
-    setType((localStorage.getItem("otpType") as "email" | "sms") || "email");
-  }, []);
+    // считываем данные для OTP из localStorage
+    const savedContact = window.localStorage.getItem("otpContact");
+    const savedType = window.localStorage.getItem("otpType") as "email" | "sms" | null;
+
+    if (!savedContact || !savedType) {
+      router.push("/auth/signup"); // если нет данных, возвращаем на регистрацию
+      return;
+    }
+
+    setContact(savedContact);
+    setType(savedType);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp.length < 6) return alert("Введите весь код OTP");
+    if (!contact) return;
+
+    if (otp.length < 6) {
+      alert("Введите весь код OTP");
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await signupStep2(otp, contact, type);
-      // Сохраняем токен после успешной регистрации
-      localStorage.removeItem("otpContact");
-      localStorage.removeItem("otpType");
-      document.cookie = `token=${res.token}; path=/; max-age=86400`;
+
+      // сохраняем токен
+      Cookies.set("token", res.token, { expires: 1 });
+      window.localStorage.removeItem("otpContact");
+      window.localStorage.removeItem("otpType");
+
+      alert("Аккаунт успешно создан!");
       router.push("/profile");
     } catch (err: any) {
-      alert(err.message || "Ошибка проверки кода");
+      alert(err.message || "Ошибка подтверждения OTP");
     } finally {
       setLoading(false);
     }
@@ -42,8 +61,8 @@ export default function OTPPage() {
 
     setResendLoading(true);
     try {
-      await resendOtp(contact);
-      alert("Код отправлен повторно");
+      const res = await resendOtp(contact);
+      if (res.success) alert("Код отправлен повторно");
     } catch (err: any) {
       alert(err.message || "Ошибка повторной отправки кода");
     } finally {
@@ -59,8 +78,6 @@ export default function OTPPage() {
         <form className="flex flex-col items-center w-full" onSubmit={handleSubmit}>
           <input
             type="text"
-            inputMode="numeric"
-            pattern="\d*"
             placeholder="Введите код из SMS или Email"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}

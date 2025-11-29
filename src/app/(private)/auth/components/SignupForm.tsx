@@ -29,10 +29,12 @@ export default function SignupForm() {
 
     try {
       await signupStep1(payload);
-      // Сохраняем контакт для OTP страницы
-      localStorage.setItem("otpContact", payload.email || payload.phoneNumber);
-      localStorage.setItem("otpType", payload.email ? "email" : "sms");
-      window.location.href = "/auth/otp";
+
+      // ⚡ записываем данные в localStorage только после успешного запроса
+      window.localStorage.setItem("otpContact", payload.email || payload.phoneNumber);
+      window.localStorage.setItem("otpType", payload.email ? "email" : "sms");
+
+      window.location.href = "/auth/otp"; // переходим на страницу ввода OTP
     } catch (err: any) {
       alert(err.message || "Ошибка регистрации");
     } finally {
