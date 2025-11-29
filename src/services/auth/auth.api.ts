@@ -1,5 +1,13 @@
 import { apiClient } from "../apiClient";
 
+// --- временное хранилище данных перед подтверждением OTP ---
+let tempUser: {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+} | null = null;
+
 export interface SignupPayload {
   name: string;
   email: string;
@@ -11,29 +19,46 @@ export interface SignupResponse {
   token: string;
 }
 
-export async function signup(data: SignupPayload): Promise<SignupResponse> {
+// Сохраняем данные пользователя временно и отправляем OTP
+export async function signupStep1(data: SignupPayload): Promise<{ success: boolean }> {
+  tempUser = data;
+
+  await apiClient("/auth/send-otp", {
+    method: "POST",
+    body: JSON.stringify({
+      to: data.email || data.phoneNumber,
+      subject: "Verification Code",
+    }),
+  });
+
+  return { success: true };
+}
+
+// После подтверждения OTP создаём аккаунт
+export async function signupStep2(otpCode: string, contact: string, type: "email" | "sms"): Promise<SignupResponse> {
+  if (!tempUser) throw new Error("Нет данных пользователя для регистрации");
+
+  // Отправляем проверку OTP
+  const otpRes = await apiClient<{ success: boolean }>("/auth/verify-otp", {
+    method: "POST",
+    body: JSON.stringify({ otpCode, contact, type }),
+  });
+
+  if (!otpRes.success) throw new Error("OTP не подтверждён");
+
+  // Создаём аккаунт уже на сервере
   const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(tempUser),
   });
 
-  const token = signupRes.token;
-
-    // 2. Сразу отправляем OTP
-  await apiClient("/auth/send-otp", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        to: data.email || data.phoneNumber,
-        subject: "Verification Code",
-      }),
-  });
+  // Очищаем временное хранилище
+  tempUser = null;
 
   return signupRes;
 }
 
+// --- Вход в систему ---
 export interface LoginPayload {
   email: string;
   password: string;
@@ -50,28 +75,13 @@ export function login(data: LoginPayload): Promise<LoginResponse> {
   });
 }
 
-export interface VerifyOtpPayload {
-  otpCode: string;
-  contact: string; // email или телефон
-  type: "email" | "sms";
-  token: string;
-}
-
-export async function verifyOtp({ otpCode, contact, type, token }: VerifyOtpPayload): Promise<{ success: boolean }> {
-  return apiClient<{ success: boolean }>("/auth/verify-otp", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ otpCode, contact, type }),
-  });
-}
-
-export async function resendOtp(token: string): Promise<{ success: boolean }> {
+// --- Повторная отправка OTP ---
+export async function resendOtp(contact: string): Promise<{ success: boolean }> {
   return apiClient<{ success: boolean }>("/auth/send-otp", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+    body: JSON.stringify({
+      to: contact,
+      subject: "Verification Code",
+    }),
+  });
 }
