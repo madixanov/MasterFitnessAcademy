@@ -13,11 +13,12 @@ export default function SignupForm() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-
+    const phoneRaw = form.get("phone") as string;
+    const phone = phoneRaw.replace(/\D/g, "");
     const payload: SignupPayload = {
       name: form.get("name") as string,
       email: form.get("email") as string,
-      phoneNumber: form.get("phone") as string,
+      phone: phone,
       password: form.get("password") as string,
     }
 
