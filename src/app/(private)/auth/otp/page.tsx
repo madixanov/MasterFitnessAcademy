@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signupStep2, resendOtp } from "@/services/auth/auth.api";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/UI/button";
@@ -10,9 +10,13 @@ export default function OTPPage() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [contact, setContact] = useState("");
+  const [type, setType] = useState<"email" | "sms">("email");
 
-  const contact = localStorage.getItem("otpContact") || "";
-  const type = (localStorage.getItem("otpType") as "email" | "sms") || "email";
+  useEffect(() => {
+    setContact(localStorage.getItem("otpContact") || "");
+    setType((localStorage.getItem("otpType") as "email" | "sms") || "email");
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
