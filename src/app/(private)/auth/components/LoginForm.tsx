@@ -18,7 +18,7 @@ export default function LoginForm() {
 
       <label htmlFor="password" className="mb-5 flex flex-col gap-1 relative">
         Пароль
-        <PasswordField id={"password"} />
+        <PasswordField id={"password"} name="password" />
       </label>
 
       <div className="flex justify-between items-center">
