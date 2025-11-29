@@ -4,6 +4,7 @@ import PasswordField from "./PasswordField";
 import {UserPlus} from "lucide-react";
 import { signup, SignupPayload, SignupResponse } from "@/services/auth/auth.api";
 import { useState } from "react";
+import Cookies from "js-cookie";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,7 @@ export default function SignupForm() {
     try {
       const result: SignupResponse = await signup(payload);
 
-      document.cookie = `token=${result.token}; path=/; max-age=86400`;
+      Cookies.set("token", result.token, { expires: 1 });
       window.location.href = "/auth/otp";
     } catch (err: any) {
       alert(err.message || "Ошибка регистрации"); 

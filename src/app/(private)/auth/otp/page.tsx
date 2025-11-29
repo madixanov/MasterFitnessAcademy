@@ -11,7 +11,7 @@ export default function OTPPage() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  const  token = Cookies.get("token");
+  const token = Cookies.get("token");
 
   useEffect(() => {
     if (!token) {
@@ -31,11 +31,11 @@ export default function OTPPage() {
         router.push("/profile");
       }
     } catch (err: any) {
-      alert(err.message || "Ошибка проверки кода")
+      alert(err.message || "Ошибка проверки кода");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleResend = async () => {
     if (!token) return;
@@ -51,39 +51,45 @@ export default function OTPPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm"
-        onSubmit={handleSubmit}
-      >
-        <h1 className="text-2xl font-bold mb-6 text-center">Введите код OTP</h1>
-
-        <input
-          type="text"
-          placeholder="Код из SMS или Email"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          required
-          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[#FF7A00] text-white py-2 rounded-md hover:bg-orange-600 transition-colors mb-2"
+    <main className="min-h-[calc(100vh-200px)] p-6">
+      <section className="bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col justify-center items-center">
+        <form
+          className="flex flex-col"
+          onSubmit={handleSubmit}
         >
-          {loading ? "Проверка..." : "Подтвердить"}
-        </button>
+          <h1 className="text-2xl font-bold mb-6 text-center">Введите код OTP</h1>
 
-        <button
-          type="button"
-          onClick={handleResend}
-          disabled={resendLoading}
-          className="w-full text-[#FF7A00] border border-[#FF7A00] py-2 rounded-md hover:bg-[#FF6600]/10 transition-colors"
-        >
-          {resendLoading ? "Отправка..." : "Отправить код заново"}
-        </button>
-      </form>
-    </div>
+          <label htmlFor="otp" className="mb-5 flex flex-col gap-1">
+            Код из SMS или Email
+            <input
+              id="otp"
+              type="text"
+              placeholder="Введите код"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+              className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
+            />
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mb-2 hover:bg-[#FF6600] transition-colors text-white"
+          >
+            {loading ? "Проверка..." : "Подтвердить"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendLoading}
+            className="w-full text-[#FF7A00] border border-[#FF7A00] py-2 rounded-md hover:bg-[#FF7A00]/10 transition-colors"
+          >
+            {resendLoading ? "Отправка..." : "Отправить код заново"}
+          </button>
+        </form>
+      </section>
+    </main>
   );
 }

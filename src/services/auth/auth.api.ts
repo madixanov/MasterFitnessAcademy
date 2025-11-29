@@ -11,11 +11,27 @@ export interface SignupResponse {
   token: string;
 }
 
-export function signup(data: SignupPayload): Promise<SignupResponse> {
-  return apiClient<SignupResponse>("/auth/signup", {
+export async function signup(data: SignupPayload): Promise<SignupResponse> {
+  const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
   });
+
+  const token = signupRes.token;
+
+    // 2. Сразу отправляем OTP
+  await apiClient("/auth/send-otp", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        to: data.email || data.phoneNumber,
+        subject: "Verification Code",
+      }),
+  });
+
+  return signupRes;
 }
 
 export interface LoginPayload {
