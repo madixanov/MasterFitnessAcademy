@@ -71,7 +71,7 @@ export default function SignupForm() {
           id="phone"
           name="phone"
           type="text"
-          placeholder="+998 77 777 77 77"
+          placeholder="+998"
           required
           className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
            />
@@ -79,12 +79,12 @@ export default function SignupForm() {
 
       <label htmlFor="password" className="mb-5 flex flex-col gap-1 relative">
         Пароль
-        <PasswordField id={"password"} />
+        <PasswordField id={"password"} name="password" />
       </label>
 
       <label htmlFor="repeat-password" className="mb-5 flex flex-col gap-1 relative">
         Подтвердите пароль
-        <PasswordField id={"repeat-password"} />
+        <PasswordField id={"repeat-password"} name="password" />
       </label>
 
 

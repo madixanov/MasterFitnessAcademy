@@ -5,9 +5,10 @@ import { Eye, EyeOff } from "lucide-react";
 
 type PasswordFieldProps = {
   id: string,
+  name: string
 }
 
-export default function PasswordField({ id }: PasswordFieldProps) {
+export default function PasswordField({ id, name }: PasswordFieldProps) {
   const [show, setShow] = useState(false);
 
   return (
@@ -15,6 +16,7 @@ export default function PasswordField({ id }: PasswordFieldProps) {
       <input
         type={show ? "text" : "password"}
         id={id}
+        name={name}
         placeholder="••••••••"
         required
         className="focus:outline-none border border-[#2A2A2A] px-5 py-2 rounded-md w-full pr-12"
