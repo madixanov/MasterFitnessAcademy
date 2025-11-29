@@ -5,16 +5,10 @@ import { useRouter } from "next/navigation";
 import { verifyOtp, resendOtp } from "@/services/auth/auth.api";
 import Cookies from "js-cookie";
 import { Button } from "@/components/UI/button";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/UI/input-otp";
 
 export default function OTPPage() {
   const router = useRouter();
-  const [otpCode, setotpCode] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
@@ -28,14 +22,17 @@ export default function OTPPage() {
     e.preventDefault();
     if (!token) return;
 
-    if (otpCode.length < 6) return alert("Введите весь код OTP");
+    if (otp.length < 6) {
+      alert("Введите весь код OTP");
+      return;
+    }
 
     setLoading(true);
     try {
       const contact = Cookies.get("contact") || "";
       const type: "email" | "sms" = contact.includes("@") ? "email" : "sms";
 
-      const res = await verifyOtp({ otpCode, contact, type, token });
+      const res = await verifyOtp({ otpCode: otp, contact, type, token });
       if (res.success) {
         alert("Успешная проверка OTP!");
         router.push("/profile");
@@ -65,27 +62,15 @@ export default function OTPPage() {
       <section className="bg-[#1A1A1A] border border-[#2A2A2A] p-8 rounded-lg flex flex-col items-center">
         <h1 className="text-2xl font-bold mb-6 text-center">Введите код OTP</h1>
 
-        <form className="flex flex-col items-center" onSubmit={handleSubmit}>
-          <InputOTP
+        <form className="flex flex-col items-center w-full max-w-sm" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Введите код из SMS или Email"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
             maxLength={6}
-            value={otpValue}
-            onValueChange={(val: string[]) => setOtpValue(val)}
-            className="mb-6"
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-            </InputOTPGroup>
-
-            <InputOTPSeparator />
-
-            <InputOTPGroup>
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
+            className="w-full px-4 py-2 mb-6 text-center text-lg border border-[#2A2A2A] rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
+          />
 
           <Button type="submit" className="w-full mb-2" disabled={loading}>
             {loading ? "Проверка..." : "Подтвердить"}
