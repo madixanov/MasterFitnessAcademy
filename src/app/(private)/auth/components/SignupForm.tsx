@@ -84,7 +84,7 @@ export default function SignupForm() {
 
       <label htmlFor="repeat-password" className="mb-5 flex flex-col gap-1 relative">
         Подтвердите пароль
-        <PasswordField id={"repeat-password"} name="password" />
+        <PasswordField id={"repeat-password"} name="repeat-password" />
       </label>
 
 
