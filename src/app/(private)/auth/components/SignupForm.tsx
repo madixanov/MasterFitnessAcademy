@@ -1,9 +1,47 @@
-import PasswordField from "./PasswordField"
-import {UserPlus} from "lucide-react"
+"use client"
+
+import PasswordField from "./PasswordField";
+import {UserPlus} from "lucide-react";
+import { signup, SignupPayload, SignupResponse } from "@/services/auth/auth.api";
+import { useState } from "react";
 
 export default function SignupForm() {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+
+    const payload: SignupPayload = {
+      name: form.get("name") as string,
+      email: form.get("email") as string,
+      number: form.get("phone") as string,
+      password: form.get("password") as string,
+    }
+
+    const repeatPassword = form.get("repeat-password") as string;
+
+    if (payload.password !== repeatPassword) {
+      alert("Пароли не совпадают");
+      setLoading(false)
+      return;
+    }
+
+    try {
+      const result: SignupResponse = await signup(payload);
+
+      document.cookie = `token=${result.token}; path=/; max-age=86400`;
+      window.location.href = "/auth/otp";
+    } catch (err: any) {
+      alert(err.message || "Ошибка регистрации"); 
+    } finally {
+      setLoading(false)
+    }
+  }
   return (
-    <form className="flex flex-col">
+    <form className="flex flex-col" onSubmit={handleSubmit}>
       <label htmlFor="name" className="mb-5 flex flex-col gap-1">
         Имя и фамилия
         <input

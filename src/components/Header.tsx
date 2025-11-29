@@ -82,6 +82,16 @@ export default function Header() {
   const handleMouseLeave = () =>
     setState((prev) => ({ ...prev, isHovered: false }));
 
+  const handleProfileClick = () => {
+    const token = localStorage.getItem("token"); // или cookies — скажи где у тебя!
+
+    if (token) {
+      router.push("/profile");
+    } else {
+      router.push("/auth");
+    }
+  };
+
   return (
     <header
       className={`
@@ -177,12 +187,13 @@ export default function Header() {
           <Menu />
 
           {/* PROFILE ICON */}
-          <Link href="/profile">
-            <div className="relative hidden w-10 h-10 cursor-pointer lg:flex flex-col gap-1 items-center justify-center group">
-              <div className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]" />
-              <div className="w-[35px] h-[15px] border-2 border-white rounded-b-md rounded-t-xl transition-all duration-300 group-hover:border-[#FF6600]" />
-            </div>
-          </Link>
+          <button
+            onClick={handleProfileClick}
+            className="relative hidden w-10 h-10 cursor-pointer lg:flex flex-col gap-1 items-center justify-center group"
+          >
+            <div className="w-[15px] h-[15px] rounded-full border-2 border-white transition-all duration-300 group-hover:border-[#FF6600]" />
+            <div className="w-[35px] h-[15px] border-2 border-white rounded-b-md rounded-t-xl transition-all duration-300 group-hover:border-[#FF6600]" />
+          </button>
         </div>
       </MainContainer>
     </header>
