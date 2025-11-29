@@ -51,17 +51,19 @@ export function login(data: LoginPayload): Promise<LoginResponse> {
 }
 
 export interface VerifyOtpPayload {
-  otp: string;
+  otpCode: string;
+  contact: string; // email или телефон
+  type: "email" | "sms";
   token: string;
 }
 
-export async function verifyOtp({ otp, token }: VerifyOtpPayload): Promise<{ success: boolean }> {
+export async function verifyOtp({ otpCode, contact, type, token }: VerifyOtpPayload): Promise<{ success: boolean }> {
   return apiClient<{ success: boolean }>("/auth/verify-otp", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ otp })
+    body: JSON.stringify({ otpCode, contact, type }),
   });
 }
 
