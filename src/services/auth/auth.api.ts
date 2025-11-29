@@ -3,7 +3,7 @@ import { apiClient } from "../apiClient";
 export interface SignupPayload {
   name: string;
   email: string;
-  number: string;
+  phoneNumber: string;
   password: string;
 }
 

@@ -17,7 +17,7 @@ export default function SignupForm() {
     const payload: SignupPayload = {
       name: form.get("name") as string,
       email: form.get("email") as string,
-      number: form.get("phone") as string,
+      phoneNumber: form.get("phone") as string,
       password: form.get("password") as string,
     }
 
