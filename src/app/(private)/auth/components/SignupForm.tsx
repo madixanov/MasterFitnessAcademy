@@ -30,17 +30,17 @@ export default function SignupForm() {
     try {
       await signupStep1(payload);
 
-      // ⚡ записываем данные в localStorage только после успешного запроса
-      window.localStorage.setItem("otpContact", payload.email || payload.phoneNumber);
-      window.localStorage.setItem("otpType", payload.email ? "email" : "sms");
+      // сохраняем контакт и тип для страницы OTP
+      localStorage.setItem("otpContact", payload.email || payload.phoneNumber);
+      localStorage.setItem("otpType", payload.email ? "email" : "sms");
 
-      window.location.href = "/auth/otp"; // переходим на страницу ввода OTP
+      window.location.href = "/auth/otp";
     } catch (err: any) {
       alert(err.message || "Ошибка регистрации");
     } finally {
       setLoading(false);
     }
-  };
+    };
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>

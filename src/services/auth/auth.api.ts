@@ -21,7 +21,9 @@ export interface SignupResponse {
 
 // Сохраняем данные пользователя временно и отправляем OTP
 export async function signupStep1(data: SignupPayload): Promise<{ success: boolean }> {
-  tempUser = data;
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("tempUser", JSON.stringify(data));
+  }
 
   await apiClient("/auth/send-otp", {
     method: "POST",
@@ -36,9 +38,14 @@ export async function signupStep1(data: SignupPayload): Promise<{ success: boole
 
 // После подтверждения OTP создаём аккаунт
 export async function signupStep2(otpCode: string, contact: string, type: "email" | "sms"): Promise<SignupResponse> {
-  if (!tempUser) throw new Error("Нет данных пользователя для регистрации");
+  if (typeof window === "undefined") throw new Error("Невозможно зарегистрироваться на сервере без браузера");
 
-  // Отправляем проверку OTP
+  const tempUserStr = window.localStorage.getItem("tempUser");
+  if (!tempUserStr) throw new Error("Нет данных пользователя для регистрации");
+
+  const tempUser: SignupPayload = JSON.parse(tempUserStr);
+
+  // проверка OTP
   const otpRes = await apiClient<{ success: boolean }>("/auth/verify-otp", {
     method: "POST",
     body: JSON.stringify({ otpCode, contact, type }),
@@ -46,14 +53,14 @@ export async function signupStep2(otpCode: string, contact: string, type: "email
 
   if (!otpRes.success) throw new Error("OTP не подтверждён");
 
-  // Создаём аккаунт уже на сервере
+  // создаём аккаунт
   const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
     method: "POST",
     body: JSON.stringify(tempUser),
   });
 
-  // Очищаем временное хранилище
-  tempUser = null;
+  // очищаем localStorage
+  window.localStorage.removeItem("tempUser");
 
   return signupRes;
 }
