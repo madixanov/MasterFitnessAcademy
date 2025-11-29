@@ -13,12 +13,10 @@ export default function SignupForm() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-    const phoneRaw = form.get("phone") as string;
-    const phone = phoneRaw.replace(/\D/g, "");
     const payload: SignupPayload = {
       name: form.get("name") as string,
       email: form.get("email") as string,
-      phone: phone,
+      phoneNumber: form.get("phone") as string,
       password: form.get("password") as string,
     }
 
@@ -47,6 +45,7 @@ export default function SignupForm() {
         Имя и фамилия
         <input
           id="name"
+          name="name"
           type="text"
           placeholder="Иван Петров"
           required
@@ -58,6 +57,7 @@ export default function SignupForm() {
         Email
         <input
           id="email"
+          name="email"
           type="email"
           placeholder="example@mail.com"
           required
@@ -69,6 +69,7 @@ export default function SignupForm() {
         Телефон
         <input 
           id="phone"
+          name="phone"
           type="text"
           placeholder="+998 77 777 77 77"
           required
