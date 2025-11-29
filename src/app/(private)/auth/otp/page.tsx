@@ -25,7 +25,11 @@ export default function OTPPage() {
 
     setLoading(true);
     try {
-      const res = await verifyOtp({ otp, token });
+      // получаем контакт из куки или localStorage
+      const contact = Cookies.get("contact") || ""; // или email, который пользователь вводил при регистрации
+      const type: "email" | "sms" = contact.includes("@") ? "email" : "sms";
+
+      const res = await verifyOtp({ otpCode: otp, contact, type, token });
       if (res.success) {
         alert("Успешная проверка OTP!");
         router.push("/profile");
