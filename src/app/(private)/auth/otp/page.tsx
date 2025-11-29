@@ -4,32 +4,38 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { verifyOtp, resendOtp } from "@/services/auth/auth.api";
 import Cookies from "js-cookie";
+import { Button } from "@/components/UI/button";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/UI/input-otp";
 
 export default function OTPPage() {
   const router = useRouter();
-  const [otp, setOtp] = useState("");
+  const [otpCode, setotpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
   const token = Cookies.get("token");
 
   useEffect(() => {
-    if (!token) {
-      router.push("/auth");
-    }
+    if (!token) router.push("/auth");
   }, [token, router]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
 
+    if (otpCode.length < 6) return alert("Введите весь код OTP");
+
     setLoading(true);
     try {
-      // получаем контакт из куки или localStorage
-      const contact = Cookies.get("contact") || ""; // или email, который пользователь вводил при регистрации
+      const contact = Cookies.get("contact") || "";
       const type: "email" | "sms" = contact.includes("@") ? "email" : "sms";
 
-      const res = await verifyOtp({ otpCode: otp, contact, type, token });
+      const res = await verifyOtp({ otpCode, contact, type, token });
       if (res.success) {
         alert("Успешная проверка OTP!");
         router.push("/profile");
@@ -55,43 +61,45 @@ export default function OTPPage() {
   };
 
   return (
-    <main className="min-h-[calc(100vh-200px)] p-6">
-      <section className="bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col justify-center items-center">
-        <form
-          className="flex flex-col"
-          onSubmit={handleSubmit}
-        >
-          <h1 className="text-2xl font-bold mb-6 text-center">Введите код OTP</h1>
+    <main className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6">
+      <section className="bg-[#1A1A1A] border border-[#2A2A2A] p-8 rounded-lg flex flex-col items-center">
+        <h1 className="text-2xl font-bold mb-6 text-center">Введите код OTP</h1>
 
-          <label htmlFor="otp" className="mb-5 flex flex-col gap-1">
-            Код из SMS или Email
-            <input
-              id="otp"
-              type="text"
-              placeholder="Введите код"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              required
-              className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mb-2 hover:bg-[#FF6600] transition-colors text-white"
+        <form className="flex flex-col items-center" onSubmit={handleSubmit}>
+          <InputOTP
+            maxLength={6}
+            value={otpValue}
+            onValueChange={(val: string[]) => setOtpValue(val)}
+            className="mb-6"
           >
-            {loading ? "Проверка..." : "Подтвердить"}
-          </button>
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+            </InputOTPGroup>
 
-          <button
+            <InputOTPSeparator />
+
+            <InputOTPGroup>
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+
+          <Button type="submit" className="w-full mb-2" disabled={loading}>
+            {loading ? "Проверка..." : "Подтвердить"}
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full"
             type="button"
-            onClick={handleResend}
             disabled={resendLoading}
-            className="w-full text-[#FF7A00] border border-[#FF7A00] py-2 rounded-md hover:bg-[#FF7A00]/10 transition-colors"
+            onClick={handleResend}
           >
             {resendLoading ? "Отправка..." : "Отправить код заново"}
-          </button>
+          </Button>
         </form>
       </section>
     </main>
