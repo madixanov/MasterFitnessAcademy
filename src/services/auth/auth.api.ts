@@ -1,12 +1,5 @@
 import { apiClient } from "../apiClient";
 
-let tempUser: {
-  name: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-} | null = null;
-
 export interface SignupPayload {
   name: string;
   email: string;
@@ -18,45 +11,41 @@ export interface SignupResponse {
   token: string;
 }
 
-export async function signupStep1(data: SignupPayload): Promise<{ success: boolean }> {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem("tempUser", JSON.stringify(data));
-  }
+export async function signup(data: SignupPayload): Promise<SignupResponse> {
+  const res = await apiClient<SignupResponse>("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 
-  await apiClient("/auth/send-otp", {
+  return res;
+}
+
+
+export async function sendOtp(contact: string): Promise<{ success: boolean }> {
+  return apiClient<{ success: boolean }>("/auth/send-otp", {
     method: "POST",
     body: JSON.stringify({
-      to: data.email || data.phoneNumber,
+      to: contact,
       subject: "Verification Code",
     }),
   });
-
-  return { success: true };
 }
 
-export async function signupStep2(otpCode: string, contact: string, type: "email" | "sms"): Promise<SignupResponse> {
-  if (typeof window === "undefined") throw new Error("Невозможно зарегистрироваться на сервере без браузера");
-
-  const tempUserStr = window.localStorage.getItem("tempUser");
-  if (!tempUserStr) throw new Error("Нет данных пользователя для регистрации");
-
-  const tempUser: SignupPayload = JSON.parse(tempUserStr);
-
-  const otpRes = await apiClient<{ success: boolean }>("/auth/verify-otp", {
+export async function verifyOtp(code: string, contact: string, type: "email" | "sms") {
+  return apiClient<{ success: boolean }>("/auth/verify-otp", {
     method: "POST",
-    body: JSON.stringify({ otpCode, contact, type }),
+    body: JSON.stringify({ otpCode: code, contact, type }),
   });
+}
 
-  if (!otpRes.success) throw new Error("OTP не подтверждён");
-
-  const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
+export async function resendOtp(contact: string): Promise<{ success: boolean }> {
+  return apiClient<{ success: boolean }>("/auth/send-otp", {
     method: "POST",
-    body: JSON.stringify(tempUser),
+    body: JSON.stringify({
+      to: contact,
+      subject: "Verification Code",
+    }),
   });
-
-  window.localStorage.removeItem("tempUser");
-
-  return signupRes;
 }
 
 export interface LoginPayload {
@@ -72,15 +61,5 @@ export async function login(data: LoginPayload): Promise<LoginResponse> {
   return apiClient<LoginResponse>("/auth/signin", {
     method: "POST",
     body: JSON.stringify(data),
-  });
-}
-
-export async function resendOtp(contact: string): Promise<{ success: boolean }> {
-  return apiClient<{ success: boolean }>("/auth/send-otp", {
-    method: "POST",
-    body: JSON.stringify({
-      to: contact,
-      subject: "Verification Code",
-    }),
   });
 }

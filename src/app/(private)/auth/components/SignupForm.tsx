@@ -3,10 +3,12 @@
 import PasswordField from "./PasswordField";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
-import { signupStep1, SignupPayload } from "@/services/auth/auth.api";
+import { signup, sendOtp, SignupPayload } from "@/services/auth/auth.api";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
+  const [isEmailExists, setIsEmailExists] = useState(false);
+  const [savedEmail, setSavedEmail] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,19 +30,35 @@ export default function SignupForm() {
     }
 
     try {
-      await signupStep1(payload);
+      await signup(payload);
 
-      // сохраняем контакт и тип для страницы OTP
-      localStorage.setItem("otpContact", payload.email || payload.phoneNumber);
-      localStorage.setItem("otpType", payload.email ? "email" : "sms");
+      await sendOtp(payload.email);
 
-      window.location.href = "/auth/otp";
+      window.location.href = "/auth/verify-otp?email=" + payload.email;
     } catch (err: any) {
-      alert(err.message || "Ошибка регистрации");
+      const message = err.message || "";
+
+      if (message.includes("already") || message.includes("exists")) {
+        setIsEmailExists(true);
+        setSavedEmail(payload.email);
+      } else {
+        alert(message || "Ошибка регистрации");
+      }
     } finally {
       setLoading(false);
     }
-    };
+  };
+
+  const handleActivateAccount = async () => {
+    if (!savedEmail) return;
+
+    try {
+      await sendOtp(savedEmail);
+      window.location.href = "/auth/verify-otp?email=" + savedEmail;
+    } catch (err: any) {
+      alert("Ошибка отправки кода подтверждения");
+    }
+  };
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>
@@ -90,9 +108,30 @@ export default function SignupForm() {
         <PasswordField id="repeat-password" name="repeat-password" />
       </label>
 
-      <button className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7">
-        <UserPlus className="w-5 h-5 mr-4" /> Зарегистрироваться
-      </button>
+      {!isEmailExists && (
+        <button
+          disabled={loading}
+          className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50"
+        >
+          <UserPlus className="w-5 h-5 mr-4" /> Зарегистрироваться
+        </button>
+      )}
+
+      {isEmailExists && (
+        <div className="mt-5 p-4 border border-red-400 bg-red-900/20 rounded-md text-center">
+          <p className="mb-3 text-red-300">
+            Этот email уже зарегистрирован, но аккаунт не активирован.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleActivateAccount}
+            className="w-full py-2 bg-[#FF7A00] rounded-lg"
+          >
+            Активировать аккаунт
+          </button>
+        </div>
+      )}
     </form>
   );
 }
