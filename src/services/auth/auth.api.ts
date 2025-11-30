@@ -31,10 +31,15 @@ export async function sendOtp(contact: string): Promise<{ success: boolean }> {
   });
 }
 
-export async function verifyOtp(code: string, contact: string, type: "email" | "sms") {
-  return apiClient<{ success: boolean }>("/auth/verify-otp", {
+export interface VerifyOtpResponse {
+  success: boolean;
+  token?: string;
+}
+
+export async function verifyOtp(otp: string, contact: string, type: "email" | "sms"): Promise<VerifyOtpResponse> {
+  return apiClient<VerifyOtpResponse>("/auth/verify-otp", {
     method: "POST",
-    body: JSON.stringify({ otpCode: code, contact, type }),
+    body: JSON.stringify({ otpCode: otp, contact, type }),
   });
 }
 

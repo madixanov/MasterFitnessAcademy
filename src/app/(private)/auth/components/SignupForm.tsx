@@ -32,15 +32,25 @@ export default function SignupForm() {
     try {
       await signup(payload);
 
-      await sendOtp(payload.email);
+      // сохраняем email в localStorage для OTP
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("pendingEmail", payload.email);
+      }
 
-      window.location.href = "/auth/verify-otp?email=" + payload.email;
+      // сразу редирект на OTP
+      window.location.href = "/auth/verify-otp";
     } catch (err: any) {
       const message = err.message || "";
 
       if (message.includes("already") || message.includes("exists")) {
+        // показываем блок "Активировать аккаунт"
         setIsEmailExists(true);
         setSavedEmail(payload.email);
+
+        // сохраняем email в localStorage на случай повторного перехода
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("pendingEmail", payload.email);
+        }
       } else {
         alert(message || "Ошибка регистрации");
       }
@@ -54,7 +64,7 @@ export default function SignupForm() {
 
     try {
       await sendOtp(savedEmail);
-      window.location.href = "/auth/verify-otp?email=" + savedEmail;
+      window.location.href = "/auth/verify-otp";
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");
     }
@@ -62,6 +72,7 @@ export default function SignupForm() {
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>
+      {/* поля формы */}
       <label htmlFor="name" className="mb-5 flex flex-col gap-1">
         Имя и фамилия
         <input

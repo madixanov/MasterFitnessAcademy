@@ -1,25 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { verifyOtp, resendOtp } from "@/services/auth/auth.api";
 import Cookies from "js-cookie";
 import { Button } from "@/components/UI/button";
 
 export default function OTPPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const email = searchParams.get("email");
+  const [email, setEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
-    if (!email) {
-      router.push("/auth/signup"); // если нет email → назад
+    if (typeof window !== "undefined") {
+      const savedEmail = window.localStorage.getItem("pendingEmail");
+      if (!savedEmail) {
+        router.push("/auth/signup");
+        return;
+      }
+      setEmail(savedEmail);
     }
-  }, [email, router]);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +34,18 @@ export default function OTPPage() {
     }
 
     setLoading(true);
-
     try {
       const res = await verifyOtp(otp, email, "email");
 
-      if (!res.success) {
+      if (res.success && res.token) {
+        Cookies.set("token", res.token, { expires: 1 });
+        window.localStorage.removeItem("pendingEmail");
+        router.push("/profile");
+      } else {
         alert("Неверный код");
-        return;
       }
+
+      window.localStorage.removeItem("pendingEmail");
 
       alert("Аккаунт подтверждён!");
       router.push("/profile");
@@ -53,7 +60,6 @@ export default function OTPPage() {
     if (!email) return;
 
     setResendLoading(true);
-
     try {
       const res = await resendOtp(email);
       if (res.success) alert("Код отправлен повторно");
