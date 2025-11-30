@@ -13,24 +13,6 @@ export default function OTPPage() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  // При монтировании страницы получаем email из localStorage и сразу отправляем OTP
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedEmail = window.localStorage.getItem("pendingEmail");
-      console.log("Email для OTP:", savedEmail);
-      if (!savedEmail) {
-        router.push("/auth/signup");
-        return;
-      }
-      setEmail(savedEmail);
-
-      // сразу отправляем OTP
-      sendOtp(savedEmail).catch((err) => {
-        console.error("Ошибка отправки OTP при загрузке:", err);
-      });
-    }
-  }, [router]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
