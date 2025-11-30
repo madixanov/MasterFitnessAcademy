@@ -12,12 +12,24 @@ export interface SignupResponse {
 }
 
 export async function signup(data: SignupPayload): Promise<SignupResponse> {
-  const res = await apiClient<SignupResponse>("/auth/signup", {
+  const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
   });
 
-  return res;
+  const token = signupRes.token;
+  await apiClient("/auth/send-otp", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        to: data.email || data.phoneNumber,
+        subject: "Verification Code",
+      }),
+  });
+
+  return signupRes;
 }
 
 
