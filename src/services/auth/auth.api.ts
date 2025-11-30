@@ -22,8 +22,11 @@ export async function signup(data: SignupPayload): Promise<SignupResponse> {
 
 
 export async function sendOtp(contact: string): Promise<{ success: boolean }> {
+  if (!contact) throw new Error("Email или телефон не указан");
+
   return apiClient<{ success: boolean }>("/auth/send-otp", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       to: contact,
       subject: "Verification Code",
@@ -40,16 +43,6 @@ export async function verifyOtp(otp: string, contact: string, type: "email" | "s
   return apiClient<VerifyOtpResponse>("/auth/verify-otp", {
     method: "POST",
     body: JSON.stringify({ otpCode: otp, contact, type }),
-  });
-}
-
-export async function resendOtp(contact: string): Promise<{ success: boolean }> {
-  return apiClient<{ success: boolean }>("/auth/send-otp", {
-    method: "POST",
-    body: JSON.stringify({
-      to: contact,
-      subject: "Verification Code",
-    }),
   });
 }
 

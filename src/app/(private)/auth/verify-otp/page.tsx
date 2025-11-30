@@ -17,6 +17,7 @@ export default function OTPPage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedEmail = window.localStorage.getItem("pendingEmail");
+      console.log("Email для OTP:", savedEmail);
       if (!savedEmail) {
         router.push("/auth/signup");
         return;
@@ -62,7 +63,7 @@ export default function OTPPage() {
 
     setResendLoading(true);
     try {
-      const res = await sendOtp(email); // повторная отправка
+      const res = await sendOtp(email);
       if (res.success) alert("Код отправлен повторно");
     } catch (err: any) {
       alert("Ошибка отправки");
