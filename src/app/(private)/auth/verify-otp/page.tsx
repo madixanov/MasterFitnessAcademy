@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { verifyOtp, resendOtp } from "@/services/auth/auth.api";
+import { verifyOtp, sendOtp } from "@/services/auth/auth.api";
 import Cookies from "js-cookie";
 import { Button } from "@/components/UI/button";
 
@@ -13,6 +13,7 @@ export default function OTPPage() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
+  // При монтировании страницы получаем email из localStorage и сразу отправляем OTP
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedEmail = window.localStorage.getItem("pendingEmail");
@@ -21,6 +22,11 @@ export default function OTPPage() {
         return;
       }
       setEmail(savedEmail);
+
+      // сразу отправляем OTP
+      sendOtp(savedEmail).catch((err) => {
+        console.error("Ошибка отправки OTP при загрузке:", err);
+      });
     }
   }, [router]);
 
@@ -44,11 +50,6 @@ export default function OTPPage() {
       } else {
         alert("Неверный код");
       }
-
-      window.localStorage.removeItem("pendingEmail");
-
-      alert("Аккаунт подтверждён!");
-      router.push("/profile");
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
@@ -61,7 +62,7 @@ export default function OTPPage() {
 
     setResendLoading(true);
     try {
-      const res = await resendOtp(email);
+      const res = await sendOtp(email); // повторная отправка
       if (res.success) alert("Код отправлен повторно");
     } catch (err: any) {
       alert("Ошибка отправки");
@@ -91,7 +92,7 @@ export default function OTPPage() {
 
           <Button
             variant="outline"
-            className="w-full bg-black"
+            className="w-full bg-transparent"
             type="button"
             disabled={resendLoading}
             onClick={handleResend}

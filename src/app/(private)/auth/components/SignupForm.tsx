@@ -22,6 +22,7 @@ export default function SignupForm() {
       password: form.get("password") as string,
     };
 
+    setSavedEmail(payload.email)
     const repeatPassword = form.get("repeat-password") as string;
     if (payload.password !== repeatPassword) {
       alert("Пароли не совпадают");
@@ -63,7 +64,7 @@ export default function SignupForm() {
     if (!savedEmail) return;
 
     try {
-      await sendOtp(savedEmail);
+      window.localStorage.setItem("pendingEmail", savedEmail);
       window.location.href = "/auth/verify-otp";
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");
