@@ -41,18 +41,22 @@ export default function OTPPage() {
   };
 
   const handleResend = async () => {
-    if (!email) return;
+  const savedEmail = typeof window !== "undefined" ? window.localStorage.getItem("pendingEmail") : null;
+  if (!savedEmail) {
+    alert("Email не найден, невозможно отправить код");
+    return;
+  }
 
-    setResendLoading(true);
-    try {
-      const res = await sendOtp(email);
-      if (res.success) alert("Код отправлен повторно");
-    } catch (err: any) {
-      alert("Ошибка отправки");
-    } finally {
-      setResendLoading(false);
-    }
-  };
+  setResendLoading(true);
+  try {
+    const res = await sendOtp(savedEmail);
+    if (res.success) alert("Код отправлен повторно");
+  } catch (err: any) {
+    alert("Ошибка отправки");
+  } finally {
+    setResendLoading(false);
+  }
+};
 
   return (
     <main className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6">

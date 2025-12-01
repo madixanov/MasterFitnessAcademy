@@ -64,7 +64,7 @@ export default function SignupForm() {
     if (!savedEmail) return;
 
     try {
-      window.localStorage.setItem("pendingEmail", savedEmail);
+      await sendOtp(savedEmail);
       window.location.href = "/auth/verify-otp";
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");
