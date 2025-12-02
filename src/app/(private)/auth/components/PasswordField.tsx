@@ -20,6 +20,7 @@ export default function PasswordField({ id, name, value, onChange }: PasswordFie
         id={id}
         name={name}
         value={value}
+        onChange={onChange}
         placeholder="••••••••"
         required
         className="focus:outline-none border border-[#2A2A2A] px-5 py-2 rounded-md w-full pr-12"
