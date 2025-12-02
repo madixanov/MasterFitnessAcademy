@@ -20,6 +20,7 @@ export default function EmailResetForm() {
       if (typeof window !== "undefined") {
         window.localStorage.setItem("resetPasswordEmail", email);
       }
+      window.location.href = "/auth/reset-password/verify-otp";
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");
     }
