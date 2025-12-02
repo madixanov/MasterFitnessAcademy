@@ -26,6 +26,8 @@ export default function ResetOTPPage() {
       return;
     }
 
+    const form = new FormData(e.currentTarget); 
+    setOtp(form.get("otp") as string)
     const otpPayload: VerifyResetOtpPayload = {
       contact: savedEmail.trim(),
       otpCode: otp.trim(),
@@ -37,7 +39,7 @@ export default function ResetOTPPage() {
       const res = await verifyResetOtp(otpPayload);
       alert(res.message || "Код подтверждён");
       window.localStorage.removeItem("resetPasswordEmail");
-      router.push("/reset-password/new-password");
+      router.push("/auth/reset-password/new-password");
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
@@ -78,7 +80,6 @@ export default function ResetOTPPage() {
             placeholder="Введите код"
             name="otp"
             value={otp}
-            onChange={(e) => setOtp(e.target.value)}
             maxLength={6}
             className="w-full px-4 py-2 mb-6 text-center text-lg border border-[#2A2A2A] rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
           />
