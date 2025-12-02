@@ -46,15 +46,21 @@ export async function sendOtp(contact: string): Promise<{ success: boolean }> {
   });
 }
 
+export interface VerifyOtpPayload {
+  otpCode: string;
+  contact: string;
+  type: string; 
+}
+
 export interface VerifyOtpResponse {
   success: boolean;
   token?: string;
 }
 
-export async function verifyOtp(otp: string, contact: string, type: "email" | "sms"): Promise<VerifyOtpResponse> {
+export async function verifyOtp(data: VerifyOtpPayload): Promise<VerifyOtpResponse> {
   return apiClient<VerifyOtpResponse>("/auth/verify-otp", {
     method: "POST",
-    body: JSON.stringify({ otpCode: otp, contact, type }),
+    body: JSON.stringify(data),
   });
 }
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { verifyOtp, sendOtp } from "@/services/auth/auth.api";
+import { verifyOtp, sendOtp, VerifyOtpPayload } from "@/services/auth/auth.api";
 import Cookies from "js-cookie";
 import { Button } from "@/components/UI/button";
 
@@ -12,7 +12,7 @@ export default function OTPPage() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const savedEmail = window.localStorage.getItem("pendingEmail");
@@ -27,9 +27,16 @@ export default function OTPPage() {
       return;
     }
 
+    const form = new FormData(e.currentTarget);
+    const otpPayload: VerifyOtpPayload = {
+      otpCode: form.get("otp") as string,
+      contact: savedEmail,
+      type: "email"
+    }
+
     setLoading(true);
     try {
-      const res = await verifyOtp(otp, savedEmail, "email");
+      const res = await verifyOtp(otpPayload);
 
       if (res.success && res.token) {
         Cookies.set("token", res.token, { expires: 1 });
@@ -72,6 +79,7 @@ export default function OTPPage() {
           <input
             type="text"
             placeholder="Введите код"
+            name="otp"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
             maxLength={6}
