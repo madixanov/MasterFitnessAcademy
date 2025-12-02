@@ -34,10 +34,11 @@ export default function Sidebar() {
     };
   }, [isOpen]);
 
-  const handleLogout = () => {
-    Cookies.remove("token");
-    localStorage.removeItem("pendingEmail");
-    router.push("/auth") 
+  const handleLogout = (router: any) => {
+    Cookies.remove("token")
+    localStorage.removeItem("token")
+    sessionStorage.removeItem("token")
+    router.push("/auth")
   }
 
   return (
