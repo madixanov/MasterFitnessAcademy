@@ -1,6 +1,6 @@
 "use client"
 
-import { sendOtp, sendOtpPayload } from "@/services/auth/auth.api"
+import { sendResetOtp, sendOtpPayload } from "@/services/auth/auth.api"
 import { Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
@@ -16,7 +16,7 @@ export default function EmailResetForm() {
     }
 
     try {
-      await sendOtp(payload);
+      await sendResetOtp(payload);
       if (typeof window !== "undefined") {
         window.localStorage.setItem("resetPasswordEmail", email);
       }

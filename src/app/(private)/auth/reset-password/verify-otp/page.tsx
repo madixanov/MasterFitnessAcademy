@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { verifyResetOtp, sendOtp, VerifyResetOtpPayload, sendOtpPayload } from "@/services/auth/auth.api";
+import { verifyResetOtp, sendResetOtp, VerifyResetOtpPayload, sendOtpPayload } from "@/services/auth/auth.api";
 import { Button } from "@/components/UI/button";
 
 export default function ResetOTPPage() {
@@ -55,7 +55,7 @@ export default function ResetOTPPage() {
     }
     setResendLoading(true);
     try {
-      const res = await sendOtp(payload);
+      const res = await sendResetOtp(payload);
       if (res.success) alert("Код отправлен повторно");
     } catch (err: any) {
       alert("Ошибка отправки");

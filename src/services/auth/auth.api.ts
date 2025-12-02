@@ -47,6 +47,16 @@ export async function sendOtp(data: sendOtpPayload): Promise<{ success: boolean 
   });
 }
 
+export async function sendResetOtp(data: sendOtpPayload): Promise<{ success: boolean }> {
+  if (!data) throw new Error("Email или телефон не указан");
+
+  return apiClient<{ success: boolean }>("/auth/send-otp-reset", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+}
+
 export interface VerifyOtpPayload {
   otpCode: string;
   contact: string;
