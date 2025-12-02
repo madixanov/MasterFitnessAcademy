@@ -16,6 +16,8 @@ export default function ResetOTPPage() {
     e.preventDefault();
 
     const savedEmail = window.localStorage.getItem("resetPasswordEmail");
+    const form = new FormData(e.currentTarget); 
+    setOtp(form.get("otp") as string)
     if (!savedEmail) {
       alert("Email не найден");
       return;
@@ -26,8 +28,6 @@ export default function ResetOTPPage() {
       return;
     }
 
-    const form = new FormData(e.currentTarget); 
-    setOtp(form.get("otp") as string)
     const otpPayload: VerifyResetOtpPayload = {
       contact: savedEmail.trim(),
       otpCode: otp.trim(),
