@@ -97,3 +97,19 @@ export async function login(data: LoginPayload): Promise<LoginResponse> {
     body: JSON.stringify(data),
   });
 }
+
+export interface NewPasswordPayload {
+  email: string,
+  newPassword: string,
+}
+
+export interface NewPasswordResponse {
+  message: string
+}
+
+export async function newPassword(data: NewPasswordPayload): Promise<NewPasswordResponse> {
+  return apiClient<NewPasswordResponse>("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}

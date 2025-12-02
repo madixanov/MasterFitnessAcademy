@@ -37,7 +37,7 @@ export default function ResetOTPPage() {
       const res = await verifyResetOtp(otpPayload);
       alert(res.message || "Код подтверждён");
       window.localStorage.removeItem("resetPasswordEmail");
-      router.push("/auth");
+      router.push("/reset-password/new-password");
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
