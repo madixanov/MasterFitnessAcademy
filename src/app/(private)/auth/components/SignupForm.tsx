@@ -116,12 +116,12 @@ export default function SignupForm() {
 
       <label htmlFor="password" className="mb-5 flex flex-col gap-1 relative">
         Пароль
-        <PasswordField id="password" name="password" value="" />
+        <PasswordField id="password" name="password" />
       </label>
 
       <label htmlFor="repeat-password" className="mb-5 flex flex-col gap-1 relative">
         Подтвердите пароль
-        <PasswordField id="repeat-password" name="repeat-password" value="" />
+        <PasswordField id="repeat-password" name="repeat-password" />
       </label>
 
       {!isEmailExists && (
