@@ -79,7 +79,6 @@ export default function ResetOTPPage() {
             type="text"
             placeholder="Введите код"
             name="otp"
-            value={otp}
             maxLength={6}
             className="w-full px-4 py-2 mb-6 text-center text-lg border border-[#2A2A2A] rounded-md focus:outline-none focus:ring-2 focus:ring-[#FF7A00]"
           />
