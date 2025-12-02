@@ -1,3 +1,5 @@
+"use client"
+
 import { Smartphone, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { sendOtp, sendOtpPayload } from "@/services/auth/auth.api"

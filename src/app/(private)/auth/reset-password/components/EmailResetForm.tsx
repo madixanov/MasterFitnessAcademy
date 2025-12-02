@@ -1,3 +1,5 @@
+"use client"
+
 import { sendOtp, sendOtpPayload } from "@/services/auth/auth.api"
 import { Mail, ArrowLeft } from "lucide-react"
 import Link from "next/link"
