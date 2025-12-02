@@ -53,8 +53,7 @@ export interface VerifyOtpPayload {
 }
 
 export interface VerifyOtpResponse {
-  success: boolean;
-  token?: string;
+  message: string,
 }
 
 export async function verifyOtp(data: VerifyOtpPayload): Promise<VerifyOtpResponse> {

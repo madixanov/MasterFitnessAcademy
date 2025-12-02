@@ -16,7 +16,6 @@ export default function OTPPage() {
     e.preventDefault();
 
     const savedEmail = window.localStorage.getItem("pendingEmail");
-
     if (!savedEmail) {
       alert("Email не найден");
       return;
@@ -27,24 +26,20 @@ export default function OTPPage() {
       return;
     }
 
-    const form = new FormData(e.currentTarget);
     const otpPayload: VerifyOtpPayload = {
-      otpCode: form.get("otp") as string,
-      contact: savedEmail,
+      otpCode: otp.trim(),
+      contact: savedEmail.trim(),
       type: "email"
-    }
+    };
 
     setLoading(true);
+
     try {
       const res = await verifyOtp(otpPayload);
-
-      if (res.success && res.token) {
-        Cookies.set("token", res.token, { expires: 1 });
-        window.localStorage.removeItem("pendingEmail");
-        router.push("/profile");
-      } else {
-        alert("Неверный код");
-      }
+      // если ошибок нет → считаем, что аккаунт подтверждён
+      alert(res.message || "Код подтверждён");
+      window.localStorage.removeItem("pendingEmail");
+      router.push("/profile");
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
