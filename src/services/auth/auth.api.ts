@@ -69,7 +69,9 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  token: string;
+  message: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export async function login(data: LoginPayload): Promise<LoginResponse> {
