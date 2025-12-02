@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { verifyOtp, sendOtp, VerifyOtpPayload } from "@/services/auth/auth.api";
-import Cookies from "js-cookie";
+import { verifyOtp, sendOtp, VerifyOtpPayload, sendOtpPayload } from "@/services/auth/auth.api";
 import { Button } from "@/components/UI/button";
 
 export default function OTPPage() {
@@ -48,22 +47,26 @@ export default function OTPPage() {
   };
 
   const handleResend = async () => {
-  const savedEmail = typeof window !== "undefined" ? window.localStorage.getItem("pendingEmail") : null;
-  if (!savedEmail) {
-    alert("Email не найден, невозможно отправить код");
-    return;
-  }
+    const savedEmail = typeof window !== "undefined" ? window.localStorage.getItem("pendingEmail") : null;
+    if (!savedEmail) {
+      alert("Email не найден, невозможно отправить код");
+      return;
+    }
 
-  setResendLoading(true);
-  try {
-    const res = await sendOtp(savedEmail);
-    if (res.success) alert("Код отправлен повторно");
-  } catch (err: any) {
-    alert("Ошибка отправки");
-  } finally {
-    setResendLoading(false);
-  }
-};
+    const payload: sendOtpPayload = {
+      to: savedEmail,
+      subject: "Verification Code"
+    }
+    setResendLoading(true);
+    try {
+      const res = await sendOtp(payload);
+      if (res.success) alert("Код отправлен повторно");
+    } catch (err: any) {
+      alert("Ошибка отправки");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   return (
     <main className="min-h-[calc(100vh-200px)] flex items-center justify-center p-6">

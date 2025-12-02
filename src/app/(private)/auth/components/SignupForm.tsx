@@ -3,7 +3,7 @@
 import PasswordField from "./PasswordField";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
-import { signup, sendOtp, SignupPayload } from "@/services/auth/auth.api";
+import { signup, sendOtp, SignupPayload, sendOtpPayload } from "@/services/auth/auth.api";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
@@ -62,9 +62,13 @@ export default function SignupForm() {
 
   const handleActivateAccount = async () => {
     if (!savedEmail) return;
+    const payload: sendOtpPayload = {
+      to: savedEmail,
+      subject: "Verification Code"
+    }
 
     try {
-      await sendOtp(savedEmail);
+      await sendOtp(payload);
       window.location.href = "/auth/verify-otp";
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");

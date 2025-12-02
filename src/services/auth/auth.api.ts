@@ -32,17 +32,18 @@ export async function signup(data: SignupPayload): Promise<SignupResponse> {
   return signupRes;
 }
 
+export interface sendOtpPayload {
+  to: string,
+  subject: string
+}
 
-export async function sendOtp(contact: string): Promise<{ success: boolean }> {
-  if (!contact) throw new Error("Email или телефон не указан");
+export async function sendOtp(data: sendOtpPayload): Promise<{ success: boolean }> {
+  if (!data) throw new Error("Email или телефон не указан");
 
   return apiClient<{ success: boolean }>("/auth/send-otp", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      to: contact,
-      subject: "Verification Code",
-    }),
+    body: JSON.stringify(data),
   });
 }
 
