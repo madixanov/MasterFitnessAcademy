@@ -74,7 +74,7 @@ export interface VerifyResetOtpResponse {
 }
 
 export async function verifyResetOtp(data: VerifyResetOtpPayload): Promise<VerifyResetOtpResponse> {
-  return apiClient<VerifyOtpResponse>("/auth/verify-otp-reset", {
+  return apiClient<VerifyResetOtpResponse>("/auth/verify-otp-reset", {
     method: "POST",
     body: JSON.stringify(data),
   });
