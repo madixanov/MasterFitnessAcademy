@@ -8,14 +8,19 @@ import { Button } from "@/components/UI/button";
 
 export default function OTPPage() {
   const router = useRouter();
-  const [email, setEmail] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+
+    const savedEmail = window.localStorage.getItem("pendingEmail");
+
+    if (!savedEmail) {
+      alert("Email не найден");
+      return;
+    }
 
     if (otp.length < 6) {
       alert("Введите весь код");
@@ -24,7 +29,7 @@ export default function OTPPage() {
 
     setLoading(true);
     try {
-      const res = await verifyOtp(otp, email, "email");
+      const res = await verifyOtp(otp, savedEmail, "email");
 
       if (res.success && res.token) {
         Cookies.set("token", res.token, { expires: 1 });
