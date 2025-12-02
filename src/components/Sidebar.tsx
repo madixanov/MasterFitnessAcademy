@@ -34,7 +34,7 @@ export default function Sidebar() {
     };
   }, [isOpen]);
 
-  const handleLogout = (router: any) => {
+  const handleLogout = () => {
     Cookies.remove("token")
     localStorage.removeItem("token")
     sessionStorage.removeItem("token")
