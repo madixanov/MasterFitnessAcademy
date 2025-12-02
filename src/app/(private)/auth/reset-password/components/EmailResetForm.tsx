@@ -7,14 +7,19 @@ import Link from "next/link"
 export default function EmailResetForm() {
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     const form = new FormData(e.currentTarget);
+    const email = form.get("email") as string
     const payload: sendOtpPayload = {
-      to: form.get("email") as string,
+      to: email,
       subject: "Reset your password"
     }
 
     try {
       await sendOtp(payload);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("resetPasswordEmail", email);
+      }
     } catch (err: any) {
       alert("Ошибка отправки кода подтверждения");
     }

@@ -64,6 +64,22 @@ export async function verifyOtp(data: VerifyOtpPayload): Promise<VerifyOtpRespon
   });
 }
 
+export interface VerifyResetOtpPayload {
+  contact: string;
+  otpCode: string;
+}
+
+export interface VerifyResetOtpResponse {
+  message: string,
+}
+
+export async function verifyResetOtp(data: VerifyResetOtpPayload): Promise<VerifyResetOtpResponse> {
+  return apiClient<VerifyOtpResponse>("/auth/verify-otp-reset", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
