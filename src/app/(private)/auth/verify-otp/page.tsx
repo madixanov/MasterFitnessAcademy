@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { verifyOtp, sendOtp, VerifyOtpPayload, sendOtpPayload } from "@/services/auth/auth.api";
 import { Button } from "@/components/UI/button";
 
 export default function OTPPage() {
-  const router = useRouter();
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -38,7 +36,7 @@ export default function OTPPage() {
       // если ошибок нет → считаем, что аккаунт подтверждён
       alert(res.message || "Код подтверждён");
       window.localStorage.removeItem("pendingEmail");
-      router.push("/auth");
+      window.location.href = "/auth/"
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
