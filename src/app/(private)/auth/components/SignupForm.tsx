@@ -22,10 +22,8 @@ export default function SignupForm() {
       password: form.get("password") as string,
     };
 
-    setSavedEmail(signupPayload.email)
-
     const otpPayload: sendOtpPayload = {
-      to: savedEmail,
+      to: signupPayload.email,
       subject: "Verification Code"
     }
 
