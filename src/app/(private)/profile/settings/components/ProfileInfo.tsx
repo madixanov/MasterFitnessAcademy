@@ -11,13 +11,6 @@ export default function ProfileInfo() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const initials = `${user.name?.[0] ?? ""}${user.surname?.[0] ?? ""}`.toUpperCase();
-  const createdAt = new Date(user.createdAt).toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -35,6 +28,18 @@ export default function ProfileInfo() {
 
     fetchUser();
   }, [])
+
+  const initials = user
+  ? `${user.name?.[0] ?? ""}${user.surname?.[0] ?? ""}`.toUpperCase()
+  : "";
+
+  const createdAt = user
+    ? new Date(user.createdAt).toLocaleDateString("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : "";
 
   if (loading) return <ProfileSkeleton />
   if (!user) return <p>Не авторизован</p>
