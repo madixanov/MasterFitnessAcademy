@@ -38,7 +38,7 @@ export default function OTPPage() {
       // если ошибок нет → считаем, что аккаунт подтверждён
       alert(res.message || "Код подтверждён");
       window.localStorage.removeItem("pendingEmail");
-      router.push("/profile");
+      router.push("/auth");
     } catch (err: any) {
       alert(err.message || "Ошибка подтверждения");
     } finally {
