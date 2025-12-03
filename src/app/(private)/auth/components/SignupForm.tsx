@@ -21,12 +21,14 @@ export default function SignupForm() {
       phoneNumber: form.get("phone") as string,
       password: form.get("password") as string,
     };
-    const otPayload: sendOtpPayload = {
+
+    setSavedEmail(signupPayload.email)
+
+    const otpPayload: sendOtpPayload = {
       to: savedEmail,
       subject: "Verification Code"
     }
 
-    setSavedEmail(signupPayload.email)
     const repeatPassword = form.get("repeat-password") as string;
     if (signupPayload.password !== repeatPassword) {
       alert("Пароли не совпадают");
@@ -36,7 +38,7 @@ export default function SignupForm() {
 
     try {
       await signup(signupPayload);
-      await sendOtp(otPayload);
+      await sendOtp(otpPayload);
 
       // сохраняем email в localStorage для OTP
       if (typeof window !== "undefined") {
