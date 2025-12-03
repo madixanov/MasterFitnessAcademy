@@ -14,7 +14,7 @@ export default function ProfileInfo() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = Cookies.get("accessToken");
+        const token = Cookies.get("token");
         if (!token) throw new Error("Нет токена");
       
         const data = await getProfile(token);
