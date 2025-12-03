@@ -15,27 +15,32 @@ export default function SignupForm() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
-    const payload: SignupPayload = {
+    const signupPayload: SignupPayload = {
       name: form.get("name") as string,
       email: form.get("email") as string,
       phoneNumber: form.get("phone") as string,
       password: form.get("password") as string,
     };
+    const otPayload: sendOtpPayload = {
+      to: savedEmail,
+      subject: "Verification Code"
+    }
 
-    setSavedEmail(payload.email)
+    setSavedEmail(signupPayload.email)
     const repeatPassword = form.get("repeat-password") as string;
-    if (payload.password !== repeatPassword) {
+    if (signupPayload.password !== repeatPassword) {
       alert("Пароли не совпадают");
       setLoading(false);
       return;
     }
 
     try {
-      await signup(payload);
+      await signup(signupPayload);
+      await sendOtp(otPayload);
 
       // сохраняем email в localStorage для OTP
       if (typeof window !== "undefined") {
-        window.localStorage.setItem("pendingEmail", payload.email);
+        window.localStorage.setItem("pendingEmail", signupPayload.email);
       }
 
       // сразу редирект на OTP
@@ -46,11 +51,11 @@ export default function SignupForm() {
       if (message.includes("already") || message.includes("exists")) {
         // показываем блок "Активировать аккаунт"
         setIsEmailExists(true);
-        setSavedEmail(payload.email);
+        setSavedEmail(signupPayload.email);
 
         // сохраняем email в localStorage на случай повторного перехода
         if (typeof window !== "undefined") {
-          window.localStorage.setItem("pendingEmail", payload.email);
+          window.localStorage.setItem("pendingEmail", signupPayload.email);
         }
       } else {
         alert(message || "Ошибка регистрации");

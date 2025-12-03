@@ -17,18 +17,6 @@ export async function signup(data: SignupPayload): Promise<SignupResponse> {
     body: JSON.stringify(data),
   });
 
-  const token = signupRes.token;
-  await apiClient("/auth/send-otp", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        to: data.email || data.phoneNumber,
-        subject: "Verification Code",
-      }),
-  });
-
   return signupRes;
 }
 
