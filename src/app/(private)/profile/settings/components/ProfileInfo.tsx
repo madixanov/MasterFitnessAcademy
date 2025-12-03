@@ -1,3 +1,5 @@
+"use client"
+
 import Image from "next/image"
 import { Pen } from "lucide-react"
 import { useEffect, useState } from "react";
