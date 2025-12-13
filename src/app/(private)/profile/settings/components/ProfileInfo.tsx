@@ -38,9 +38,7 @@ export default function ProfileInfo() {
 
     try {
       setUploading(true);
-      const token = Cookies.get("token");
-      if (!token) throw new Error("Нет токена");
-      const data = await uploadProfilePhoto(file, token);
+      const data = await uploadProfilePhoto(file);
       setUser((prev: any) => ({ ...prev, photo: data.img || data.url }));
     } catch (err) {
       console.error("Ошибка при загрузке фото", err);
