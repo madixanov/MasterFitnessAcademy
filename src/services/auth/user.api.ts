@@ -10,7 +10,7 @@ export const getProfile = async (accessToken: string): Promise<any> => {
 };
 
 export async function uploadProfilePhoto(file: File) {
-  const token = Cookies.get("accessToken");
+  const token = Cookies.get("token");
   if (!token) throw new Error("Нет токена");
 
   const formData = new FormData();
