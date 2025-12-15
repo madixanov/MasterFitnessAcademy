@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import PasswordField from "./PasswordField"
-import { LogIn, LogOut } from "lucide-react"
+import { LogIn, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { login } from "@/services/auth/auth.api"
 import Cookies from "js-cookie"
@@ -90,9 +90,9 @@ export default function LoginForm() {
 
       <button
         disabled={loading}
-        className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50"
+        className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50 gap-2"
       >
-        {loading ? "Вход..." : <>
+        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>
           <LogIn className="w-5 h-5 mr-4" /> Войти
         </>}
       </button>

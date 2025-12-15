@@ -35,11 +35,12 @@ export default function Sidebar() {
   }, [isOpen]);
 
   const handleLogout = () => {
-    Cookies.remove("token")
-    localStorage.removeItem("token")
-    sessionStorage.removeItem("token")
-    router.push("/auth")
-  }
+    Cookies.remove("token");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("welcomeToastShown"); // удаляем флаг приветствия
+    router.push("/auth");
+  };
 
   return (
     <>
