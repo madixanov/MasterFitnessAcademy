@@ -1,32 +1,42 @@
-// components/ui/Toast.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 
 interface ToastProps {
   message: string;
   type: "success" | "error";
-  onClose: () => void;
   duration?: number;
+  onClose: () => void;
 }
 
 export default function Toast({
   message,
   type,
-  onClose,
   duration = 3000,
+  onClose,
 }: ToastProps) {
+  const [visible, setVisible] = useState(true);
+
   useEffect(() => {
-    const timer = setTimeout(onClose, duration);
+    const timer = setTimeout(() => setVisible(false), duration);
+
     return () => clearTimeout(timer);
-  }, [onClose, duration]);
+  }, [duration]);
+
+  // Когда скрывается, вызываем callback родителю
+  useEffect(() => {
+    if (!visible) {
+      const timeout = setTimeout(() => onClose(), 200); // плавное исчезновение
+      return () => clearTimeout(timeout);
+    }
+  }, [visible, onClose]);
 
   return (
     <div
       className={clsx(
-        "pointer-events-none w-[320px] rounded-lg border px-4 py-3 shadow-lg",
-        "animate-slide-in",
+        "pointer-events-none w-[320px] rounded-lg border px-4 py-3 shadow-lg transition-all duration-200",
+        visible ? "opacity-100" : "opacity-0",
         type === "success"
           ? "bg-green-500/10 border-green-500 text-green-400"
           : "bg-red-500/10 border-red-500 text-red-400"
@@ -38,10 +48,10 @@ export default function Toast({
       <div className="mt-3 h-1 w-full overflow-hidden rounded bg-white/10">
         <div
           className={clsx(
-            "h-full animate-toast-progress",
+            "h-full",
             type === "success" ? "bg-green-500" : "bg-red-500"
           )}
-          style={{ animationDuration: `${duration}ms` }}
+          style={{ animation: `toast-progress ${duration}ms linear forwards` }}
         />
       </div>
     </div>

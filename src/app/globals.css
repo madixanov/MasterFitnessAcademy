@@ -140,28 +140,9 @@
   50% { transform: translateX(10px); }
 }
 
-@keyframes slide-in {
-  from {
-    transform: translateX(120%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.animate-slide-in {
-  animation: slide-in 0.3s ease-out;
-}
-
 @keyframes toast-progress {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
+  from { width: 100%; }
+  to { width: 0%; }
 }
 
 .animate-toast-progress {
@@ -169,3 +150,4 @@
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
+
