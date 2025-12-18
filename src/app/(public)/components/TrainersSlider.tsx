@@ -51,6 +51,8 @@ export default function TrainersSlider() {
       <MainContainer>
         <section className="relative overflow-visible z-10 flex justify-center mb-20">
           <Swiper
+            modules={[Navigation]}
+            navigation
             slidesPerView={1}
             className="w-full !pb-7 lg:!pb-10"
           >
