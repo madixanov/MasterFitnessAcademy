@@ -8,14 +8,39 @@ import { getBranches, Branch } from "@/services/branches/branches.api";
 // ===== Skeleton компонент =====
 function BranchSkeleton() {
   return (
-    <div className="animate-pulse flex flex-col md:flex-row gap-5 mb-10">
+    <div className="mb-10 flex flex-col md:flex-row justify-between gap-5 animate-pulse">
+      
       {/* Левая карточка */}
-      <div className="w-full lg:w-[445px] border-2 rounded-xl p-8 gap-5 bg-[#2c2c2c] h-[400px]" />
+      <div className="relative w-full lg:w-[445px] flex flex-col justify-center items-start border-2 p-8 gap-6 lg:gap-8 backdrop-blur-md bg-black/10 border-white/10 rounded-xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.5),_0_8px_20px_rgba(0,0,0,0.3)]">
+
+        {/* Город */}
+        <div className="h-9 w-2/3 bg-white/10 rounded-lg mb-4" />
+
+        {/* Телефон */}
+        <div className="flex flex-col gap-3 w-full">
+          <div className="h-6 w-1/2 bg-white/10 rounded" />
+          <div className="h-7 w-3/4 bg-white/10 rounded" />
+        </div>
+
+        {/* Почта */}
+        <div className="flex flex-col gap-3 w-full">
+          <div className="h-6 w-1/2 bg-white/10 rounded" />
+          <div className="h-7 w-4/5 bg-white/10 rounded" />
+        </div>
+
+        {/* Адрес */}
+        <div className="flex flex-col gap-3 w-full">
+          <div className="h-6 w-1/2 bg-white/10 rounded" />
+          <div className="h-7 w-full bg-white/10 rounded" />
+        </div>
+      </div>
+
       {/* Карта */}
-      <div className="w-full lg:w-200 h-[400px] rounded-xl bg-[#3a3a3a]" />
+      <div className="w-full lg:w-200 h-[400px] rounded-xl bg-white/10 shadow-lg" />
     </div>
   );
 }
+
 
 export default function Contacts() {
   const [branches, setBranches] = useState<Branch[]>([]);

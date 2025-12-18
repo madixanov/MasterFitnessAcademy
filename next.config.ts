@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ["localhost", "www.telsot.uz", "master-fitness.netlify.app"], // добавляем все нужные домены
+    domains: ["localhost", "www.telsot.uz", "master-fitness.netlify.app", "telsot.uz"], // добавляем все нужные домены
   },
   async rewrites() {
     return [
