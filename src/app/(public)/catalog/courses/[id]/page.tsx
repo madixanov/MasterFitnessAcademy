@@ -7,8 +7,9 @@ import { CircleCheckBig, Clock, BookOpen, Users, ChartColumn } from "lucide-reac
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCourseById, Course } from "@/services/courses/courses.api";
 import { useCourseStore } from "@/store/courseStore";
+import { createOrder } from "@/services/orders/orders.api"; 
+import Toast from "@/components/UI/toast";
 
-// Skeleton для страницы курса
 function CourseSkeleton() {
   return (
     <MainContainer>
@@ -34,12 +35,18 @@ export default function CourseInfoPage() {
   const router = useRouter();
   const setCourseStore = useCourseStore((state) => state.setCourse);
 
-  // безопасно приводим id к string
   const rawId = params.get("id");
   const id: string | undefined = Array.isArray(rawId) ? rawId[0] : rawId || undefined;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [creatingOrder, setCreatingOrder] = useState(false);
+
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -47,20 +54,33 @@ export default function CourseInfoPage() {
     getCourseById(id)
       .then((data) => {
         setCourse(data);
-        setCourseStore(data); // сохраняем курс в store для enroll page
+        setCourseStore(data);
       })
       .catch((err) => console.error("Ошибка загрузки курса:", err))
       .finally(() => setLoading(false));
   }, [id, setCourseStore]);
 
+  const handleCreateOrder = async () => {
+    if (!id) return;
+    setCreatingOrder(true);
+
+    try {
+      await createOrder({ courseId: id });
+      showToast("Заказ успешно создан!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("Ошибка при создании заказа", "error");
+    } finally {
+      setCreatingOrder(false);
+    }
+  };
+
   if (loading || !course) return <CourseSkeleton />;
 
-  // Преимущества курса
   const advantages = course.Course_Benefits_Sheet
     ? course.Course_Benefits_Sheet.split("\n\n").map((a) => a.trim()).filter(Boolean)
     : [];
 
-  // Модули курса
   const modules: Module[] = course.modules?.map((mod) => ({
     title: mod.name,
     lessons: [{ title: mod.name, desc: mod.desc }]
@@ -69,6 +89,17 @@ export default function CourseInfoPage() {
   return (
     <main className="my-30">
       <MainContainer>
+        {/* Toast container */}
+        <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
+        </div>
+
         {/* Название курса */}
         <article className="w-full mb-10">
           <span className="bg-[#FF7A00] px-3 rounded-sm py-0.5 text-sm">Новый курс</span>
@@ -120,13 +151,21 @@ export default function CourseInfoPage() {
           </div>
         </div>
 
-        {/* Кнопка записи */}
-        <div className="flex justify-center items-center w-full mt-20">
+        {/* Кнопки */}
+        <div className="flex flex-col md:flex-row justify-center items-center w-full mt-20 gap-4">
           <button
             onClick={() => id && router.push(`/catalog/courses/enroll/${id}`)}
-            className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer"
+            className="bg-[#1a1a1a] px-10 py-5 rounded-md font-medium cursor-pointer text-[#FF7A00]"
           >
-            Записаться на курс
+            Записаться на консультацию
+          </button>
+
+          <button
+            onClick={handleCreateOrder}
+            disabled={creatingOrder}
+            className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer text-white disabled:opacity-50"
+          >
+            {creatingOrder ? "Создание..." : "Создать заказ"}
           </button>
         </div>
       </MainContainer>
