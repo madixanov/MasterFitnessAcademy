@@ -17,7 +17,7 @@ export default function LoginForm() {
   const router = useRouter()
 
   useEffect(() => {
-    const token = Cookies.get("token") || localStorage.getItem("token")
+    const token = Cookies.get("token") // ✅ только cookie
     if (token) {
       router.push("/profile")
     }
@@ -31,12 +31,11 @@ export default function LoginForm() {
     try {
       const res = await login({ email, password })
 
+      // ✅ храним только в cookies
       if (rememberMe) {
         Cookies.set("token", res.accessToken, { expires: 7 }) // 7 дней
-        localStorage.setItem("token", res.accessToken)
       } else {
-        Cookies.set("token", res.accessToken)
-        sessionStorage.setItem("token", res.accessToken)
+        Cookies.set("token", res.accessToken) // сессия
       }
 
       router.push("/profile")
@@ -92,9 +91,7 @@ export default function LoginForm() {
         disabled={loading}
         className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50 gap-2"
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>
-          <LogIn className="w-5 h-5 mr-4" /> Войти
-        </>}
+        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><LogIn className="w-5 h-5 mr-4" /> Войти</>}
       </button>
     </form>
   )

@@ -10,7 +10,11 @@ import Toast from "@/components/UI/toast";
 
 import { getMyCourses, MyCourse } from "@/services/mycourse/mycourse.api";
 
+import { useRequireAuth } from "./components/useRequireAuth";
+
 export default function Profile() {
+  useRequireAuth();
+
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
