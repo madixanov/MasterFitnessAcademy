@@ -9,7 +9,7 @@ interface ProductContainerProps {
 export default function ProductContainer({ title, description, image }: ProductContainerProps) {
   return (
     <div
-      className="group relative w-full h-[400px] bg-cover bg-center rounded-3xl overflow-hidden cursor-pointer shadow-[0_6px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out"
+      className="group relative w-full h-[300px] bg-cover bg-center rounded-3xl overflow-hidden cursor-pointer shadow-[0_6px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.12)] transition-all duration-500 ease-out"
       style={{ backgroundImage: `url(${image})` }}
     >
       {/* Основное мягкое затемнение фона */}
@@ -22,7 +22,7 @@ export default function ProductContainer({ title, description, image }: ProductC
 
         {/* Текст поверх затемнения */}
         <div className="relative z-10 flex flex-col items-center pb-5 lg:pb-0 group-hover:pb-0">
-          <h3 className="hidden lg:block text-5xl lg:text-3xl font-semibold uppercase tracking-wide mb-6 transition-all duration-500 ease-out group-hover:-translate-y-5 group-hover:text-[#FF6600]">
+          <h3 className="hidden lg:block text-5xl lg:text-3xl font-semibold uppercase tracking-wide translate-y-35 mb-6 transition-all duration-500 ease-out group-hover:-translate-y-5 group-hover:text-[#FF6600]">
             {title}
           </h3>
 

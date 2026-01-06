@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "../../globals.css";
 import Sidebar from "@/components/Sidebar";
+import PaymentBanner from "@/components/PaymentBanner";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -29,6 +30,7 @@ export default function RootLayout({
           <div className="flex flex-col flex-1 lg:ml-60">
             {/* Отступ под фиксированный Header */}
             <main className="flex-1 p-4 sm:p-6 lg:p-8">
+              <PaymentBanner />
               {children}
             </main>
           </div>

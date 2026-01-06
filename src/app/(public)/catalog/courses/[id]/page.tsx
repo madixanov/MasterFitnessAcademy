@@ -117,19 +117,12 @@ export default function CourseInfoPage() {
           <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
             <BookOpen className="w-7 h-7 text-[#FF7A00]" />
             <h2 className="text-xl">{course.Number_of_lessons}</h2>
-            <p className="text-sm text-[#999]">Количество уроков</p>
+            <p className="text-sm text-[#999]">Количество часов</p>
           </div>
           <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
             <Users className="w-7 h-7 text-[#FF7A00]" />
             <h2 className="text-xl">{course.Training_format}</h2>
             <p className="text-sm text-[#999]">Формат обучения</p>
-          </div>
-          <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
-            <ChartColumn className="w-7 h-7 text-[#FF7A00]" />
-            <h2 className="text-xl">
-              {course.level === 1 ? "Начальный" : course.level === 2 ? "Средний" : "Продвинутый"}
-            </h2>
-            <p className="text-sm text-[#999]">Уровень сложности</p>
           </div>
         </div>
 

@@ -17,7 +17,7 @@ export default function EnrollPage({ params }: { params: Promise<{ id: string }>
   if (!course) return <p>Загрузка курса...</p>;
 
   return (
-    <main className="flex flex-col min-h-[calc(100vh-140px)] items-center justify-center">
+    <main className="flex flex-col min-h-[calc(100vh-140px)] items-center justify-center my-30">
       <MainContainer>
         <Link className="mb-10" href={`/catalog/courses/info?id=${id}`}>
           <button className="px-4 flex justify-center items-center bg-[#0A0A0A] border border-[#2A2A2A] py-2 rounded-lg mb-10">
