@@ -3,27 +3,29 @@
 import { useEffect, useState } from "react";
 
 import HomeworkList from "./components/HomeworkList";
-import LatestLesson from "./components/LatestLessons";
+import LatestLesson from "./components/MyCourseCard";
 import LessonseList from "./components/LessonsList";
 import PaymentsList from "./components/PaymentsList";
 import Toast from "@/components/UI/toast";
 
-import { getMyCourses, MyCourse } from "@/services/mycourse/mycourse.api";
-
 import { useRequireAuth } from "./components/useRequireAuth";
+import { useMyCoursesStore } from "@/store/myCourseStore";
 
 export default function Profile() {
   useRequireAuth();
+
+  const { fetchMyCourses } = useMyCoursesStore();
 
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
 
-  const [hasInactiveCourse, setHasInactiveCourse] = useState(false);
+  useEffect(() => {
+    fetchMyCourses();
+  }, [fetchMyCourses]);
 
   useEffect(() => {
-    // Welcome toast
     const hasSeenWelcome = sessionStorage.getItem("welcomeToastShown");
     if (!hasSeenWelcome) {
       setToast({
@@ -32,20 +34,6 @@ export default function Profile() {
       });
       sessionStorage.setItem("welcomeToastShown", "true");
     }
-  }, []);
-
-  useEffect(() => {
-    async function checkCourses() {
-      const courses = await getMyCourses();
-
-      const inactive = courses.some(
-        (course) => course.status === "INACTIVE"
-      );
-
-      setHasInactiveCourse(inactive);
-    }
-
-    checkCourses();
   }, []);
 
   return (

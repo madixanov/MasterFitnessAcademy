@@ -1,27 +1,29 @@
-// stores/useMyCoursesStore.ts
 import { create } from "zustand";
-import { MyCourse, getMyCourses } from "@/services/mycourse/mycourse.api";
+import { getMyCourses, MyCourse } from "@/services/mycourse/mycourse.api";
 
 interface MyCoursesState {
   courses: MyCourse[];
   loading: boolean;
-  hasInactiveCourse: boolean;
-  fetchCourses: () => Promise<void>;
+  error: string | null;
+
+  fetchMyCourses: () => Promise<void>;
 }
 
 export const useMyCoursesStore = create<MyCoursesState>((set) => ({
   courses: [],
-  loading: true,
-  hasInactiveCourse: false,
-  fetchCourses: async () => {
-    set({ loading: true });
+  loading: false,
+  error: null,
+
+  fetchMyCourses: async () => {
+    set({ loading: true, error: null });
+
     try {
-      const courses = await getMyCourses();
-      const hasInactiveCourse = courses.some((c) => c.status === "INACTIVE");
-      set({ courses, hasInactiveCourse, loading: false });
-    } catch (err) {
-      console.error(err);
-      set({ courses: [], hasInactiveCourse: false, loading: false });
+      const data = await getMyCourses();
+      set({ courses: data });
+    } catch (e) {
+      set({ error: "Не удалось загрузить курсы" });
+    } finally {
+      set({ loading: false });
     }
   },
 }));
