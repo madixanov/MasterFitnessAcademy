@@ -12,8 +12,43 @@ export interface LessonPayload {
   img: string[];
   desc: string;
   duration: number;
+  startsAt: string; // ISO дата и время начала
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
 }
 
+// -------------------------
+// Урок с ID и createdAt
+// -------------------------
+export interface Lesson extends LessonPayload {
+  id: string;
+  createdAt: string;
+  homeworks?: any[];
+  modul?: {
+    id: string;
+    name: string;
+    desc: string;
+    courseId: string;
+    title: string;
+    createdAt: string;
+  };
+  Course?: {
+    id: string;
+    name: string;
+    description: string | null;
+    date: string;
+    price: number;
+    image: string[];
+    level: number;
+    status: "ACTIVE" | "INACTIVE";
+    trainerId: string;
+    Course_duration: string;
+    Number_of_lessons: string;
+    Training_format: string;
+    Course_Benefits_Sheet: string;
+    createdAt: string;
+    userId: string | null;
+  };
+}
 // ------------------------------------
 // Урок с ID и createdAt
 // ------------------------------------

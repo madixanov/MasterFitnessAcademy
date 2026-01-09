@@ -1,84 +1,102 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { CircleAlert, Video, Calendar, Clock } from "lucide-react";
-
-import { getLessonsByModule, Lesson } from "@/services/lessons/lessons.api";
+import { LessonFull } from "../page";
 
 interface Props {
-  moduleId: string;
+  lessons: LessonFull[];
 }
 
-export default function UpcomingLessons({ moduleId }: Props) {
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function UpcomingLessons({ lessons }: Props) {
+  const now = Date.now();
 
-  useEffect(() => {
-    async function fetchLessons() {
-      setLoading(true);
-      const data = await getLessonsByModule(moduleId);
-      setLessons(data);
-      setLoading(false);
-    }
+  // будущие уроки без фильтра по статусу
+  const upcomingLessons = lessons
+    .filter((l) => new Date(l.startsAt).getTime() > now)
+    .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 
-    if (moduleId) fetchLessons();
-  }, [moduleId]);
-
-  if (loading) {
-    return <div className="text-gray-400">Загрузка уроков...</div>;
-  }
-
-  if (!lessons.length) {
+  if (!upcomingLessons.length) {
     return <div className="text-gray-400">Ближайших уроков нет</div>;
   }
 
   return (
     <div className="flex flex-col gap-5 w-full">
-      {lessons.map((lesson) => {
-        const date = new Date(lesson.createdAt);
+      {upcomingLessons.map((lesson: LessonFull) => {
+        const startsAtDate = new Date(lesson.startsAt);
 
         return (
           <div
             key={lesson.id}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg"
+            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col"
           >
             {/* Header */}
-            <div className="flex justify-between items-center">
-              <div className="flex gap-3 items-stretch">
-                <span className="px-2 text-sm lg:text-md lg:px-5 bg-[#FF7A00] rounded-lg flex justify-center items-center">
-                  {lesson.name}
-                </span>
+            <div className="flex justify-between items-center flex-wrap mb-3">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-5">
+                <span className="px-5 bg-[#FF7A00] rounded-lg">{lesson.name}</span>
 
-                <span className="text-sm lg:text-md inline-flex items-center gap-1 lg:gap-3 text-[#FDC700] bg-[#F0B100]/20 px-2 lg:px-4 py-1 rounded-lg font-medium border border-[#F0B100]/30">
+                <span className="inline-flex items-center gap-2 text-[#FDC700] bg-[#F0B100]/20 px-4 py-1 rounded-xl text-xs md:text-sm font-medium border border-[#F0B100]/30">
                   <CircleAlert className="w-4 h-4" />
                   Ожидается
                 </span>
               </div>
 
-              <button className="flex gap-1 lg:gap-3 px-2 py-1 lg:px-3 lg:py-2 cursor-pointer text-sm lg:text-md bg-[#FF7A00] rounded-sm items-center transition hover:bg-[#FF7A00]/80">
-                <Video className="w-4 h-4" />
-                Перейти
-              </button>
+              <div className="flex gap-4 items-center mt-2 md:mt-0">
+                {lesson.video && lesson.video !== "-" && (
+                  <a
+                    href={lesson.video}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex gap-2 items-center px-3 py-2 text-sm md:text-md bg-[#FF7A00] rounded-sm hover:bg-[#FF7A00]/80 transition"
+                  >
+                    <Video className="w-4 h-4" /> Смотреть видео
+                  </a>
+                )}
+
+                <button className="flex gap-3 px-3 py-2 text-sm bg-[#0A0A0A] rounded-sm items-center transition hover:bg-[#0A0A0A]/80 border border-[#2A2A2A]">
+                  Материалы
+                </button>
+              </div>
             </div>
 
             {/* Body */}
-            <article className="mt-4">
-              <h2 className="text-xl mb-3">{lesson.title}</h2>
+            <article className="flex flex-col w-full gap-3">
+              <h2 className="text-xl font-semibold">{lesson.title}</h2>
 
-              <span className="block text-[#999] mb-2">
-                Модуль: {lesson.modulId}
-              </span>
+              {lesson.desc && <p className="text-gray-400">{lesson.desc}</p>}
 
-              <div className="flex gap-4 flex-wrap">
-                <span className="flex items-center text-[#999] gap-2">
+              {lesson.img && lesson.img.length > 0 && (
+                <div className="flex gap-2 flex-wrap">
+                  {lesson.img.map(
+                    (src, idx) =>
+                      src && src !== "-" && (
+                        <img
+                          key={idx}
+                          src={src}
+                          alt={`Изображение ${idx + 1}`}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                      )
+                  )}
+                </div>
+              )}
+
+              <div className="flex flex-col md:flex-row md:items-center gap-3 text-gray-400 mt-2 flex-wrap">
+                <span className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {date.toLocaleDateString()}
+                  {startsAtDate.toLocaleDateString()}{" "}
+                  {startsAtDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </span>
 
-                <span className="flex items-center text-[#999] gap-2">
-                  <Clock className="w-4 h-4" />
-                  {lesson.duration} мин
+                <span className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" /> {lesson.duration} мин
                 </span>
+
+                <span className="text-sm">
+                  Модуль: <strong>{lesson.moduleName}</strong>
+                </span>
+
+                <span className="text-sm">ID урока: {lesson.id}</span>
+                <span className="text-sm">ID курса: {lesson.courseId}</span>
               </div>
             </article>
           </div>

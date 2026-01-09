@@ -2,42 +2,92 @@
 
 import { useEffect, useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-
+import { useMyCoursesStore } from "@/store/myCourseStore";
+import { getCourseById, Course } from "@/services/courses/courses.api";
 import UpcomingLessons from "./components/UpcomingLessons";
 import FinishedLessons from "./components/FinishedLessons";
 
-import { getMyCourses } from "@/services/mycourse/mycourse.api";
+export interface LessonFull {
+  id: string;
+  name: string;
+  title: string;
+  desc: string;
+  video: string;
+  img: string[];
+  duration: number;
+  startsAt: string;
+  moduleId: string;
+  moduleName: string;
+  courseId: string;
+}
 
 export default function Lessons() {
-  const [moduleId, setModuleId] = useState<string | null>(null);
+  const { courses, loading: coursesLoading } = useMyCoursesStore();
+  const [lessons, setLessons] = useState<LessonFull[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchMyCourse() {
+    async function loadLessons() {
       setLoading(true);
 
-      const myCourses = await getMyCourses();
-
-      if (myCourses.length) {
-        setModuleId(myCourses[0].moduleId);
+      const activeCourse = courses.find(c => c.status === "ACTIVE");
+      if (!activeCourse) {
+        setLessons([]);
+        setLoading(false);
+        return;
       }
 
-      setLoading(false);
+      try {
+        const fullCourse: Course = await getCourseById(activeCourse.courseId);
+        const allLessons: LessonFull[] = [];
+
+        fullCourse.modules?.forEach(module => {
+          module.lessons?.forEach((lesson: any) => {
+            allLessons.push({
+              id: lesson.id,
+              name: lesson.name,
+              title: lesson.title,
+              desc: lesson.desc,
+              video: lesson.video,
+              img: lesson.img,
+              duration: lesson.duration,
+              startsAt: lesson.startsAt,
+              moduleId: module.id,
+              moduleName: module.name,
+              courseId: fullCourse.id,
+            });
+          });
+        });
+
+        // сортировка по дате
+        allLessons.sort(
+          (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+        );
+
+        setLessons(allLessons);
+      } catch (err) {
+        console.error("Не удалось загрузить уроки:", err);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    fetchMyCourse();
-  }, []);
+    if (courses.length > 0) loadLessons();
+  }, [courses]);
 
-  if (loading) {
-    return <div className="text-gray-400">Загрузка...</div>;
+  const now = Date.now();
+
+  const upcomingLessons = lessons.filter(l => new Date(l.startsAt).getTime() > now);
+  const finishedLessons = lessons.filter(l => new Date(l.startsAt).getTime() <= now);
+
+  if (coursesLoading || loading) {
+    return <div className="text-gray-400">Загрузка уроков...</div>;
   }
 
   return (
     <main className="flex flex-col">
       <h2 className="text-4xl font-medium mb-3">Уроки</h2>
-      <p className="text-sm text-[#999] mb-6">
-        Расписание и история занятий
-      </p>
+      <p className="text-sm text-[#999] mb-6">Расписание и история занятий</p>
 
       <Tabs.Root defaultValue="upcoming" className="flex flex-col w-full">
         <Tabs.List className="relative flex bg-[#2A2A2A] mb-6 justify-center md:justify-start items-center rounded-lg py-1 px-2 overflow-hidden max-w-xs md:mx-0">
@@ -57,11 +107,11 @@ export default function Lessons() {
         </Tabs.List>
 
         <Tabs.Content value="upcoming">
-          {moduleId && <UpcomingLessons moduleId={moduleId} />}
+          <UpcomingLessons lessons={upcomingLessons} />
         </Tabs.Content>
 
         <Tabs.Content value="finished">
-          {moduleId && <FinishedLessons moduleId={moduleId} />}
+          <FinishedLessons lessons={finishedLessons} />
         </Tabs.Content>
       </Tabs.Root>
     </main>
