@@ -10,6 +10,7 @@ import { useCourseStore } from "@/store/courseStore";
 import { createOrder } from "@/services/orders/orders.api"; 
 import Toast from "@/components/UI/toast";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
 
 // Skeleton курса
 function CourseSkeleton() {
@@ -68,7 +69,8 @@ export default function CourseInfoPage() {
   const handleCreateOrder = async () => {
     if (!id) return;
 
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
+    console.log(token)
     if (!token) {
       router.push("/auth"); // перенаправляем на страницу авторизации
       return;
