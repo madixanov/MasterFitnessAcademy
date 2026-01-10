@@ -67,6 +67,13 @@ export default function CourseInfoPage() {
 
   const handleCreateOrder = async () => {
     if (!id) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth"); // перенаправляем на страницу авторизации
+      return;
+    }
+
     setCreatingOrder(true);
 
     try {
