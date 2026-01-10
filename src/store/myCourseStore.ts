@@ -1,8 +1,11 @@
+// store/myCoursesStore.ts
 import { create } from "zustand";
-import { getMyCourses, MyCourse } from "@/services/mycourse/mycourse.api";
+import { MyCourse } from "@/services/mycourse/mycourse.api";
+import { fetchCoursesAndTests } from "@/services/mycourse/mycourse.service";
 
 interface MyCoursesState {
   courses: MyCourse[];
+  tests: any[];
   loading: boolean;
   error: string | null;
 
@@ -11,23 +14,22 @@ interface MyCoursesState {
 
 export const useMyCoursesStore = create<MyCoursesState>((set, get) => ({
   courses: [],
+  tests: [],
   loading: false,
   error: null,
 
   fetchMyCourses: async () => {
     const { loading, courses } = get();
-
-    // ❗ защита от повторных запросов
     if (loading || courses.length > 0) return;
 
     set({ loading: true, error: null });
 
     try {
-      const data = await getMyCourses();
-      set({ courses: data, error: null });
+      const { courses: myCourses, tests } = await fetchCoursesAndTests();
+      set({ courses: myCourses, tests });
     } catch (err) {
       console.error("fetchMyCourses error:", err);
-      set({ error: "Не удалось загрузить курсы" });
+      set({ error: "Не удалось загрузить курсы и тесты" });
     } finally {
       set({ loading: false });
     }

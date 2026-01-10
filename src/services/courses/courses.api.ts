@@ -22,6 +22,7 @@ export interface Course {
   /** relations */
   trainer?: Trainer;
   modules?: any[];
+  tests?: any[]
 }
 
 /** Получить все курсы */
