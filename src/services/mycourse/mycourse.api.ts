@@ -5,7 +5,7 @@ export interface MyCourse {
   id: string;
   userId: string;
   courseId: string;
-  status: "ACTIVE" | "INACTIVE";
+  status: "ACTIVE" | "INACTIVE" | "COMPLETED";
   createdAt: string;
 
   name: string;
