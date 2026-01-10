@@ -14,17 +14,23 @@ import { useMyCoursesStore } from "@/store/myCourseStore";
 export default function Profile() {
   useRequireAuth();
 
-  const { fetchMyCourses } = useMyCoursesStore();
+  const {
+    fetchMyCourses,
+    loading: coursesLoading,
+    error: coursesError,
+  } = useMyCoursesStore();
 
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
 
+  /* 🔹 загрузка курсов (без дублей) */
   useEffect(() => {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
+  /* 🔹 welcome toast */
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem("welcomeToastShown");
     if (!hasSeenWelcome) {
@@ -35,6 +41,16 @@ export default function Profile() {
       sessionStorage.setItem("welcomeToastShown", "true");
     }
   }, []);
+
+  /* 🔹 toast при ошибке загрузки курсов */
+  useEffect(() => {
+    if (coursesError) {
+      setToast({
+        message: coursesError,
+        type: "error",
+      });
+    }
+  }, [coursesError]);
 
   return (
     <main className="flex flex-col">
@@ -57,6 +73,7 @@ export default function Profile() {
         </p>
       </div>
 
+      {/* 🔹 можно добавить skeleton при coursesLoading */}
       <LatestLesson />
       <LessonseList />
 

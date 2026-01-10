@@ -22,10 +22,23 @@ export interface LessonFull {
 }
 
 export default function Lessons() {
-  const { courses, loading: coursesLoading } = useMyCoursesStore();
+  const {
+    courses,
+    loading: coursesLoading,
+    fetchMyCourses,
+  } = useMyCoursesStore();
+
   const [lessons, setLessons] = useState<LessonFull[]>([]);
   const [loading, setLoading] = useState(true);
 
+  /* 1️⃣ если стор пустой — грузим мои курсы */
+  useEffect(() => {
+    if (!courses.length && !coursesLoading) {
+      fetchMyCourses();
+    }
+  }, [courses.length, coursesLoading, fetchMyCourses]);
+
+  /* 2️⃣ когда курсы появились — грузим уроки */
   useEffect(() => {
     async function loadLessons() {
       setLoading(true);
@@ -59,9 +72,10 @@ export default function Lessons() {
           });
         });
 
-        // сортировка по дате
         allLessons.sort(
-          (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
+          (a, b) =>
+            new Date(a.startsAt).getTime() -
+            new Date(b.startsAt).getTime()
         );
 
         setLessons(allLessons);
@@ -72,13 +86,18 @@ export default function Lessons() {
       }
     }
 
-    if (courses.length > 0) loadLessons();
+    if (courses.length) {
+      loadLessons();
+    }
   }, [courses]);
 
   const now = Date.now();
-
-  const upcomingLessons = lessons.filter(l => new Date(l.startsAt).getTime() > now);
-  const finishedLessons = lessons.filter(l => new Date(l.startsAt).getTime() <= now);
+  const upcomingLessons = lessons.filter(
+    l => new Date(l.startsAt).getTime() > now
+  );
+  const finishedLessons = lessons.filter(
+    l => new Date(l.startsAt).getTime() <= now
+  );
 
   if (coursesLoading || loading) {
     return <div className="text-gray-400">Загрузка уроков...</div>;
@@ -87,10 +106,12 @@ export default function Lessons() {
   return (
     <main className="flex flex-col">
       <h2 className="text-4xl font-medium mb-3">Уроки</h2>
-      <p className="text-sm text-[#999] mb-6">Расписание и история занятий</p>
+      <p className="text-sm text-[#999] mb-6">
+        Расписание и история занятий
+      </p>
 
       <Tabs.Root defaultValue="upcoming" className="flex flex-col w-full">
-        <Tabs.List className="relative flex bg-[#2A2A2A] mb-6 justify-center md:justify-start items-center rounded-lg py-1 px-2 overflow-hidden max-w-xs md:mx-0">
+        <Tabs.List className="relative flex bg-[#2A2A2A] mb-6 justify-center md:justify-start items-center rounded-lg py-1 px-2 overflow-hidden max-w-xs">
           <Tabs.Trigger
             value="upcoming"
             className="px-6 py-1 text-white rounded-lg data-[state=active]:bg-[#1A1A1A]"
