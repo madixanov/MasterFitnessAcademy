@@ -1,6 +1,10 @@
+"use client";
+
 import MainContainer from "@/components/MainContainer";
 import Image from "next/image";
+import { motion, Variants } from "framer-motion";
 
+// Список преимуществ
 const advantagesList = [
   {
     icon: "/ifbb.svg",
@@ -17,7 +21,7 @@ const advantagesList = [
   },
   {
     icon: "/diploma.svg",
-    text: "Возможность получения Красного и Синего диплома"
+    text: "Возможность получения Красного и Синего диплома",
   },
   {
     icon: "/teachers.svg",
@@ -27,18 +31,29 @@ const advantagesList = [
     icon: "/grade.svg",
     text: "Повышение квалификации и рентабельности",
   },
-]
+];
+
+// Анимация fade-up для Framer Motion
+const fadeUpVariants: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
 
 export default function Advantages() {
   return (
     <div className="relative flex justify-center items-center mb-10 bg-[url('/figure.svg')] w-full bg-center bg-cover xl:bg-none">
+      {/* Декоративные изображения */}
       <Image
         src="/advantages-photo.svg"
         alt="decor 1"
         width={300}
         height={300}
         preload
-        className="absolute 2xl:top-[-20] rotate-40  2xl:left-130 opacity-70 hidden 2xl:block"
+        className="absolute 2xl:top-[-20] rotate-40 2xl:left-130 opacity-70 hidden 2xl:block"
       />
       <Image
         src="/advantages-photo.svg"
@@ -80,26 +95,50 @@ export default function Advantages() {
         preload
         className="absolute 2xl:bottom-0 rotate-250 2xl:right-120 opacity-70 hidden 2xl:block"
       />
-      {/* Ромб-контейнер */}
-      <div
-        className="xl:bg-[url('/figure.svg')] bg-center bg-cover bg-no-repeat overflow-hidden text-white w-[1920px] h-[1186px] md:h-[1000px] lg:h-[1130px] xl:h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-30 xl:pt-50"
-      >
+
+      {/* Основной контейнер */}
+      <div className="xl:bg-[url('/figure.svg')] bg-center bg-cover bg-no-repeat overflow-hidden text-white w-[1920px] h-[1186px] md:h-[1000px] lg:h-[1130px] xl:h-[1168px] relative flex flex-col justify-center items-center lg:justify-start lg:pt-30 xl:pt-50">
         <MainContainer>
           <div className="flex flex-col justify-center items-center">
-            <h2 className="text-3xl font-bold mb-6 md:text-5xl md:mb-10 lg:mb-10">ПОЧЕМУ ВЫБИРАЮТ НАС?</h2>
+            {/* Заголовок с анимацией */}
+            <motion.h2
+              className="text-3xl font-bold mb-6 md:text-5xl md:mb-10 lg:mb-10"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={fadeUpVariants}
+            >
+              ПОЧЕМУ ВЫБИРАЮТ НАС?
+            </motion.h2>
+
+            {/* Список преимуществ */}
             <div className="flex max-w-[1000px] flex-wrap gap-6 text-sm mx-auto justify-center items-center">
               {advantagesList.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col items-center text-center w-full md:max-w-[250px] lg:h-[344px]"
-                  >
-                    <div className="relative w-20 h-20 md:w-full md:h-28 mb-0 md:mb-4">
-                      <Image src={item.icon} alt={item.title || "icon"} fill className="object-contain" />
-                    </div>
-                    {item.title && <p className="text-3xl font-bold md:text-5xl">{item.title}</p>}
-                    <p className="text-center w-full lg:w-65 text-lg font-semibold lg:text-3xl">{item.text}</p>
+                <motion.div
+                  key={i}
+                  className="flex flex-col items-center text-center w-full md:max-w-[250px] lg:h-[344px]"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={fadeUpVariants}
+                  transition={{ delay: i * 0.1 }} // ступенчатая анимация
+                >
+                  <div className="relative w-20 h-20 md:w-full md:h-28 mb-0 md:mb-4">
+                    <Image
+                      src={item.icon}
+                      alt={item.title || "icon"}
+                      fill
+                      className="object-contain"
+                    />
                   </div>
-                ))}
+                  {item.title && (
+                    <p className="text-3xl font-bold md:text-5xl">{item.title}</p>
+                  )}
+                  <p className="text-center w-full lg:w-65 text-lg font-semibold lg:text-3xl">
+                    {item.text}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </MainContainer>

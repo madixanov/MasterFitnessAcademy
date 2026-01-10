@@ -4,31 +4,23 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import MainContainer from "@/components/MainContainer";
 import { getBranches, Branch } from "@/services/branches/branches.api";
+import { motion, Variants } from "framer-motion";
 
 // ===== Skeleton компонент =====
 function BranchSkeleton() {
   return (
     <div className="mb-10 flex flex-col md:flex-row justify-between gap-5 animate-pulse">
-      
       {/* Левая карточка */}
       <div className="relative w-full lg:w-[445px] flex flex-col justify-center items-start border-2 p-8 gap-6 lg:gap-8 backdrop-blur-md bg-black/10 border-white/10 rounded-xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.5),_0_8px_20px_rgba(0,0,0,0.3)]">
-
-        {/* Город */}
         <div className="h-9 w-2/3 bg-white/10 rounded-lg mb-4" />
-
-        {/* Телефон */}
         <div className="flex flex-col gap-3 w-full">
           <div className="h-6 w-1/2 bg-white/10 rounded" />
           <div className="h-7 w-3/4 bg-white/10 rounded" />
         </div>
-
-        {/* Почта */}
         <div className="flex flex-col gap-3 w-full">
           <div className="h-6 w-1/2 bg-white/10 rounded" />
           <div className="h-7 w-4/5 bg-white/10 rounded" />
         </div>
-
-        {/* Адрес */}
         <div className="flex flex-col gap-3 w-full">
           <div className="h-6 w-1/2 bg-white/10 rounded" />
           <div className="h-7 w-full bg-white/10 rounded" />
@@ -41,6 +33,15 @@ function BranchSkeleton() {
   );
 }
 
+// ===== Framer Motion variants =====
+const fadeUpVariants: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
 
 export default function Contacts() {
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -64,19 +65,32 @@ export default function Contacts() {
   return (
     <div className="relative mb-15">
       <MainContainer>
-        <h1 className="uppercase text-center font-semibold text-3xl md:text-5xl lg:text-7xl mb-7 lg:mb-13">
+        {/* Заголовок секции */}
+        <motion.h1
+          className="uppercase text-center font-semibold text-3xl md:text-5xl lg:text-7xl mb-7 lg:mb-13"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={fadeUpVariants}
+        >
           Филиалы
-        </h1>
+        </motion.h1>
 
         {isLoading ? (
           <BranchSkeleton />
         ) : (
-          branches.map((branch) => (
-            <div key={branch.id} className="mb-10 flex flex-col md:flex-row justify-between gap-5 relative">
+          branches.map((branch, i) => (
+            <motion.div
+              key={branch.id}
+              className="mb-10 flex flex-col md:flex-row justify-between gap-5 relative"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={fadeUpVariants}
+              transition={{ delay: i * 0.15 }} // ступенчатое появление
+            >
               {/* Инфо о филиале */}
               <div className="relative w-full lg:w-[445px] flex flex-col justify-center items-start border-2 p-8 gap-5 lg:gap-10 backdrop-blur-md bg-black/10 border-white/10 rounded-xl shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_8px_rgba(0,0,0,0.5),_0_8px_20px_rgba(0,0,0,0.3)]">
-                
-                {/* Название города */}
                 <h2 className="text-white font-bold text-3xl xl:text-4xl mb-6">{branch.city}</h2>
 
                 {/* Телефон */}
@@ -124,7 +138,7 @@ export default function Contacts() {
                   title={`Map of ${branch.city}`}
                 ></iframe>
               </div>
-            </div>
+            </motion.div>
           ))
         )}
       </MainContainer>

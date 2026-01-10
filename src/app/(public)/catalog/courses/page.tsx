@@ -6,6 +6,7 @@ import ProductContainer from "@/components/UI/ProductContainer";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, Transition } from "framer-motion";
 
 import { getCourses, Course } from "@/services/courses/courses.api";
 
@@ -15,6 +16,20 @@ function CourseSkeleton() {
     <div className="animate-pulse w-full h-[280px] bg-white/10 rounded-2xl" />
   );
 }
+
+// Варианты анимации для карточек
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.5,
+      ease: [0.25, 0.1, 0.25, 1], // правильный формат для ease (Bezier кривая)
+    } as Transition,
+  }),
+};
 
 export default function Courses() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -58,17 +73,23 @@ export default function Courses() {
               ? Array.from({ length: 6 }).map((_, i) => (
                   <CourseSkeleton key={i} />
                 ))
-              : courses.map((course) => (
-                  <Link
-                    href={`/catalog/courses/info?id=${course.id}`}
+              : courses.map((course, i) => (
+                  <motion.div
                     key={course.id}
+                    custom={i}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.2 }}
+                    variants={cardVariants}
                   >
-                    <ProductContainer
-                      title="Курс"
-                      description={course.name}
-                      image={course.image?.[0] || "/courses/default.jpg"}
-                    />
-                  </Link>
+                    <Link href={`/catalog/courses/info?id=${course.id}`}>
+                      <ProductContainer
+                        title="Курс"
+                        description={course.name}
+                        image={course.image?.[0] || "/courses/default.jpg"}
+                      />
+                    </Link>
+                  </motion.div>
                 ))}
           </section>
         </MainContainer>

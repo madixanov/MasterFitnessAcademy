@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import MainContainer from "@/components/MainContainer";
 import LessonModules, { Module } from "./components/LessonModulesList";
-import { CircleCheckBig, Clock, BookOpen, Users, ChartColumn } from "lucide-react";
+import { CircleCheckBig, Clock, BookOpen, Users } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCourseById, Course } from "@/services/courses/courses.api";
 import { useCourseStore } from "@/store/courseStore";
 import { createOrder } from "@/services/orders/orders.api"; 
 import Toast from "@/components/UI/toast";
+import { motion } from "framer-motion";
 
+// Skeleton курса
 function CourseSkeleton() {
   return (
     <MainContainer>
@@ -30,6 +32,12 @@ function CourseSkeleton() {
   );
 }
 
+// Простая анимация для motion.div
+const fadeInUpVariant = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export default function CourseInfoPage() {
   const params = useSearchParams();
   const router = useRouter();
@@ -43,10 +51,7 @@ export default function CourseInfoPage() {
   const [creatingOrder, setCreatingOrder] = useState(false);
 
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-
-  const showToast = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
-  };
+  const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
 
   useEffect(() => {
     if (!id) return;
@@ -89,7 +94,7 @@ export default function CourseInfoPage() {
   return (
     <main className="my-30">
       <MainContainer>
-        {/* Toast container */}
+        {/* Toast */}
         <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
           {toast && (
             <Toast
@@ -101,51 +106,79 @@ export default function CourseInfoPage() {
         </div>
 
         {/* Название курса */}
-        <article className="w-full mb-10">
+        <motion.article
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUpVariant}
+          transition={{ duration: 0.5 }}
+          className="w-full mb-10"
+        >
           <span className="bg-[#FF7A00] px-3 rounded-sm py-0.5 text-sm">Новый курс</span>
           <h1 className="text-4xl my-5">{course.name}</h1>
           <p className="text-[#999] max-w-2xl">{course.description}</p>
-        </article>
+        </motion.article>
 
         {/* Основные параметры */}
         <div className="w-full flex flex-col md:flex-row gap-5 mt-10">
-          <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
-            <Clock className="w-7 h-7 text-[#FF7A00]" />
-            <h2 className="text-xl">{course.Course_duration}</h2>
-            <p className="text-sm text-[#999]">Длительность</p>
-          </div>
-          <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
-            <BookOpen className="w-7 h-7 text-[#FF7A00]" />
-            <h2 className="text-xl">{course.Number_of_lessons}</h2>
-            <p className="text-sm text-[#999]">Количество часов</p>
-          </div>
-          <div className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5">
-            <Users className="w-7 h-7 text-[#FF7A00]" />
-            <h2 className="text-xl">{course.Training_format}</h2>
-            <p className="text-sm text-[#999]">Формат обучения</p>
-          </div>
+          {[
+            { icon: <Clock className="w-7 h-7 text-[#FF7A00]" />, value: course.Course_duration, label: "Длительность" },
+            { icon: <BookOpen className="w-7 h-7 text-[#FF7A00]" />, value: course.Number_of_lessons, label: "Количество часов" },
+            { icon: <Users className="w-7 h-7 text-[#FF7A00]" />, value: course.Training_format, label: "Формат обучения" },
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUpVariant}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+              className="flex w-full flex-col justify-center items-center border border-[#2A2A2A] rounded-md bg-[#1a1a1a] p-5"
+            >
+              {item.icon}
+              <h2 className="text-xl">{item.value}</h2>
+              <p className="text-sm text-[#999]">{item.label}</p>
+            </motion.div>
+          ))}
         </div>
 
         {/* Программа курса */}
-        <section className="mt-10 w-full">
+        <motion.section
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUpVariant}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="mt-10 w-full"
+        >
           <h2 className="text-2xl mb-5">Программа курса</h2>
           <LessonModules modules={modules} />
-        </section>
+        </motion.section>
 
         {/* Преимущества */}
         <div className="mt-10 w-full">
           <h2 className="text-2xl mb-5">Преимущества курса</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {advantages.map((a, index) => (
-              <div key={index} className="flex items-center w-full px-5 py-4 border border-[#2A2A2A] rounded-md bg-[#1a1a1a]">
+              <motion.div
+                key={index}
+                initial="hidden"
+                animate="visible"
+                variants={fadeInUpVariant}
+                transition={{ duration: 0.5, delay: 1 + index * 0.15 }}
+                className="flex items-center w-full px-5 py-4 border border-[#2A2A2A] rounded-md bg-[#1a1a1a]"
+              >
                 <CircleCheckBig className="w-5 h-5 mr-4 text-[#FF7A00]" /> {a}
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
 
         {/* Кнопки */}
-        <div className="flex flex-col md:flex-row justify-center items-center w-full mt-20 gap-4">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUpVariant}
+          transition={{ duration: 0.5, delay: 1.5 }}
+          className="flex flex-col md:flex-row justify-center items-center w-full mt-20 gap-4"
+        >
           <button
             onClick={() => id && router.push(`/catalog/courses/enroll/${id}`)}
             className="bg-[#1a1a1a] px-10 py-5 rounded-md font-medium cursor-pointer text-[#FF7A00]"
@@ -160,7 +193,7 @@ export default function CourseInfoPage() {
           >
             {creatingOrder ? "Создание..." : "Создать заказ"}
           </button>
-        </div>
+        </motion.div>
       </MainContainer>
     </main>
   );
