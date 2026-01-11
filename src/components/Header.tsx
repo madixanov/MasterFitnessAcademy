@@ -147,7 +147,7 @@ export default function Header() {
                 {[
                   { label: "Главная", href: "/" },
                   { label: "Курсы", href: "/catalog" },
-                  { label: "О нас", scrollTo: "advantages" },
+                  { label: "Дипломы", href: "/diplomas" },
                   { label: "Чемпионы", scrollTo: "gallery" },
                   { label: "Контакты", scrollTo: "contacts" },
                 ].map((item) => (

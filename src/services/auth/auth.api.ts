@@ -114,7 +114,7 @@ export async function login(data: LoginPayload, rememberMe: boolean = false): Pr
   });
 
   const cookieOptions = { expires: rememberMe ? 30 : undefined, path: "/" };
-  Cookies.set("accessToken", loginRes.accessToken, cookieOptions);
+  Cookies.set("token", loginRes.accessToken, cookieOptions);
   Cookies.set("refreshToken", loginRes.refreshToken, cookieOptions);
 
   return loginRes;
