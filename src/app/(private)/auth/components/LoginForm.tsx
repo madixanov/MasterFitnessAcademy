@@ -29,16 +29,8 @@ export default function LoginForm() {
     setLoading(true)
 
     try {
-      const res = await login({ email, password })
-
-      // ✅ храним только в cookies
-      if (rememberMe) {
-        Cookies.set("token", res.accessToken, { expires: 7 }) // 7 дней
-      } else {
-        Cookies.set("token", res.accessToken) // сессия
-      }
-
-      router.push("/profile")
+      const res = await login({ email, password }, rememberMe);
+      router.push("/profile");
     } catch (err: any) {
       setError("Неверный email или пароль")
     } finally {

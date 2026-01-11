@@ -1,5 +1,9 @@
+import Cookies from "js-cookie";
 import { apiClient } from "../apiClient";
 
+// ------------------------
+// SIGNUP
+// ------------------------
 export interface SignupPayload {
   name: string;
   email: string;
@@ -8,21 +12,29 @@ export interface SignupPayload {
 }
 
 export interface SignupResponse {
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
-export async function signup(data: SignupPayload): Promise<SignupResponse> {
+export async function signup(data: SignupPayload, rememberMe: boolean = false): Promise<SignupResponse> {
   const signupRes: SignupResponse = await apiClient<SignupResponse>("/auth/signup", {
     method: "POST",
     body: JSON.stringify(data),
   });
 
+  const cookieOptions = { expires: rememberMe ? 30 : undefined, path: "/" };
+  Cookies.set("accessToken", signupRes.accessToken, cookieOptions);
+  Cookies.set("refreshToken", signupRes.refreshToken, cookieOptions);
+
   return signupRes;
 }
 
+// ------------------------
+// SEND OTP
+// ------------------------
 export interface sendOtpPayload {
-  to: string,
-  subject: string
+  to: string;
+  subject: string;
 }
 
 export async function sendOtp(data: sendOtpPayload): Promise<{ success: boolean }> {
@@ -45,14 +57,17 @@ export async function sendResetOtp(data: sendOtpPayload): Promise<{ success: boo
   });
 }
 
+// ------------------------
+// VERIFY OTP
+// ------------------------
 export interface VerifyOtpPayload {
   otpCode: string;
   contact: string;
-  type: string; 
+  type: string;
 }
 
 export interface VerifyOtpResponse {
-  message: string,
+  message: string;
 }
 
 export async function verifyOtp(data: VerifyOtpPayload): Promise<VerifyOtpResponse> {
@@ -68,7 +83,7 @@ export interface VerifyResetOtpPayload {
 }
 
 export interface VerifyResetOtpResponse {
-  message: string,
+  message: string;
 }
 
 export async function verifyResetOtp(data: VerifyResetOtpPayload): Promise<VerifyResetOtpResponse> {
@@ -78,6 +93,9 @@ export async function verifyResetOtp(data: VerifyResetOtpPayload): Promise<Verif
   });
 }
 
+// ------------------------
+// LOGIN
+// ------------------------
 export interface LoginPayload {
   email: string;
   password: string;
@@ -89,20 +107,29 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
-export async function login(data: LoginPayload): Promise<LoginResponse> {
-  return apiClient<LoginResponse>("/auth/signin", {
+export async function login(data: LoginPayload, rememberMe: boolean = false): Promise<LoginResponse> {
+  const loginRes: LoginResponse = await apiClient<LoginResponse>("/auth/signin", {
     method: "POST",
     body: JSON.stringify(data),
   });
+
+  const cookieOptions = { expires: rememberMe ? 30 : undefined, path: "/" };
+  Cookies.set("accessToken", loginRes.accessToken, cookieOptions);
+  Cookies.set("refreshToken", loginRes.refreshToken, cookieOptions);
+
+  return loginRes;
 }
 
+// ------------------------
+// NEW PASSWORD
+// ------------------------
 export interface NewPasswordPayload {
-  email: string,
-  newPassword: string,
+  email: string;
+  newPassword: string;
 }
 
 export interface NewPasswordResponse {
-  message: string
+  message: string;
 }
 
 export async function newPassword(data: NewPasswordPayload): Promise<NewPasswordResponse> {
@@ -110,4 +137,25 @@ export async function newPassword(data: NewPasswordPayload): Promise<NewPassword
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+// ------------------------
+// LOGOUT
+// ------------------------
+export async function logout() {
+  const token = Cookies.get("accessToken");
+
+  if (token) {
+    try {
+      await apiClient("/auth/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (err) {
+      console.warn("Ошибка при logout на сервере:", err);
+    }
+  }
+
+  Cookies.remove("accessToken");
+  Cookies.remove("refreshToken");
 }
