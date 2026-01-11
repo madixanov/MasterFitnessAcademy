@@ -117,10 +117,7 @@ export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksPr
                 )}
               </div>
             </div>
-
-            {/* Дата отправки и кнопка скачать решение */}
-            <div className="flex gap-5 items-center justify-between bg-[#2A2A2A] p-5 rounded-md mt-5">
-              <span className="flex items-center text-[#999] text-sm">
+            <span className="flex items-center text-[#999] text-sm">
                 <FileText className="w-4 h-4 mr-2" /> Работа отправлена{" "}
                 {new Date(hw.createdAt).toLocaleDateString("ru-RU", {
                   day: "2-digit",
@@ -128,13 +125,6 @@ export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksPr
                   year: "numeric",
                 })}
               </span>
-
-              {hw.files?.length > 0 || hw.text ? (
-                <button className="flex items-center bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 text-sm rounded-sm">
-                  <Download className="w-4 h-4 mr-2" /> Скачать решение
-                </button>
-              ) : null}
-            </div>
           </div>
         );
       })}

@@ -44,10 +44,8 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
   const handleSubmit = async (homeworkId: string) => {
     setLoading(true);
     try {
-      // 1. Загружаем файлы через uploadFiles
       const uploadedFiles = await uploadFiles(files);
 
-      // 2. Формируем payload и отправляем домашку
       const payload: HomeworkSubmissionPayload = {
         homeworkId,
         text,
@@ -125,15 +123,15 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
               <div className="flex gap-5 items-stretch mt-5">
                 <button
                   className={`flex items-center px-4 py-1 text-sm rounded-sm ${
-                    isPastDeadline ? "bg-gray-700 cursor-not-allowed" : "bg-[#FF7A00]"
+                    isPastDeadline
+                      ? "bg-gray-700 cursor-not-allowed"
+                      : "bg-[#FF7A00]"
                   }`}
-                  onClick={() => setOpenModalId(homework.id)}
+                  onClick={() => !isPastDeadline && setOpenModalId(homework.id)}
                   disabled={isPastDeadline}
                 >
-                  <Upload className="w-4 h-4 mr-2" /> Загрузить решение
-                </button>
-                <button className="flex items-center bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 text-sm rounded-sm">
-                  <FileText className="w-4 h-4 mr-2" /> Подробнее
+                  <Upload className="w-4 h-4 mr-2" />
+                  {isPastDeadline ? "Дедлайн прошёл" : "Загрузить решение"}
                 </button>
               </div>
 
