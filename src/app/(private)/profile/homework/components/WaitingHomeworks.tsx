@@ -1,54 +1,188 @@
-import { Clock, Upload, FileText } from "lucide-react"
+"use client";
 
-const  homeworks = [
-  {
-    subject: "Математика", 
-    task: "Решить задачи 25-30", 
-    theme: "Квадратные уравнения", 
-    secondaryTask: "Решить задачи из учебника, показать подробное решение с объяснениями.", 
-    deadline: "12.11.2025",
-    points: 10
-  },
-  {
-    subject: "Английиский язык", 
-    task: 'Написать эссе "My Future Career"', 
-    theme: "Writing Skills", 
-    secondaryTask: "Эссе объёмом 200-250 слов на тему будущей профессии.", 
-    deadline: "15.11.2025",
-    points: 15
-  },
-]
+import { useState } from "react";
+import { Clock, Upload, FileText, X } from "lucide-react";
+import { Homework } from "@/services/homework/homework.api";
+import { HomeworkSubmissionPayload, submitHomework } from "@/services/homework/homework.api";
+import { uploadFiles } from "@/services/upload/upload.api";
+import Toast from "@/components/UI/toast";
 
-export default function WaitingHomeworks() {
+interface WaitingHomeworksProps {
+  homeworks: Homework[];
+  onSubmitSuccess?: () => void; // коллбек после успешной отправки
+}
+
+interface ToastItem {
+  id: string;
+  message: string;
+  type: "success" | "error";
+}
+
+export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: WaitingHomeworksProps) {
+  const [openModalId, setOpenModalId] = useState<string | null>(null);
+  const [text, setText] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  const addToast = (message: string, type: "success" | "error") => {
+    const id = crypto.randomUUID();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleSubmit = async (homeworkId: string) => {
+    setLoading(true);
+    try {
+      // 1. Загружаем файлы через uploadFiles
+      const uploadedFiles = await uploadFiles(files);
+
+      // 2. Формируем payload и отправляем домашку
+      const payload: HomeworkSubmissionPayload = {
+        homeworkId,
+        text,
+        files: uploadedFiles,
+      };
+
+      await submitHomework(payload);
+
+      setOpenModalId(null);
+      setText("");
+      setFiles([]);
+      addToast("Домашка успешно отправлена!", "success");
+      onSubmitSuccess?.();
+    } catch (err) {
+      console.error(err);
+      addToast("Ошибка при отправке домашки.", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-7">
-      {homeworks.map((homework, index) => (
-        <div key={index} className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col">
-          <div className="flex justify-between">
-            <div>
-              <div className="flex items-stretch gap-5 mb-3">
-                <span className="px-2 text-sm lg:text-md lg:px-5 bg-[#FF7A00] rounded-lg flex justify-center items-center">{homework.subject}</span>
+    <div className="relative">
+      {/* Список тостов */}
+      <div className="fixed top-5 right-5 flex flex-col gap-3 z-50">
+        {toasts.map((t) => (
+          <Toast key={t.id} message={t.message} type={t.type} onClose={() => removeToast(t.id)} />
+        ))}
+      </div>
+
+      {/* Сами домашки */}
+      <div className="flex flex-col gap-7">
+        {homeworks.map((homework) => {
+          const isPastDeadline = new Date(homework.deadline).getTime() < Date.now();
+
+          return (
+            <div key={homework.id} className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col">
+              {/* Заголовок и дедлайн */}
+              <div className="flex items-stretch gap-5 mb-3 flex-wrap">
+                <span className="px-2 text-sm lg:text-md lg:px-5 bg-[#FF7A00] rounded-lg flex justify-center items-center">
+                  {homework.title || "Домашнее задание"}
+                </span>
                 <span className="text-sm lg:text-md inline-flex items-center gap-1 lg:gap-3 text-[#FDC700] bg-[#F0B100]/20 px-2 lg:px-3 py-1 rounded-lg font-medium border border-[#F0B100]/30">
-                  <Clock className="w-4 h-4" /> До {homework.deadline}
+                  <Clock className="w-4 h-4" /> До{" "}
+                  {new Date(homework.deadline).toLocaleDateString("ru-RU", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
                 </span>
               </div>
-              <article className="flex flex-col gap-3 mb-10">
-                <h2 className="text-2xl">{homework.task}</h2>
-                <p className="text-[#999]">{homework.theme}</p>
+
+              <article className="flex flex-col gap-3 mb-5">
+                <h2 className="text-2xl">{homework.title}</h2>
+                <p className="text-[#999]">{homework.description}</p>
               </article>
+
+              {homework.files?.length > 0 && (
+                <div className="flex flex-col gap-1 mb-5">
+                  {homework.files.map((file, idx) => (
+                    <a
+                      key={idx}
+                      href={file}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#FDC700] text-sm hover:underline"
+                    >
+                      {file.split("/").pop()}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {/* Кнопки */}
+              <div className="flex gap-5 items-stretch mt-5">
+                <button
+                  className={`flex items-center px-4 py-1 text-sm rounded-sm ${
+                    isPastDeadline ? "bg-gray-700 cursor-not-allowed" : "bg-[#FF7A00]"
+                  }`}
+                  onClick={() => setOpenModalId(homework.id)}
+                  disabled={isPastDeadline}
+                >
+                  <Upload className="w-4 h-4 mr-2" /> Загрузить решение
+                </button>
+                <button className="flex items-center bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 text-sm rounded-sm">
+                  <FileText className="w-4 h-4 mr-2" /> Подробнее
+                </button>
+              </div>
+
+              {/* Модалка */}
+              {openModalId === homework.id && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                  <div className="bg-[#1A1A1A] p-6 rounded-lg w-full max-w-lg relative">
+                    <button
+                      className="absolute top-3 right-3 text-gray-400 hover:text-white"
+                      onClick={() => setOpenModalId(null)}
+                    >
+                      <X />
+                    </button>
+                    <h3 className="text-xl mb-4">Отправка домашки</h3>
+                    <textarea
+                      className="w-full p-3 mb-3 bg-[#2A2A2A] text-white rounded-lg"
+                      rows={4}
+                      placeholder="Ваше решение"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                    />
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleFileChange}
+                      className="mb-3 text-sm text-white"
+                    />
+                    <div className="flex justify-end gap-3">
+                      <button
+                        className="bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 rounded-sm text-sm"
+                        onClick={() => setOpenModalId(null)}
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        className="bg-[#FF7A00] px-4 py-1 rounded-sm text-sm"
+                        onClick={() => handleSubmit(homework.id)}
+                        disabled={loading}
+                      >
+                        {loading ? "Отправка..." : "Отправить"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="flex flex-col items-end">
-              <span className="text-[#FF7A00] text-4xl">{homework.points}</span>
-              <span className="text-[#999]">баллов</span>
-            </div>
-          </div>
-          <p className="text-[#999] text-lg mb-7">{homework.secondaryTask}</p>
-          <div className="flex gap-5 items-stretch">
-            <button className="flex items-center bg-[#FF7A00] px-4 py-1 text-sm rounded-sm"><Upload className="w-4 h-4 mr-2"/> Загрузить файл</button>
-            <button className="flex items-center bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 text-sm rounded-sm"><FileText className="w-4 h-4 mr-2"/> Подробнее</button>
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
-  )
+  );
 }

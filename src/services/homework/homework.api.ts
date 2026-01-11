@@ -1,7 +1,7 @@
 import { apiClient } from "../apiClient";
 import Cookies from "js-cookie";
 
-export type SubmissionStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type SubmissionStatus = "PENDING" | "CHECKED" | "REJECTED";
 
 export interface HomeworkSubmission {
   id: string;
@@ -29,6 +29,12 @@ export interface HomeworkPayload {
   description: string;
   files: string[];
   deadline: string; // ISO
+}
+
+export interface HomeworkSubmissionPayload {
+  homeworkId: string;
+  text: string;
+  files: string[];
 }
 
 // ------------------------------------
@@ -67,5 +73,25 @@ export async function getMyHomeworkSubmissions(): Promise<HomeworkSubmission[]> 
   } catch (err: any) {
     console.error("Ошибка при получении моих submissions:", err.message);
     return [];
+  }
+}
+
+export async function submitHomework(
+  payload: HomeworkSubmissionPayload
+): Promise<HomeworkSubmission | null> {
+  try {
+    const token = Cookies.get("token") || "";
+
+    return await apiClient<HomeworkSubmission>("/homework-submissions/", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch (err: any) {
+    console.error("Ошибка при отправке домашки:", err.message);
+    return null;
   }
 }
