@@ -5,7 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { cn } from "@/lib/utils";
-import { Menu, X, House, BookOpen, FileText, CreditCard, User, LogOut } from "lucide-react";
+import {
+  Menu,
+  X,
+  House,
+  BookOpen,
+  FileText,
+  CreditCard,
+  User,
+  LogOut,
+  BookMarked,
+} from "lucide-react";
 import { getMyOrders } from "@/services/orders/orders.api";
 
 type OrderStatus = "ACTIVE" | "PENDING" | "CANCELED";
@@ -14,6 +24,7 @@ const menu = [
   { name: "Главная", href: "/profile", icon: House },
   { name: "Уроки", href: "/profile/lessons", icon: BookOpen },
   { name: "Домашние Задания", href: "/profile/homework", icon: FileText },
+  { name: "Тесты", href: "/tests", icon: BookMarked },
   { name: "Платежи", href: "/profile/payments", icon: CreditCard },
   { name: "Профиль", href: "/profile/settings", icon: User },
 ];
@@ -109,10 +120,12 @@ export default function Sidebar() {
             const Icon = item.icon;
             const isActive = pathname === item.href;
 
-            // ⚠️ блокировка уроков и домашек при PENDING
+            // ⚠️ блокировка уроков, домашек и тестов при PENDING
             const isDisabled =
               orderStatus === "PENDING" &&
-              (item.href === "/profile/lessons" || item.href === "/profile/homework");
+              (item.href === "/profile/lessons" ||
+                item.href === "/profile/homework" ||
+                item.href === "/tests");
 
             return (
               <div key={item.href} className="relative">

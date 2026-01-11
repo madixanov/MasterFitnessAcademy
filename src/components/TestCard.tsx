@@ -6,20 +6,22 @@ import { BookOpen, Calendar } from "lucide-react";
 import { useMyCoursesStore } from "@/store/myCourseStore";
 
 export default function TestStartBanner() {
-  const { tests, fetchMyCourses, loading } = useMyCoursesStore();
+  const { tests, fetchMyCourses } = useMyCoursesStore();
 
   useEffect(() => {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
-  if (loading) return <p>Загрузка тестов...</p>;
-  if (!tests.length) return <p>Тестов пока нет.</p>;
+  if (!tests.length) return null;
 
-  // Берём первый тест для примера
+  // Берём первый тест
   const test = tests[0];
 
+  // 🔹 показываем баннер только если тест активен
+  if (test.status !== "ACTIVE") return null;
+
   return (
-    <div className="rounded-xl border border-[#22C55E] bg-gradient-to-b from-[#22C55E33] to-[#22C55E0D] p-6 max-w-[700px] mx-auto text-center">
+    <div className="rounded-xl border border-[#22C55E] bg-gradient-to-b from-[#22C55E33] to-[#22C55E0D] p-6 max-w-[700px] mx-auto text-center shadow-lg">
       <div className="flex flex-col items-center gap-4">
         <BookOpen className="w-10 h-10 text-[#22C55E]" />
         <h2 className="text-2xl font-bold text-white">
