@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Clock, Upload, FileText, X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Clock, Upload, FileText, X, Trash2 } from "lucide-react";
 import { Homework } from "@/services/homework/homework.api";
 import { HomeworkSubmissionPayload, submitHomework } from "@/services/homework/homework.api";
 import { uploadFiles } from "@/services/upload/upload.api";
 import Toast from "@/components/UI/toast";
+import { useRouter } from "next/navigation";
 
 interface WaitingHomeworksProps {
   homeworks: Homework[];
@@ -23,6 +24,8 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const router = useRouter();
 
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
@@ -36,12 +39,22 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFiles(Array.from(e.target.files));
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      setFiles((prev) => [...prev, ...Array.from(selectedFiles)]);
     }
   };
 
+  const handleFileRemove = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (homeworkId: string) => {
+    if (!text && files.length === 0) {
+      addToast("Добавьте текст или файлы перед отправкой.", "error");
+      return;
+    }
+
     setLoading(true);
     try {
       const uploadedFiles = await uploadFiles(files);
@@ -53,6 +66,7 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
       };
 
       await submitHomework(payload);
+      router.refresh();
 
       setOpenModalId(null);
       setText("");
@@ -67,6 +81,14 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
     }
   };
 
+  // Фильтр домашних заданий по поиску
+  const filteredHomeworks = useMemo(() => {
+    if (!search) return homeworks;
+    return homeworks.filter((hw) =>
+      hw.title?.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [homeworks, search]);
+
   return (
     <div className="relative">
       {/* Список тостов */}
@@ -76,9 +98,20 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
         ))}
       </div>
 
+      {/* Поиск */}
+      <div className="mb-5">
+        <input
+          type="text"
+          placeholder="Поиск по домашкам..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full p-3 rounded-lg bg-[#2A2A2A] text-white placeholder:text-[#999]"
+        />
+      </div>
+
       {/* Сами домашки */}
       <div className="flex flex-col gap-7">
-        {homeworks.map((homework) => {
+        {filteredHomeworks.map((homework) => {
           const isPastDeadline = new Date(homework.deadline).getTime() < Date.now();
 
           return (
@@ -159,6 +192,27 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
                       onChange={handleFileChange}
                       className="mb-3 text-sm text-white"
                     />
+
+                    {/* Список файлов с кнопкой удалить */}
+                    {files.length > 0 && (
+                      <div className="mb-3 flex flex-col gap-2">
+                        {files.map((file, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center justify-between bg-[#2A2A2A] px-3 py-1 rounded"
+                          >
+                            <span className="text-sm text-white truncate">{file.name}</span>
+                            <button
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => handleFileRemove(idx)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="flex justify-end gap-3">
                       <button
                         className="bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 rounded-sm text-sm"

@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, CircleAlert, FileText } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Download, CircleAlert, FileText, Search } from "lucide-react";
 import { HomeworkSubmission } from "@/services/homework/homework.api";
 
 interface OnCheckingHomeworksProps {
@@ -20,7 +21,21 @@ interface OnCheckingHomeworksProps {
 }
 
 export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksProps) {
-  if (!homeworks.length) {
+  const [search, setSearch] = useState("");
+
+  const filteredHomeworks = useMemo(() => {
+    if (!search) return homeworks;
+
+    const q = search.toLowerCase();
+
+    return homeworks.filter((hw) =>
+      hw.homework.title?.toLowerCase().includes(q) ||
+      hw.homework.description?.toLowerCase().includes(q) ||
+      hw.text?.toLowerCase().includes(q)
+    );
+  }, [homeworks, search]);
+
+  if (!filteredHomeworks.length) {
     return (
       <p className="text-[#999] text-center mt-10">
         Домашки на проверке отсутствуют.
@@ -29,59 +44,71 @@ export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksPr
   }
 
   return (
-    <div className="flex flex-col gap-7">
-      {homeworks.map((hw) => {
-        let statusColor = "#51A2FF"; // default - синий
-        let statusText = "На проверке";
+    <div className="flex flex-col gap-6">
+      {/* Поиск */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999]" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Поиск по домашним заданиям..."
+          className="w-full pl-10 pr-4 py-2 bg-[#2A2A2A] rounded-lg text-white placeholder:text-[#999]"
+        />
+      </div>
 
-        if (hw.status === "CHECKED") {
-          statusColor = "#05DF72"; // зеленый
-          statusText = "Проверено";
-        } else if (hw.status === "REJECTED") {
-          statusColor = "#FF4C4C"; // красный
-          statusText = "Отклонено";
-        }
+      {/* Список */}
+      <div className="flex flex-col gap-7">
+        {filteredHomeworks.map((hw) => {
+          let statusColor = "#51A2FF";
+          let statusText = "На проверке";
 
-        return (
-          <div
-            key={hw.id}
-            className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col"
-          >
-            <div className="flex flex-col lg:flex-row justify-between gap-5">
-              <div className="flex-1">
-                {/* Заголовок и статус */}
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <span className="px-3 py-1 text-sm lg:text-md bg-[#FF7A00] rounded-lg flex justify-center items-center">
-                    {hw.homework.title || "Домашнее задание"}
-                  </span>
-                  <span
-                    className="inline-flex items-center gap-2 bg-opacity-20 px-3 py-1 rounded-xl text-xs font-medium border"
-                    style={{
-                      color: statusColor,
-                      backgroundColor: `${statusColor}33`, // прозрачный фон
-                      borderColor: `${statusColor}50`,
-                    }}
-                  >
-                    <CircleAlert className="w-4 h-4" />
-                    {statusText}
-                  </span>
-                </div>
+          if (hw.status === "CHECKED") {
+            statusColor = "#05DF72";
+            statusText = "Проверено";
+          } else if (hw.status === "REJECTED") {
+            statusColor = "#FF4C4C";
+            statusText = "Отклонено";
+          }
 
-                {/* Описание задания */}
-                <article className="flex flex-col gap-2 mb-5">
-                  <h2 className="text-2xl">{hw.homework.title}</h2>
-                  <p className="text-[#999]">{hw.homework.description}</p>
-                </article>
+          return (
+            <div
+              key={hw.id}
+              className="w-full bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col"
+            >
+              {/* Заголовок */}
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <span className="px-3 py-1 text-sm bg-[#FF7A00] rounded-lg">
+                  {hw.homework.title || "Домашнее задание"}
+                </span>
+                <span
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-xl text-xs border"
+                  style={{
+                    color: statusColor,
+                    backgroundColor: `${statusColor}33`,
+                    borderColor: `${statusColor}50`,
+                  }}
+                >
+                  <CircleAlert className="w-4 h-4" />
+                  {statusText}
+                </span>
+              </div>
 
-                {/* Вторичное задание */}
-                {hw.homework.secondaryTask && (
-                  <p className="text-[#999] text-lg mb-5">{hw.homework.secondaryTask}</p>
-                )}
+              {/* Описание */}
+              <article className="mb-4">
+                <h2 className="text-2xl mb-1">{hw.homework.title}</h2>
+                <p className="text-[#999]">{hw.homework.description}</p>
+              </article>
 
-                {/* Файлы самого задания */}
-                {hw.homework.files?.length > 0 && (
-                  <div className="flex flex-col gap-1 mb-5">
-                    {hw.homework.files.map((file: string, idx: number) => (
+              {hw.homework.secondaryTask && (
+                <p className="text-[#999] mb-4">{hw.homework.secondaryTask}</p>
+              )}
+
+              {/* Файлы задания */}
+              {hw.homework.files?.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm text-[#999] mb-1">Файлы задания:</p>
+                  <div className="flex flex-col gap-1">
+                    {hw.homework.files.map((file, idx) => (
                       <a
                         key={idx}
                         href={file}
@@ -89,20 +116,28 @@ export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksPr
                         rel="noopener noreferrer"
                         className="text-[#51A2FF] text-sm hover:underline flex items-center gap-1"
                       >
-                        <Download className="w-4 h-4" /> {file.split("/").pop()}
+                        <Download className="w-4 h-4" />
+                        {file.split("/").pop()}
                       </a>
                     ))}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Решение студента */}
-                {hw.text && (
-                  <div className="flex flex-col gap-1 mb-5">
-                    <span className="text-[#999] text-sm">Ваше решение:</span>
-                    <p className="text-[#ccc]">{hw.text}</p>
+              {/* Решение студента */}
+              {(hw.text || hw.files?.length > 0) && (
+                <div className="mb-5">
+                  <p className="text-sm text-[#999] mb-1">Ваше решение:</p>
 
-                    {hw.files?.length > 0 &&
-                      hw.files.map((file: string, idx: number) => (
+                  {hw.text && (
+                    <p className="text-[#ccc] mb-2 whitespace-pre-wrap">
+                      {hw.text}
+                    </p>
+                  )}
+
+                  {hw.files?.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      {hw.files.map((file, idx) => (
                         <a
                           key={idx}
                           href={file}
@@ -110,24 +145,29 @@ export default function OnCheckingHomeworks({ homeworks }: OnCheckingHomeworksPr
                           rel="noopener noreferrer"
                           className="text-[#51A2FF] text-sm hover:underline flex items-center gap-1"
                         >
-                          <Download className="w-4 h-4" /> {file.split("/").pop()}
+                          <Download className="w-4 h-4" />
+                          {file.split("/").pop()}
                         </a>
                       ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            <span className="flex items-center text-[#999] text-sm">
-                <FileText className="w-4 h-4 mr-2" /> Работа отправлена{" "}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Дата */}
+              <span className="flex items-center text-[#999] text-sm">
+                <FileText className="w-4 h-4 mr-2" />
+                Работа отправлена{" "}
                 {new Date(hw.createdAt).toLocaleDateString("ru-RU", {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
                 })}
               </span>
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

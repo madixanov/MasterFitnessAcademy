@@ -26,7 +26,7 @@ export default function Lessons() {
         const myCourses: MyCourse[] = await getMyCourses();
         if (!myCourses.length) return;
 
-        const courseId = myCourses[0].courseId; // если берём первый курс
+        const courseId = myCourses[0].courseId; // берём первый курс
 
         // 2. Получаем курс с модулями и уроками
         const course: Course = await getCourseById(courseId);
@@ -61,14 +61,18 @@ export default function Lessons() {
     const checkedArr: (HomeworkSubmission & { homework: Homework })[] = [];
 
     allHomeworks.forEach(hw => {
-      const submission = submittedHomeworks.find(s => s.homeworkId === hw.id);
+      const submissionsForHw = submittedHomeworks.filter(s => s.homeworkId === hw.id);
 
-      if (!submission) {
+      if (submissionsForHw.length === 0) {
         waitingArr.push(hw); // ещё не отправлено
-      } else if (submission.status === "PENDING") {
-        checkingArr.push({ ...submission, homework: hw }); // HomeworkSubmission + homework
-      } else if (submission.status === "CHECKED" || submission.status === "REJECTED") {
-        checkedArr.push({ ...submission, homework: hw }); // HomeworkSubmission + homework
+      } else {
+        submissionsForHw.forEach(submission => {
+          if (submission.status === "PENDING") {
+            checkingArr.push({ ...submission, homework: hw });
+          } else if (submission.status === "CHECKED" || submission.status === "REJECTED") {
+            checkedArr.push({ ...submission, homework: hw });
+          }
+        });
       }
     });
 
