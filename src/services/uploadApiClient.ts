@@ -1,38 +1,27 @@
+// uploadApiClient.ts
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
-if (!BASE_URL) {
-  throw new Error("NEXT_PUBLIC_API_URL не задан в .env");
-}
-
-export interface ApiOptions extends RequestInit {
-  headers?: Record<string, string>;
-}
-
-export async function uploadApiClient<T>(
+export async function uploadApiClient<T = any>(
   endpoint: string,
-  formData: FormData,
-  options: ApiOptions = {}
+  formData: FormData
 ): Promise<T> {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
     body: formData,
-    ...options,
-    headers: {
-      ...options.headers, // ❌ НЕ ставим Content-Type
-    },
   });
 
-  const contentType = res.headers.get("content-type");
-  let data: any = null;
+  const contentType = res.headers.get("content-type") || "";
+  let data: any;
 
-  if (contentType?.includes("application/json")) {
+  if (contentType.includes("application/json")) {
     data = await res.json();
   } else {
     data = await res.text();
   }
 
   if (!res.ok) {
-    throw new Error(data?.message || "Ошибка загрузки файла");
+    const errorMessage = typeof data === "string" ? data : data?.message || "Ошибка";
+    throw new Error(errorMessage);
   }
 
   return data as T;

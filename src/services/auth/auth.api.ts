@@ -22,10 +22,6 @@ export async function signup(data: SignupPayload, rememberMe: boolean = false): 
     body: JSON.stringify(data),
   });
 
-  const cookieOptions = { expires: rememberMe ? 30 : undefined, path: "/" };
-  Cookies.set("accessToken", signupRes.accessToken, cookieOptions);
-  Cookies.set("refreshToken", signupRes.refreshToken, cookieOptions);
-
   return signupRes;
 }
 
@@ -143,7 +139,7 @@ export async function newPassword(data: NewPasswordPayload): Promise<NewPassword
 // LOGOUT
 // ------------------------
 export async function logout() {
-  const token = Cookies.get("accessToken");
+  const token = Cookies.get("token");
 
   if (token) {
     try {
@@ -156,6 +152,6 @@ export async function logout() {
     }
   }
 
-  Cookies.remove("accessToken");
+  Cookies.remove("token");
   Cookies.remove("refreshToken");
 }
