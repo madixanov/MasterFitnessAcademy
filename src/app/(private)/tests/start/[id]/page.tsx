@@ -29,6 +29,7 @@ export default function TestStartPage() {
 
   const [loadingTest, setLoadingTest] = useState(false);
   const [result, setResult] = useState<UserTestResult | null>(null);
+  const [alreadyPassed, setAlreadyPassed] = useState(false);
 
   const submittedRef = useRef(false);
   const STORAGE_KEY = "test-progress";
@@ -49,7 +50,7 @@ export default function TestStartPage() {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
-  /* ================= LOAD TEST ================= */
+  /* ================= LOAD TEST + ONE TRY ================= */
   useEffect(() => {
     if (loading || !tests.length || !userId) return;
 
@@ -60,11 +61,21 @@ export default function TestStartPage() {
     getUserTestResults(userId)
       .then(async (results) => {
         const filtered = results.filter((r) => r.testId === test.id);
-        if (filtered.length) {
-          const latest = filtered.reduce((a, b) =>
-            new Date(b.date) > new Date(a.date) ? b : a
+
+        if (filtered.length > 0) {
+          const latest = filtered.reduce((latest, cur) =>
+            new Date(cur.date) > new Date(latest.date) ? cur : latest
           );
+
           setResult(latest);
+
+          const lastDate = new Date(latest.date);
+          const now = new Date();
+          const diff = now.getTime() - lastDate.getTime();
+          const oneDayMs = 24 * 60 * 60 * 1000;
+
+          setAlreadyPassed(diff < oneDayMs);
+          return;
         }
 
         const data = await getTestById(test.id);
@@ -98,7 +109,7 @@ export default function TestStartPage() {
 
   /* ================= TIMER ================= */
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0 || alreadyPassed) return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -121,7 +132,15 @@ export default function TestStartPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [timeLeft, selectedTest, userId, questions, answers, currentIndex]);
+  }, [
+    timeLeft,
+    selectedTest,
+    userId,
+    questions,
+    answers,
+    currentIndex,
+    alreadyPassed,
+  ]);
 
   /* ================= ANSWER ================= */
   const handleAnswer = (questionId: string, answerId: string) => {
@@ -161,26 +180,92 @@ export default function TestStartPage() {
         answers: formattedAnswers,
       });
 
+      const results = await getUserTestResults(userId);
+      const latest = results
+        .filter((r) => r.testId === selectedTest.id)
+        .reduce((latest, cur) =>
+          new Date(cur.date) > new Date(latest.date)
+            ? cur
+            : latest
+        );
+
+      setResult(latest);
+      setAlreadyPassed(true);
+
       localStorage.removeItem(
         `${STORAGE_KEY}-${selectedTest.id}-${userId}`
       );
-
-      router.push("/tests");
     } catch (e) {
       submittedRef.current = false;
       console.error("Ошибка сдачи теста:", e);
     }
-  }, [answers, selectedTest, userId, router]);
+  }, [answers, selectedTest, userId]);
 
   useEffect(() => {
     if (timeLeft === 0 && questions.length) handleFinish();
   }, [timeLeft, questions, handleFinish]);
 
+  /* ================= UNLOAD ================= */
+  useEffect(() => {
+    const handleUnload = () => {
+      if (!selectedTest || !userId || alreadyPassed || submittedRef.current)
+        return;
+
+      const payload = {
+        testId: selectedTest.id,
+        userId,
+        answers: Object.entries(answers).map(
+          ([questionId, answerId]) => ({
+            questionId,
+            answerId,
+          })
+        ),
+      };
+
+      navigator.sendBeacon(
+        "/user-test-result/submit",
+        new Blob([JSON.stringify(payload)], {
+          type: "application/json",
+        })
+      );
+
+      localStorage.removeItem(
+        `${STORAGE_KEY}-${selectedTest.id}-${userId}`
+      );
+    };
+
+    window.addEventListener("beforeunload", handleUnload);
+    return () =>
+      window.removeEventListener("beforeunload", handleUnload);
+  }, [selectedTest, userId, answers, alreadyPassed]);
+
   /* ================= UI ================= */
   if (loading || loadingTest) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
         <p className="text-xl animate-pulse">Загрузка теста...</p>
+      </div>
+    );
+  }
+
+  if (alreadyPassed && result) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
+        <h1 className="text-3xl mb-4">{selectedTest.name}</h1>
+        <p className="text-xl mb-2">Тест уже сдан</p>
+        <p className="text-xl mb-4">
+          Результат:{" "}
+          <span className="text-green-400">{result.score}</span>
+        </p>
+        <p className="text-yellow-300 mb-4">
+          Пересдача будет доступна через 24 часа.
+        </p>
+        <button
+          onClick={() => router.push("/tests")}
+          className="px-6 py-3 bg-blue-500 rounded-lg hover:bg-blue-600 transition"
+        >
+          Назад к тестам
+        </button>
       </div>
     );
   }
@@ -193,10 +278,12 @@ export default function TestStartPage() {
         <p className="text-lg mb-2">
           Количество вопросов: {selectedTest?.quantity}
         </p>
-        <p className="text-lg mb-4">
+        <p className="text-lg mb-2">
           Продолжительность: {selectedTest?.duration} минут
         </p>
-
+        <p className="text-lg mb-4 text-yellow-300">
+          Тест можно пройти один раз в день
+        </p>
         <button
           onClick={() => {
             const shuffled = [...selectedTest.questions].sort(
@@ -220,7 +307,7 @@ export default function TestStartPage() {
   const seconds = timeLeft % 60;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
+    <div className="min-h-screen bg-gray-900 text-white p-6 mt-6">
       <div className="flex justify-between mb-4">
         <span>Ученик: {userName}</span>
         <span>
@@ -241,7 +328,7 @@ export default function TestStartPage() {
             <button
               key={a.id}
               onClick={() => handleAnswer(q.id, a.id)}
-              className={`p-3 border rounded ${
+              className={`p-3 border rounded transition ${
                 answers[q.id] === a.id
                   ? "bg-green-600 border-green-500"
                   : "border-white/20 hover:bg-gray-700"
