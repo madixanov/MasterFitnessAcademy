@@ -26,6 +26,7 @@ export interface Test {
   status: "DRAFT" | "PUBLISHED" | string;
   createdAt: string;
   questions: TestQuestion[];
+  quantity: number;
 }
 
 export interface UserTestResult {

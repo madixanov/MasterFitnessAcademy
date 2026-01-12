@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import { getProfile } from "@/services/auth/user.api";
-import { getTests, getUserTestResults, Test, UserTestResult } from "@/services/test/test.api";
+import {
+  getTests,
+  getUserTestResults,
+  Test,
+  UserTestResult,
+} from "@/services/test/test.api";
 
 export default function TestsPage() {
   const router = useRouter();
@@ -40,7 +45,7 @@ export default function TestsPage() {
   }, [userId]);
 
   /* ======== Загрузка ======== */
-  if (loading)
+  if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
         <div className="flex space-x-2 mb-6">
@@ -49,9 +54,12 @@ export default function TestsPage() {
           <div className="w-4 h-4 bg-yellow-400 rounded-full animate-bounce delay-300"></div>
         </div>
 
-        <p className="text-xl font-semibold animate-pulse">Загрузка тестов...</p>
+        <p className="text-xl font-semibold animate-pulse">
+          Загрузка тестов...
+        </p>
       </div>
     );
+  }
 
   /* ======== Список тестов ======== */
   return (
@@ -70,10 +78,13 @@ export default function TestsPage() {
 
       <div className="grid gap-4">
         {tests.map((test) => {
-          // Находим все результаты по этому тесту
           const userTestAttempts = results
             .filter((r) => r.testId === test.id)
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            .sort(
+              (a, b) =>
+                new Date(b.date).getTime() -
+                new Date(a.date).getTime()
+            );
 
           const latestResult = userTestAttempts[0];
 
@@ -84,24 +95,33 @@ export default function TestsPage() {
             >
               <div>
                 <h2 className="text-xl font-semibold">{test.name}</h2>
+
                 <p className="text-sm text-gray-300">
-                  {test.questions.length} вопросов • {test.duration} минут
+                  {test.quantity} вопросов • {test.duration} минут
                 </p>
 
                 {latestResult ? (
                   <p className="text-sm mt-1 text-green-400">
-                    Последний результат: {latestResult.score} / {latestResult.total}{" "}
-                    ({new Date(latestResult.date).toLocaleString()})
+                    Последний результат: {latestResult.score} /{" "}
+                    {latestResult.total} (
+                    {new Date(latestResult.date).toLocaleString()}
+                    )
                   </p>
                 ) : (
-                  <p className="text-sm mt-1 text-yellow-300">Тест доступен для сдачи</p>
+                  <p className="text-sm mt-1 text-yellow-300">
+                    Тест доступен для сдачи
+                  </p>
                 )}
               </div>
 
               <button
-                onClick={() => router.push(`/tests/start/${test.id}`)}
+                onClick={() =>
+                  router.push(`/tests/start/${test.id}`)
+                }
                 className={`px-4 py-2 rounded font-medium transition ${
-                  latestResult ? "bg-blue-500 hover:bg-blue-600" : "bg-green-500 hover:bg-green-600"
+                  latestResult
+                    ? "bg-blue-500 hover:bg-blue-600"
+                    : "bg-green-500 hover:bg-green-600"
                 }`}
               >
                 {latestResult ? "Пересдать / Смотреть" : "Начать тест"}
