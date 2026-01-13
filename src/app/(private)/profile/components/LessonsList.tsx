@@ -31,14 +31,14 @@ export default function LessonseList() {
       try {
         const fullCourse: Course = await getCourseById(activeCourse.courseId);
 
-        const allLessons: Lesson[] = [];
+        let allLessons: Lesson[] = [];
 
         fullCourse.modules?.forEach((module) => {
           module.lessons?.forEach((lesson: any) => {
             allLessons.push({
               id: lesson.id,
               title: lesson.name,
-              startsAt: lesson.startsAt, // используем startsAt
+              startsAt: lesson.startsAt,
               moduleName: module.name,
             });
           });
@@ -49,18 +49,22 @@ export default function LessonseList() {
           (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()
         );
 
+        // Берём последние 5 уроков
+        allLessons = allLessons.slice(-5);
+
         setLessons(allLessons);
       } catch (err) {
         console.error("Не удалось загрузить уроки:", err);
+        setLessons([]);
       } finally {
         setLoading(false);
       }
     }
 
-    if (courses.length > 0) {
+    if (!coursesLoading) {
       loadLessons();
     }
-  }, [courses]);
+  }, [courses, coursesLoading]);
 
   const getStatusLabel = (startsAt: string) => {
     const now = new Date();
@@ -84,7 +88,7 @@ export default function LessonseList() {
 
   return (
     <div aria-label="Расписание Уроков" className="bg-[#1A1A1A] p-5 rounded-lg mb-10">
-      <h2 className="text-lg font-semibold mb-3">Расписание уроков</h2>
+      <h2 className="text-lg font-semibold mb-3">Последние уроки</h2>
 
       {/* Для десктопа */}
       <div className="hidden sm:block overflow-x-auto">

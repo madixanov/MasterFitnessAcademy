@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Upload } from "lucide-react";
-
 import { useMyCoursesStore } from "@/store/myCourseStore";
 import { getCourseById, Course } from "@/services/courses/courses.api";
 
@@ -23,7 +21,9 @@ export default function HomeworkList() {
       setLoading(true);
 
       const activeCourse = courses.find((c) => c.status === "ACTIVE");
+
       if (!activeCourse) {
+        // Если нет активного курса — очищаем список и ставим loading в false
         setHomeworks([]);
         setLoading(false);
         return;
@@ -31,7 +31,7 @@ export default function HomeworkList() {
 
       try {
         const fullCourse: Course = await getCourseById(activeCourse.courseId);
-        const hwList: Homework[] = [];
+        let hwList: Homework[] = [];
 
         fullCourse.modules?.forEach((module) => {
           module.lessons?.forEach((lesson: any) => {
@@ -44,25 +44,32 @@ export default function HomeworkList() {
           });
         });
 
+        // Берём только последние 5 домашних заданий
+        hwList = hwList.slice(-5);
+
         setHomeworks(hwList);
       } catch (err) {
         console.error("Не удалось загрузить домашние задания:", err);
+        setHomeworks([]); // на случай ошибки очищаем
       } finally {
-        setLoading(false);
+        setLoading(false); // важно ставить loading в false всегда
       }
     }
 
-    if (courses.length > 0) {
+    // Запускаем загрузку только если курсы уже подгружены
+    if (!coursesLoading) {
       loadHomeworks();
     }
-  }, [courses]);
+  }, [courses, coursesLoading]);
 
+  // Skeleton / Загрузка
   if (coursesLoading || loading) {
     return (
       <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse h-[300px]" />
     );
   }
 
+  // Нет домашних заданий
   if (!homeworks.length) {
     return (
       <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-gray-400">
@@ -73,7 +80,7 @@ export default function HomeworkList() {
 
   return (
     <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg">
-      <h2 className="mb-5 text-lg font-semibold">Домашние задания</h2>
+      <h2 className="mb-5 text-lg font-semibold">Последние домашние задания</h2>
       <div className="flex flex-col gap-3">
         {homeworks.map((hw) => (
           <div

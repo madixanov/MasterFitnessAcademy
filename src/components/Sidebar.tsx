@@ -16,7 +16,7 @@ import {
   LogOut,
   BookMarked,
 } from "lucide-react";
-import { getMyOrders } from "@/services/orders/orders.api";
+import { getMyOrders, Order } from "@/services/orders/orders.api";
 
 type OrderStatus = "ACTIVE" | "PENDING" | "CANCELED";
 
@@ -34,10 +34,8 @@ export default function Sidebar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [orderStatus, setOrderStatus] = useState<OrderStatus | null>(null);
+  const [hasCourseOrOrder, setHasCourseOrOrder] = useState(true);
 
-  // ---------------------------
-  // Получаем статус ордера
-  // ---------------------------
   useEffect(() => {
     getMyOrders()
       .then((orders) => {
@@ -45,14 +43,16 @@ export default function Sidebar() {
           orders.find((o) => o.status === "PENDING") ??
           orders.find((o) => o.status === "ACTIVE") ??
           null;
+
         setOrderStatus(relevantOrder?.status ?? null);
+        setHasCourseOrOrder(!!relevantOrder);
       })
-      .catch((err) => console.error("Ошибка загрузки ордеров:", err));
+      .catch((err) => {
+        console.error("Ошибка загрузки ордеров:", err);
+        setHasCourseOrOrder(false);
+      });
   }, []);
 
-  // ---------------------------
-  // Мобильное открытие меню
-  // ---------------------------
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => {
@@ -60,9 +60,6 @@ export default function Sidebar() {
     };
   }, [isOpen]);
 
-  // ---------------------------
-  // Выход из профиля
-  // ---------------------------
   const handleLogout = () => {
     Cookies.remove("token");
     localStorage.removeItem("token");
@@ -73,7 +70,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Кнопка меню (мобильные) */}
       <button
         onClick={() => setIsOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-40 bg-[#1A1A1A] shadow-md p-2 rounded-md border border-gray-400"
@@ -81,7 +77,6 @@ export default function Sidebar() {
         <Menu className="w-6 h-6 text-gray-400" />
       </button>
 
-      {/* Фон overlay на мобильных */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -89,7 +84,6 @@ export default function Sidebar() {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed top-0 left-0 bottom-0 z-40 bg-[#1A1A1A] border-r border-[#2A2A2A] p-4 flex flex-col transition-transform duration-300 overflow-y-auto",
@@ -97,7 +91,6 @@ export default function Sidebar() {
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Лого */}
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="flex justify-center items-center w-full">
             <h2 className="text-2xl font-semibold text-white text-center w-full">
@@ -114,18 +107,21 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Меню */}
         <nav className="space-y-2 flex-1">
           {menu.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
 
-            // ⚠️ блокировка уроков, домашек и тестов при PENDING
+            // 🔹 Блокируем только уроки, домашние задания и тесты
             const isDisabled =
-              orderStatus === "PENDING" &&
-              (item.href === "/profile/lessons" ||
-                item.href === "/profile/homework" ||
-                item.href === "/tests");
+              (!hasCourseOrOrder &&
+                (item.href === "/profile/lessons" ||
+                  item.href === "/profile/homework" ||
+                  item.href === "/tests")) ||
+              (orderStatus === "PENDING" &&
+                (item.href === "/profile/lessons" ||
+                  item.href === "/profile/homework" ||
+                  item.href === "/tests"));
 
             return (
               <div key={item.href} className="relative">
@@ -159,7 +155,6 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Выход */}
         <div
           className="pt-6 border-t border-gray-200 text-xs text-gray-400 flex group cursor-pointer gap-2"
           onClick={handleLogout}

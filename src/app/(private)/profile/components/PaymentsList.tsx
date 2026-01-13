@@ -12,9 +12,15 @@ export default function PaymentsList() {
     async function fetchOrders() {
       try {
         const data = await getMyOrders()
-        setOrders(data)
+        // сортируем по дате создания, новые сверху
+        const sorted = data.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        // берём только последние 5
+        setOrders(sorted.slice(0, 5))
       } catch (err) {
         console.error("Ошибка загрузки ордеров:", err)
+        setOrders([])
       } finally {
         setLoading(false)
       }
@@ -22,12 +28,21 @@ export default function PaymentsList() {
     fetchOrders()
   }, [])
 
-  if (loading) return <p>Загрузка ордеров...</p>
-  if (!orders.length) return <p>Пока нет ордеров</p>
+  if (loading)
+    return (
+      <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse h-[200px]" />
+    )
+
+  if (!orders.length)
+    return (
+      <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg text-gray-400">
+        Пока нет ордеров
+      </div>
+    )
 
   return (
     <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg">
-      <h2 className="mb-5 text-lg font-semibold">Платежи</h2>
+      <h2 className="mb-5 text-lg font-semibold">Последние платежи</h2>
       <div className="flex flex-col gap-3">
         {orders.map((order) => {
           const isPaid = order.status === "ACTIVE"

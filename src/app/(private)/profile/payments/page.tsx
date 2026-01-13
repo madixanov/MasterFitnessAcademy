@@ -79,7 +79,7 @@ export default function PaymentsList() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredOrders.map((order) => {
             const statusProps = getStatusProps(order.status);
-            const courseUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/catalog/courses/info?id=${order.course.id}`;
+            const courseUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/courses/info?id=${order.course.id}`;
 
             return (
               <div
