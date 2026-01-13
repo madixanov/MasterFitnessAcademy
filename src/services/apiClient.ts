@@ -44,7 +44,7 @@ export async function apiClient<T>(
       } catch (e) {
         Cookies.remove("token");
         Cookies.remove("refreshToken");
-        window.location.href = "/login";
+        window.location.href = "/auth";
         throw e;
       } finally {
         isRefreshing = false;
