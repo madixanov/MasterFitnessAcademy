@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import MainContainer from "@/components/MainContainer";
 import LessonModules, { Module } from "./components/LessonModulesList";
 import { CircleCheckBig, Clock, BookOpen, Users } from "lucide-react";
@@ -54,6 +54,9 @@ export default function CourseInfoPage() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
 
+  // Флаг, чтобы предотвратить двойное создание заказа
+  const orderCreatedRef = useRef(false);
+
   // Загрузка курса
   useEffect(() => {
     if (!id) return;
@@ -71,17 +74,13 @@ export default function CourseInfoPage() {
   useEffect(() => {
     if (!course) return;
 
-    switch (course.status) {
-      case "INACTIVE":
-        router.push("/courses"); // курс не активен, редирект на список
-        break;
-      default:
-        break;
+    if (course.status === "INACTIVE") {
+      router.push("/courses"); // курс не активен, редирект на список
     }
   }, [course, router]);
 
   const handleCreateOrder = async () => {
-    if (!id) return;
+    if (!id || orderCreatedRef.current) return; // защита от двойного клика/монтирования
 
     const token = Cookies.get("token");
     if (!token) {
@@ -90,6 +89,7 @@ export default function CourseInfoPage() {
     }
 
     setCreatingOrder(true);
+    orderCreatedRef.current = true; // блокируем повторное создание
 
     try {
       await createOrder({ courseId: id });
@@ -97,6 +97,7 @@ export default function CourseInfoPage() {
     } catch (e) {
       console.error(e);
       showToast("Ошибка при создании заказа", "error");
+      orderCreatedRef.current = false; // сброс при ошибке
     } finally {
       setCreatingOrder(false);
     }
