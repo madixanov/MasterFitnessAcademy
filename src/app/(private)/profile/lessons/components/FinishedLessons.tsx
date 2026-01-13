@@ -52,9 +52,30 @@ export default function FinishedLessons({ lessons }: Props) {
                   </a>
                 )}
 
-                <button className="flex gap-3 px-3 py-2 text-sm bg-[#0A0A0A] rounded-sm items-center transition hover:bg-[#0A0A0A]/80 border border-[#2A2A2A]">
-                  Материалы
-                </button>
+                {lesson.img && lesson.img.length > 0 && (
+                  <div className="relative group">
+                    <button className="flex gap-2 px-3 py-2 text-sm bg-[#0A0A0A] rounded-sm items-center transition hover:bg-[#0A0A0A]/80 border border-[#2A2A2A]">
+                      Материалы
+                    </button>
+
+                    {/* Список материалов */}
+                    <div className="absolute top-full left-0 mt-1 w-max bg-[#1A1A1A] border border-gray-700 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 flex flex-col">
+                      {lesson.img.map((src, idx) =>
+                        src && src !== "-" ? (
+                          <a
+                            key={idx}
+                            href={src}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 text-xs text-orange-400 hover:bg-[#2A2A2A] hover:text-white transition"
+                          >
+                            Файл {idx + 1}
+                          </a>
+                        ) : null
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

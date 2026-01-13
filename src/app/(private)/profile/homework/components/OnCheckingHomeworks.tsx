@@ -157,12 +157,6 @@ export default function OnCheckingHomeworks({ homeworks, onSubmitSuccess }: OnCh
               </span>
 
               <div className="flex gap-2">
-                {hw.files?.length > 0 && (
-                  <button className="flex items-center bg-[#0A0A0A] border border-[#2A2A2A] px-4 py-1 text-sm rounded-sm">
-                    <Download className="w-4 h-4 mr-2" /> Скачать
-                  </button>
-                )}
-
                 <button
                   className="flex items-center bg-[#FF7A00] px-4 py-1 text-sm rounded-sm"
                   onClick={() => setOpenModalId(hw.id)}

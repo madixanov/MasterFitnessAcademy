@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CircleAlert, Video, Calendar, Clock } from "lucide-react";
 import { LessonFull } from "../page";
 
@@ -14,6 +15,16 @@ export default function UpcomingLessons({ lessons }: Props) {
   const upcomingLessons = lessons
     .filter((l) => new Date(l.startsAt).getTime() > now)
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+
+  // состояние для показа материалов для каждого урока
+  const [showMaterials, setShowMaterials] = useState<Record<string, boolean>>({});
+
+  const toggleMaterials = (lessonId: string) => {
+    setShowMaterials((prev) => ({
+      ...prev,
+      [lessonId]: !prev[lessonId],
+    }));
+  };
 
   if (!upcomingLessons.length) {
     return <div className="text-gray-400">Ближайших уроков нет</div>;
@@ -46,15 +57,40 @@ export default function UpcomingLessons({ lessons }: Props) {
                     href={lesson.video}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex gap-2 items-center px-3 py-2 text-sm md:text-md bg-[#FF7A00] rounded-sm hover:bg-[#FF7A00]/80 transition"
+                    className="flex gap-2 items-center px-3 py-2 text-sm bg-[#FF7A00] rounded-sm hover:bg-[#FF7A00]/80 transition"
                   >
                     <Video className="w-4 h-4" /> Смотреть видео
                   </a>
                 )}
 
-                <button className="flex gap-3 px-3 py-2 text-sm bg-[#0A0A0A] rounded-sm items-center transition hover:bg-[#0A0A0A]/80 border border-[#2A2A2A]">
-                  Материалы
-                </button>
+                {lesson.img && lesson.img.length > 0 && (
+                  <div className="relative">
+                    <button
+                      onClick={() => toggleMaterials(lesson.id)}
+                      className="flex gap-2 px-3 py-2 text-sm bg-[#0A0A0A] rounded-sm items-center transition hover:bg-[#0A0A0A]/80 border border-[#2A2A2A]"
+                    >
+                      Материалы
+                    </button>
+
+                    {showMaterials[lesson.id] && (
+                      <div className="absolute top-full left-0 mt-1 w-max bg-[#1A1A1A] border border-gray-700 rounded-md shadow-lg z-50 flex flex-col">
+                        {lesson.img.map((src, idx) =>
+                          src && src !== "-" ? (
+                            <a
+                              key={idx}
+                              href={src}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-4 py-2 text-xs text-orange-400 hover:bg-[#2A2A2A] hover:text-white transition"
+                            >
+                              Файл {idx + 1}
+                            </a>
+                          ) : null
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
