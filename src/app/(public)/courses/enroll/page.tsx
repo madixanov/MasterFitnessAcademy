@@ -7,7 +7,7 @@ export default function EnrollRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/catalog/courses");
+    router.replace("/courses");
   }, [router]);
 
   return null;

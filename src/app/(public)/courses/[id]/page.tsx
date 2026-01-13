@@ -54,6 +54,7 @@ export default function CourseInfoPage() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
 
+  // Загрузка курса
   useEffect(() => {
     if (!id) return;
 
@@ -66,13 +67,25 @@ export default function CourseInfoPage() {
       .finally(() => setLoading(false));
   }, [id, setCourseStore]);
 
+  // Проверка статуса курса
+  useEffect(() => {
+    if (!course) return;
+
+    switch (course.status) {
+      case "INACTIVE":
+        router.push("/courses"); // курс не активен, редирект на список
+        break;
+      default:
+        break;
+    }
+  }, [course, router]);
+
   const handleCreateOrder = async () => {
     if (!id) return;
 
     const token = Cookies.get("token");
-    console.log(token)
     if (!token) {
-      router.push("/auth"); // перенаправляем на страницу авторизации
+      router.push("/auth");
       return;
     }
 
@@ -180,7 +193,7 @@ export default function CourseInfoPage() {
           </div>
         </div>
 
-        {/* Кнопки */}
+        {/* Сообщения и кнопки */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -189,19 +202,34 @@ export default function CourseInfoPage() {
           className="flex flex-col md:flex-row justify-center items-center w-full mt-20 gap-4"
         >
           <button
-            onClick={() => id && router.push(`/catalog/courses/enroll/${id}`)}
+            onClick={() => id && router.push(`/courses/enroll/${id}`)}
             className="bg-[#1a1a1a] px-10 py-5 rounded-md font-medium cursor-pointer text-[#FF7A00]"
           >
             Записаться на консультацию
           </button>
 
-          <button
-            onClick={handleCreateOrder}
-            disabled={creatingOrder}
-            className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer text-white disabled:opacity-50"
-          >
-            {creatingOrder ? "Создание..." : "Создать заказ"}
-          </button>
+          {/* Статус курса */}
+          {course.status === "ACTIVE" && (
+            <div className="p-4 bg-yellow-800 text-white rounded-md text-center">
+              Курс уже начат. Создать заказ невозможно.
+            </div>
+          )}
+
+          {course.status === "COMPLETED" && (
+            <div className="p-4 bg-green-800 text-white rounded-md text-center">
+              Курс завершён. Создать заказ невозможно.
+            </div>
+          )}
+
+          {course.status === "PENDING" && (
+            <button
+              onClick={handleCreateOrder}
+              disabled={creatingOrder}
+              className="bg-[#FF7A00] px-10 py-5 rounded-md font-medium cursor-pointer text-white disabled:opacity-50"
+            >
+              {creatingOrder ? "Создание..." : "Создать заказ"}
+            </button>
+          )}
         </motion.div>
       </MainContainer>
     </main>

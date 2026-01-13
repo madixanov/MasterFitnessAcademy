@@ -19,7 +19,7 @@ export default function EnrollPage({ params }: { params: Promise<{ id: string }>
   return (
     <main className="flex flex-col min-h-[calc(100vh-140px)] items-center justify-center my-30">
       <MainContainer>
-        <Link className="mb-10" href={`/catalog/courses/info?id=${id}`}>
+        <Link className="mb-10" href={`/courses/info?id=${id}`}>
           <button className="px-4 flex justify-center items-center bg-[#0A0A0A] border border-[#2A2A2A] py-2 rounded-lg mb-10">
             <ArrowLeft className="w-5 h-5 mr-6" /> Назад к курсу
           </button>

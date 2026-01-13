@@ -26,9 +26,37 @@ const cardVariants = {
     transition: {
       delay: i * 0.15,
       duration: 0.5,
-      ease: [0.25, 0.1, 0.25, 1], // правильный формат для ease (Bezier кривая)
+      ease: [0.25, 0.1, 0.25, 1],
     } as Transition,
   }),
+};
+
+// Цвет статуса
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "ACTIVE":
+      return "bg-yellow-600 text-white";
+    case "PENDING":
+      return "bg-blue-600 text-white";
+    case "COMPLETED":
+      return "bg-green-600 text-white";
+    default:
+      return "bg-gray-400 text-white";
+  }
+};
+
+// Статус на русском
+const getStatusText = (status: string) => {
+  switch (status) {
+    case "ACTIVE":
+      return "Начат";
+    case "PENDING":
+      return "Набор";
+    case "COMPLETED":
+      return "Завершён";
+    default:
+      return "";
+  }
 };
 
 export default function Courses() {
@@ -37,7 +65,10 @@ export default function Courses() {
 
   useEffect(() => {
     getCourses()
-      .then(setCourses)
+      .then((data) => {
+        // Фильтруем INACTIVE курсы
+        setCourses(data.filter((course) => course.status !== "INACTIVE"));
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -63,6 +94,7 @@ export default function Courses() {
             />
           </div>
         </div>
+
         {/* Затемнение фона */}
         <div className="absolute inset-0 bg-black/60 z-10"></div>
 
@@ -82,10 +114,21 @@ export default function Courses() {
                     viewport={{ once: true, amount: 0.2 }}
                     variants={cardVariants}
                   >
-                    <Link href={`/catalog/courses/info?id=${course.id}`}>
+                    <Link href={`/courses/info?id=${course.id}`}>
                       <ProductContainer
                         title="Курс"
-                        description={course.name}
+                        description={
+                          <>
+                            <div>{course.name}</div>
+                            <span
+                              className={`mt-2 inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                course.status
+                              )}`}
+                            >
+                              {getStatusText(course.status)}
+                            </span>
+                          </>
+                        }
                         image={course.image?.[0] || "/courses/default.jpg"}
                       />
                     </Link>

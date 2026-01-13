@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 interface ProductContainerProps {
   title: string;
-  description: string;
+  description: React.ReactNode;
   image: string;
 }
 
@@ -22,13 +22,13 @@ export default function ProductContainer({ title, description, image }: ProductC
 
         {/* Текст поверх затемнения */}
         <div className="relative z-10 flex flex-col items-center pb-5 lg:pb-0 group-hover:pb-0">
-          <h3 className="hidden lg:block text-5xl lg:text-3xl font-semibold uppercase tracking-wide translate-y-35 mb-6 transition-all duration-500 ease-out group-hover:-translate-y-5 group-hover:text-[#FF6600]">
+          <h3 className="hidden lg:block text-5xl lg:text-3xl font-semibold uppercase tracking-wide translate-y-45 mb-6 transition-all duration-500 ease-out group-hover:-translate-y-5 group-hover:text-[#FF6600]">
             {title}
           </h3>
 
-          <p className="opacity-100 lg:opacity-0 w-full px-2 text-center font-semibold text-2xl xl:text-2xl mt-4 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-y-0">
+          <div className="opacity-100 lg:opacity-0 w-full px-2 text-center font-semibold text-2xl xl:text-2xl mt-4 transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-y-0">
             {description}
-          </p>
+          </div>
 
           <div className="opacity-100 lg:opacity-0 group-hover:opacity-100 mt-6 transition-opacity duration-500 ease-out animate-[wiggleRight_1.5s_ease-in-out_infinite]">
             <ArrowRight className="w-10 h-10 text-[#FF6600]" />

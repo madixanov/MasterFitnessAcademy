@@ -61,25 +61,9 @@ export default function WelcomingContainer() {
               variants={fadeUpVariants}
               transition={{ delay: 0.4 }}
             >
-              <Link href="/catalog">
+              <Link href="/courses">
                 <button className="text-white cursor-pointer bg-[#FF6600] w-50 py-2 font-semibold text-lg rounded-lg lg:w-60 lg:h-15 transition-all duration-300 hover:bg-white hover:text-[#FF6600]">
-                  ЗАПИСАТЬСЯ
-                </button>
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={fadeUpVariants}
-              transition={{ delay: 0.6 }}
-            >
-              <Link href="/catalog/courses">
-                <button className="bg-black cursor-pointer w-35 py-2 rounded-lg border-3 border-white drop-shadow-[0_0_43px_rgba(255,255,255,0.25)] lg:w-45 lg:h-15 transition-all duration-300 hover:bg-white hover:text-[#FF6600]">
-                  <span className="font-semibold text-lg inline-block text-[#FF6600]" style={{ textShadow: '0 0 15px #FF6600, 0 0 55px #FF6600' }}>
-                    КУРСЫ
-                  </span>
+                  КУРСЫ
                 </button>
               </Link>
             </motion.div>

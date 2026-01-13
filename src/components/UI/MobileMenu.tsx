@@ -35,7 +35,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const menuItems = [
     { label: "Главная", href: "/" },
-    { label: "Курсы", href: "/catalog" },
+    { label: "Курсы", href: "/courses" },
     { label: "Дипломы", href: "/diplomas" },
     { label: "Чемпионы", scrollTo: "gallery" },
     { label: "Контакты", scrollTo: "contacts" },

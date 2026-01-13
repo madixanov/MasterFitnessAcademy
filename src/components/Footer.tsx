@@ -33,7 +33,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/catalog"
+                  href="/courses"
                   aria-label="Курсы"
                   className="text-white text-xl cursor-pointer transition-all duration-300 hover:text-[#FF6600] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6600]/70 rounded-md"
                 >

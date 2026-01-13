@@ -146,7 +146,7 @@ export default function Header() {
               <ul className="flex gap-4">
                 {[
                   { label: "Главная", href: "/" },
-                  { label: "Курсы", href: "/catalog" },
+                  { label: "Курсы", href: "/courses" },
                   { label: "Дипломы", href: "/diplomas" },
                   { label: "Чемпионы", scrollTo: "gallery" },
                   { label: "Контакты", scrollTo: "contacts" },
