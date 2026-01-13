@@ -8,14 +8,8 @@ import { Autoplay } from "swiper/modules";
 import MainContainer from "@/components/MainContainer";
 import { motion, Variants } from "framer-motion";
 import "../../../styles/gallery.css";
-
-const gallery = [
-  { id: 1, title: "photo1", url: "/gallery/photo1.jpg" },
-  { id: 2, title: "photo2", url: "/gallery/photo2.jpg" },
-  { id: 3, title: "photo3", url: "/gallery/photo3.jpg" },
-  { id: 4, title: "photo4", url: "/gallery/photo4.jpg" },
-  { id: 5, title: "photo5", url: "/gallery/photo5.jpg" },
-];
+import { getPhotos, Photo } from "@/services/gallery/photoes.api";
+import { useEffect, useState } from "react";
 
 // ===== Framer Motion Variants =====
 const fadeUpVariants: Variants = {
@@ -28,6 +22,15 @@ const fadeUpVariants: Variants = {
 };
 
 export default function GallerySlider() {
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      getPhotos()
+        .then(setPhotos)
+        .finally(() => setLoading(false));
+    }, []);
+
   return (
     <MainContainer>
       <section className="relative w-full flex flex-col justify-center mb-5 lg:pb-30 lg:pt-5">
@@ -71,15 +74,15 @@ export default function GallerySlider() {
               1024: { slidesPerView: 1.8, spaceBetween: 60 },
             }}
           >
-            {gallery.map((photo) => (
+            {photos.map((photo) => (
               <SwiperSlide key={photo.id} className="carousel-slide relative">
                 <motion.div
                   className="relative w-full h-full rounded-3xl overflow-hidden"
                   variants={fadeUpVariants}
                 >
                   <Image
-                    src={photo.url}
-                    alt={photo.title}
+                    src={photo.imageUrl}
+                    alt="чемпионы"
                     fill
                     className="object-cover object-center"
                   />
