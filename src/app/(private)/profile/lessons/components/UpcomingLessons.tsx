@@ -100,22 +100,6 @@ export default function UpcomingLessons({ lessons }: Props) {
 
               {lesson.desc && <p className="text-gray-400">{lesson.desc}</p>}
 
-              {lesson.img && lesson.img.length > 0 && (
-                <div className="flex gap-2 flex-wrap">
-                  {lesson.img.map(
-                    (src, idx) =>
-                      src && src !== "-" && (
-                        <img
-                          key={idx}
-                          src={src}
-                          alt={`Изображение ${idx + 1}`}
-                          className="w-24 h-24 object-cover rounded-lg"
-                        />
-                      )
-                  )}
-                </div>
-              )}
-
               <div className="flex flex-col md:flex-row md:items-center gap-3 text-gray-400 mt-2 flex-wrap">
                 <span className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
