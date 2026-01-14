@@ -10,7 +10,6 @@ import { useCourseStore } from "@/store/courseStore";
 import { createOrder } from "@/services/orders/orders.api"; 
 import Toast from "@/components/UI/toast";
 import { motion } from "framer-motion";
-import Cookies from "js-cookie";
 
 // Skeleton курса
 function CourseSkeleton() {
@@ -33,7 +32,7 @@ function CourseSkeleton() {
   );
 }
 
-// Простая анимация для motion.div
+// Анимация для motion.div
 const fadeInUpVariant = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
@@ -80,19 +79,13 @@ export default function CourseInfoPage() {
   }, [course, router]);
 
   const handleCreateOrder = async () => {
-    if (!id || orderCreatedRef.current) return; // защита от двойного клика/монтирования
-
-    const token = Cookies.get("token");
-    if (!token) {
-      router.push("/auth");
-      return;
-    }
+    if (!id || orderCreatedRef.current) return;
 
     setCreatingOrder(true);
-    orderCreatedRef.current = true; // блокируем повторное создание
+    orderCreatedRef.current = true;
 
     try {
-      await createOrder({ courseId: id });
+      await createOrder({ courseId: id }); // токены идут автоматически через httpOnly cookie
       showToast("Заказ успешно создан!", "success");
     } catch (e) {
       console.error(e);
@@ -194,7 +187,7 @@ export default function CourseInfoPage() {
           </div>
         </div>
 
-        {/* Сообщения и кнопки */}
+        {/* Кнопки */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -209,7 +202,6 @@ export default function CourseInfoPage() {
             Записаться на консультацию
           </button>
 
-          {/* Статус курса */}
           {course.status === "ACTIVE" && (
             <div className="p-4 bg-yellow-800 text-white rounded-md text-center">
               Курс уже начат. Создать заказ невозможно.

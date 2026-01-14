@@ -12,45 +12,38 @@ import { useRequireAuth } from "./components/useRequireAuth";
 import { useMyCoursesStore } from "@/store/myCourseStore";
 
 export default function Profile() {
-  useRequireAuth();
+  // 🔹 все хуки сверху
+  const loadingAuth = useRequireAuth();
+  const { fetchMyCourses, loading: coursesLoading, error: coursesError } = useMyCoursesStore();
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
-  const {
-    fetchMyCourses,
-    loading: coursesLoading,
-    error: coursesError,
-  } = useMyCoursesStore();
-
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
-  /* 🔹 загрузка курсов (без дублей) */
+  // 🔹 загрузка курсов
   useEffect(() => {
     fetchMyCourses();
   }, [fetchMyCourses]);
 
-  /* 🔹 welcome toast */
+  // 🔹 welcome toast
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem("welcomeToastShown");
     if (!hasSeenWelcome) {
-      setToast({
-        message: "Добро пожаловать в Личный Кабинет!",
-        type: "success",
-      });
+      setToast({ message: "Добро пожаловать в Личный Кабинет!", type: "success" });
       sessionStorage.setItem("welcomeToastShown", "true");
     }
   }, []);
 
-  /* 🔹 toast при ошибке загрузки курсов */
+  // 🔹 toast при ошибке загрузки
   useEffect(() => {
-    if (coursesError) {
-      setToast({
-        message: coursesError,
-        type: "error",
-      });
-    }
+    if (coursesError) setToast({ message: coursesError, type: "error" });
   }, [coursesError]);
+
+  // 🔹 пока проверка авторизации идёт — показываем Skeleton
+  if (loadingAuth) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen bg-transparent text-white">
+        <p>Проверка авторизации...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-col">
@@ -66,6 +59,7 @@ export default function Profile() {
         )}
       </div>
 
+      {/* Заголовок */}
       <div className="flex flex-col mb-10">
         <h1 className="text-4xl font-medium mb-3">Главная</h1>
         <p className="text-sm text-[#999] lg:text-lg">
@@ -73,7 +67,9 @@ export default function Profile() {
         </p>
       </div>
 
-      {/* 🔹 можно добавить skeleton при coursesLoading */}
+      {/* Skeleton при загрузке курсов */}
+      {coursesLoading && <p className="text-[#999]">Загрузка курсов...</p>}
+
       <LatestLesson />
       <LessonseList />
 
@@ -84,3 +80,4 @@ export default function Profile() {
     </main>
   );
 }
+

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Публичные маршруты, доступные без accessToken
 const PUBLIC_ROUTES = [
   "/",
   "/auth",
@@ -7,38 +8,41 @@ const PUBLIC_ROUTES = [
   "/diplomas",
 ];
 
+// Префиксы защищённых маршрутов
 const PROTECTED_PREFIXES = [
   "/profile",
-  "/tests"
+  "/tests",
 ];
-
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ❌ не трогаем служебные маршруты
+  // ❌ Не трогаем служебные маршруты
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.startsWith("/favicon")
+    pathname.startsWith("/favicon.ico")
   ) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get("token")?.value;
+  // Берём accessToken из HTTP-only cookie
+  const accessToken = req.cookies.get("accessToken")?.value;
+  // refreshToken хранится в cookie, но здесь не нужен
+  // const refreshToken = req.cookies.get("refreshToken")?.value;
 
   const isPublic = PUBLIC_ROUTES.includes(pathname);
-  const isProtected = PROTECTED_PREFIXES.some((p) =>
-    pathname.startsWith(p)
+  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
   );
 
-  // 🔒 нет токена — нельзя в protected
-  if (isProtected && !token) {
+  // 🔒 Нет accessToken — нельзя заходить в защищённые маршруты
+  if (isProtected && !accessToken) {
     return NextResponse.redirect(new URL("/auth", req.url));
   }
 
-  // 🔁 есть токен — не пускаем на auth
-  if (token && isPublic && pathname !== "/") {
+  // 🔁 Есть accessToken — не пускаем на публичные страницы (кроме "/")
+  if (accessToken && isPublic && pathname !== "/") {
     return NextResponse.redirect(new URL("/profile", req.url));
   }
 
@@ -46,5 +50,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|api|favicon).*)"],
+  matcher: ["/((?!_next|api|favicon.ico).*)"],
 };

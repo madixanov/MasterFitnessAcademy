@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import MobileMenu from "./UI/MobileMenu";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
 
 export default function Header() {
   const [state, setState] = useState({
@@ -78,7 +79,7 @@ export default function Header() {
     setState((prev) => ({ ...prev, isHovered: false }));
 
   const handleProfileClick = () => {
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("accessToken");
     if (token) router.push("/profile");
     else router.push("/auth");
   };

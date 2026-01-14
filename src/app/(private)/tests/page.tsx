@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 import { getProfile } from "@/services/auth/user.api";
 import {
@@ -15,33 +14,49 @@ import {
 export default function TestsPage() {
   const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState("");
   const [tests, setTests] = useState<Test[]>([]);
   const [results, setResults] = useState<UserTestResult[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState("");
 
   /* ======== Загрузка профиля ======== */
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) return;
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile(); // 🔹 token берется автоматически через HTTP-only cookie
+        setUserId(data.id);
+        setUserName(`${data.name} ${data.surname || ""}`.trim());
+      } catch (err) {
+        console.error(err);
+        router.push("/auth"); // не авторизован
+      }
+    };
 
-    getProfile(token).then((data) => {
-      setUserId(data.id);
-      setUserName(`${data.name} ${data.surname || ""}`.trim());
-    });
-  }, []);
+    fetchProfile();
+  }, [router]);
 
   /* ======== Загрузка тестов и результатов ======== */
   useEffect(() => {
     if (!userId) return;
 
     setLoading(true);
-    Promise.all([getTests(), getUserTestResults(userId)])
-      .then(([allTests, userResults]) => {
+
+    const fetchData = async () => {
+      try {
+        const [allTests, userResults] = await Promise.all([
+          getTests(),
+          getUserTestResults(userId),
+        ]);
         setTests(allTests);
         setResults(userResults);
-      })
-      .finally(() => setLoading(false));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [userId]);
 
   /* ======== Загрузка ======== */
@@ -53,10 +68,7 @@ export default function TestsPage() {
           <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce delay-150"></div>
           <div className="w-4 h-4 bg-yellow-400 rounded-full animate-bounce delay-300"></div>
         </div>
-
-        <p className="text-xl font-semibold animate-pulse">
-          Загрузка тестов...
-        </p>
+        <p className="text-xl font-semibold animate-pulse">Загрузка тестов...</p>
       </div>
     );
   }
@@ -65,7 +77,7 @@ export default function TestsPage() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl">Все тесты</h1>
+        <h1 className="text-3xl font-semibold">Все тесты</h1>
         <button
           onClick={() => router.push("/profile")}
           className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition font-medium"
@@ -80,11 +92,7 @@ export default function TestsPage() {
         {tests.map((test) => {
           const userTestAttempts = results
             .filter((r) => r.testId === test.id)
-            .sort(
-              (a, b) =>
-                new Date(b.date).getTime() -
-                new Date(a.date).getTime()
-            );
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
           const latestResult = userTestAttempts[0];
 
@@ -95,29 +103,22 @@ export default function TestsPage() {
             >
               <div>
                 <h2 className="text-xl font-semibold">{test.name}</h2>
-
                 <p className="text-sm text-gray-300">
                   {test.quantity} вопросов • {test.duration} минут
                 </p>
 
                 {latestResult ? (
                   <p className="text-sm mt-1 text-green-400">
-                    Последний результат: {latestResult.score} /{" "}
-                    {latestResult.total} (
-                    {new Date(latestResult.date).toLocaleString()}
-                    )
+                    Последний результат: {latestResult.score} / {latestResult.total} (
+                    {new Date(latestResult.date).toLocaleString()})
                   </p>
                 ) : (
-                  <p className="text-sm mt-1 text-yellow-300">
-                    Тест доступен для сдачи
-                  </p>
+                  <p className="text-sm mt-1 text-yellow-300">Тест доступен для сдачи</p>
                 )}
               </div>
 
               <button
-                onClick={() =>
-                  router.push(`/tests/start/${test.id}`)
-                }
+                onClick={() => router.push(`/tests/start/${test.id}`)}
                 className={`px-4 py-2 rounded font-medium transition ${
                   latestResult
                     ? "bg-blue-500 hover:bg-blue-600"

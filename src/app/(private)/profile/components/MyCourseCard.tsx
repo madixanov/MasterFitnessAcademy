@@ -25,7 +25,7 @@ function CourseCard({
     isActive?: boolean;
     isCompleted?: boolean;
   }) {
-    const courseUrl = `/catalog/courses/info?id=${course.id}`;
+    const courseUrl = `/courses/info?id=${course.id}`;
 
     return (
       <div

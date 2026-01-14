@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useMyCoursesStore } from "@/store/myCourseStore";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 import { getProfile } from "@/services/auth/user.api";
 import {
@@ -14,9 +12,10 @@ import {
   UserTestResult,
 } from "@/services/test/test.api";
 
+const STORAGE_KEY = "test-progress";
+
 export default function TestStartPage() {
   const router = useRouter();
-  const { tests, fetchMyCourses, loading } = useMyCoursesStore();
 
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
@@ -27,137 +26,98 @@ export default function TestStartPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(0);
 
+  const [loading, setLoading] = useState(true);
   const [loadingTest, setLoadingTest] = useState(false);
+
   const [result, setResult] = useState<UserTestResult | null>(null);
   const [alreadyPassed, setAlreadyPassed] = useState(false);
 
   const submittedRef = useRef(false);
-  const STORAGE_KEY = "test-progress";
 
   /* ================= PROFILE ================= */
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (!token) return;
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setUserId(data.id);
+        setUserName(`${data.name} ${data.surname || ""}`.trim());
+      } catch {
+        router.push("/auth");
+      }
+    };
+    fetchProfile();
+  }, [router]);
 
-    getProfile(token).then((data) => {
-      setUserId(data.id);
-      setUserName(`${data.name} ${data.surname || ""}`.trim());
-    });
-  }, []);
-
-  /* ================= COURSES ================= */
+  /* ================= LOAD TEST ================= */
   useEffect(() => {
-    fetchMyCourses();
-  }, [fetchMyCourses]);
+    if (!userId) return;
 
-  /* ================= LOAD TEST + ONE TRY ================= */
-  useEffect(() => {
-    if (loading || !tests.length || !userId) return;
+    const loadTest = async () => {
+      setLoadingTest(true);
+      try {
+        const test = await getTestById("first-test"); // 🔹 замените на реальный id или логику выбора теста
+        setSelectedTest(test);
 
-    const test = tests[0];
-    setSelectedTest(test);
-    setLoadingTest(true);
-
-    getUserTestResults(userId)
-      .then(async (results) => {
+        // Проверка, сдавал ли пользователь тест за последние 24 часа
+        const results = await getUserTestResults(userId);
         const filtered = results.filter((r) => r.testId === test.id);
-
         if (filtered.length > 0) {
-          const latest = filtered.reduce((latest, cur) =>
-            new Date(cur.date) > new Date(latest.date) ? cur : latest
+          const latest = filtered.reduce((prev, cur) =>
+            new Date(cur.date) > new Date(prev.date) ? cur : prev
           );
-
           setResult(latest);
-
-          const lastDate = new Date(latest.date);
-          const now = new Date();
-          const diff = now.getTime() - lastDate.getTime();
-          const oneDayMs = 24 * 60 * 60 * 1000;
-
-          setAlreadyPassed(diff < oneDayMs);
+          const diff = Date.now() - new Date(latest.date).getTime();
+          setAlreadyPassed(diff < 24 * 60 * 60 * 1000);
           return;
         }
 
-        const data = await getTestById(test.id);
-
-        const saved = localStorage.getItem(
-          `${STORAGE_KEY}-${test.id}-${userId}`
-        );
-
+        // Проверка прогресса в localStorage
+        const saved = localStorage.getItem(`${STORAGE_KEY}-${test.id}-${userId}`);
         if (saved) {
           const parsed = JSON.parse(saved);
           setQuestions(parsed.questions);
           setCurrentIndex(parsed.currentIndex || 0);
           setAnswers(parsed.answers || {});
-          setTimeLeft(parsed.timeLeft || data.duration * 60);
+          setTimeLeft(parsed.timeLeft || test.duration * 60);
         } else {
-          const shuffled = [...data.questions].sort(
-            () => 0.5 - Math.random()
-          );
-
-          const count = Math.min(
-            data.quantity,
-            data.questions.length
-          );
-
+          const shuffled = [...test.questions].sort(() => 0.5 - Math.random());
+          const count = Math.min(test.quantity, test.questions.length);
           setQuestions(shuffled.slice(0, count));
-          setTimeLeft(data.duration * 60);
+          setTimeLeft(test.duration * 60);
         }
-      })
-      .finally(() => setLoadingTest(false));
-  }, [loading, tests, userId]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+        setLoadingTest(false);
+      }
+    };
+
+    loadTest();
+  }, [userId]);
 
   /* ================= TIMER ================= */
   useEffect(() => {
     if (timeLeft <= 0 || alreadyPassed) return;
-
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         const next = Math.max(prev - 1, 0);
-
         if (selectedTest && userId) {
           localStorage.setItem(
             `${STORAGE_KEY}-${selectedTest.id}-${userId}`,
-            JSON.stringify({
-              questions,
-              currentIndex,
-              answers,
-              timeLeft: next,
-            })
+            JSON.stringify({ questions, currentIndex, answers, timeLeft: next })
           );
         }
-
         return next;
       });
     }, 1000);
-
     return () => clearInterval(interval);
-  }, [
-    timeLeft,
-    selectedTest,
-    userId,
-    questions,
-    answers,
-    currentIndex,
-    alreadyPassed,
-  ]);
+  }, [timeLeft, selectedTest, userId, questions, answers, currentIndex, alreadyPassed]);
 
   /* ================= ANSWER ================= */
   const handleAnswer = (questionId: string, answerId: string) => {
     const updated = { ...answers, [questionId]: answerId };
     setAnswers(updated);
-
-    if (selectedTest && userId) {
-      localStorage.setItem(
-        `${STORAGE_KEY}-${selectedTest.id}-${userId}`,
-        JSON.stringify({
-          questions,
-          currentIndex,
-          answers: updated,
-          timeLeft,
-        })
-      );
-    }
   };
 
   /* ================= FINISH ================= */
@@ -166,38 +126,23 @@ export default function TestStartPage() {
 
     submittedRef.current = true;
 
-    const formattedAnswers = Object.entries(answers).map(
-      ([questionId, answerId]) => ({
-        questionId,
-        answerId,
-      })
-    );
+    const payload = Object.entries(answers).map(([questionId, answerId]) => ({
+      questionId,
+      answerId,
+    }));
 
     try {
-      await submitUserTestResult({
-        testId: selectedTest.id,
-        userId,
-        answers: formattedAnswers,
-      });
+      await submitUserTestResult({ testId: selectedTest.id, userId, answers: payload });
 
       const results = await getUserTestResults(userId);
-      const latest = results
-        .filter((r) => r.testId === selectedTest.id)
-        .reduce((latest, cur) =>
-          new Date(cur.date) > new Date(latest.date)
-            ? cur
-            : latest
-        );
-
+      const latest = results.filter((r) => r.testId === selectedTest.id)
+        .reduce((prev, cur) => new Date(cur.date) > new Date(prev.date) ? cur : prev);
       setResult(latest);
       setAlreadyPassed(true);
-
-      localStorage.removeItem(
-        `${STORAGE_KEY}-${selectedTest.id}-${userId}`
-      );
-    } catch (e) {
+      localStorage.removeItem(`${STORAGE_KEY}-${selectedTest.id}-${userId}`);
+    } catch (err) {
+      console.error(err);
       submittedRef.current = false;
-      console.error("Ошибка сдачи теста:", e);
     }
   }, [answers, selectedTest, userId]);
 
@@ -208,35 +153,24 @@ export default function TestStartPage() {
   /* ================= UNLOAD ================= */
   useEffect(() => {
     const handleUnload = () => {
-      if (!selectedTest || !userId || alreadyPassed || submittedRef.current)
-        return;
-
-      const payload = {
-        testId: selectedTest.id,
-        userId,
-        answers: Object.entries(answers).map(
-          ([questionId, answerId]) => ({
-            questionId,
-            answerId,
-          })
-        ),
-      };
-
+      if (!selectedTest || !userId || alreadyPassed || submittedRef.current) return;
       navigator.sendBeacon(
         "/user-test-result/submit",
-        new Blob([JSON.stringify(payload)], {
-          type: "application/json",
-        })
+        new Blob(
+          [
+            JSON.stringify({
+              testId: selectedTest.id,
+              userId,
+              answers: Object.entries(answers).map(([qId, aId]) => ({ questionId: qId, answerId: aId })),
+            }),
+          ],
+          { type: "application/json" }
+        )
       );
-
-      localStorage.removeItem(
-        `${STORAGE_KEY}-${selectedTest.id}-${userId}`
-      );
+      localStorage.removeItem(`${STORAGE_KEY}-${selectedTest.id}-${userId}`);
     };
-
     window.addEventListener("beforeunload", handleUnload);
-    return () =>
-      window.removeEventListener("beforeunload", handleUnload);
+    return () => window.removeEventListener("beforeunload", handleUnload);
   }, [selectedTest, userId, answers, alreadyPassed]);
 
   /* ================= UI ================= */
@@ -254,12 +188,9 @@ export default function TestStartPage() {
         <h1 className="text-3xl mb-4">{selectedTest.name}</h1>
         <p className="text-xl mb-2">Тест уже сдан</p>
         <p className="text-xl mb-4">
-          Результат:{" "}
-          <span className="text-green-400">{result.score}</span>
+          Результат: <span className="text-green-400">{result.score}</span>
         </p>
-        <p className="text-yellow-300 mb-4">
-          Пересдача будет доступна через 24 часа.
-        </p>
+        <p className="text-yellow-300 mb-4">Пересдача будет доступна через 24 часа.</p>
         <button
           onClick={() => router.push("/tests")}
           className="px-6 py-3 bg-blue-500 rounded-lg hover:bg-blue-600 transition"
@@ -270,28 +201,17 @@ export default function TestStartPage() {
     );
   }
 
-  /* ======= START SCREEN ======= */
   if (!questions.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
         <h1 className="text-3xl mb-4">{selectedTest?.name}</h1>
-        <p className="text-lg mb-2">
-          Количество вопросов: {selectedTest?.quantity}
-        </p>
-        <p className="text-lg mb-2">
-          Продолжительность: {selectedTest?.duration} минут
-        </p>
-        <p className="text-lg mb-4 text-yellow-300">
-          Тест можно пройти один раз в день
-        </p>
+        <p className="text-lg mb-2">Количество вопросов: {selectedTest?.quantity}</p>
+        <p className="text-lg mb-2">Продолжительность: {selectedTest?.duration} минут</p>
+        <p className="text-lg mb-4 text-yellow-300">Тест можно пройти один раз в день</p>
         <button
           onClick={() => {
-            const shuffled = [...selectedTest.questions].sort(
-              () => 0.5 - Math.random()
-            );
-            setQuestions(
-              shuffled.slice(0, selectedTest.quantity)
-            );
+            const shuffled = [...selectedTest.questions].sort(() => 0.5 - Math.random());
+            setQuestions(shuffled.slice(0, selectedTest.quantity));
           }}
           className="px-6 py-3 bg-green-500 rounded-lg hover:bg-green-600 transition"
         >
@@ -301,7 +221,6 @@ export default function TestStartPage() {
     );
   }
 
-  /* ======= QUESTIONS ======= */
   const q = questions[currentIndex];
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -311,8 +230,7 @@ export default function TestStartPage() {
       <div className="flex justify-between mb-4">
         <span>Ученик: {userName}</span>
         <span>
-          Таймер: {minutes.toString().padStart(2, "0")}:
-          {seconds.toString().padStart(2, "0")}
+          Таймер: {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
         </span>
       </div>
 
@@ -320,7 +238,6 @@ export default function TestStartPage() {
         <p className="mb-2">
           Вопрос {currentIndex + 1} / {questions.length}
         </p>
-
         <h2 className="text-xl mb-6">{q.question}</h2>
 
         <div className="grid gap-3">
@@ -329,9 +246,7 @@ export default function TestStartPage() {
               key={a.id}
               onClick={() => handleAnswer(q.id, a.id)}
               className={`p-3 border rounded transition ${
-                answers[q.id] === a.id
-                  ? "bg-green-600 border-green-500"
-                  : "border-white/20 hover:bg-gray-700"
+                answers[q.id] === a.id ? "bg-green-600 border-green-500" : "border-white/20 hover:bg-gray-700"
               }`}
             >
               {a.text}
@@ -349,17 +264,11 @@ export default function TestStartPage() {
           </button>
 
           {currentIndex < questions.length - 1 ? (
-            <button
-              onClick={() => setCurrentIndex((i) => i + 1)}
-              className="px-4 py-2 bg-blue-500 rounded"
-            >
+            <button onClick={() => setCurrentIndex((i) => i + 1)} className="px-4 py-2 bg-blue-500 rounded">
               Далее
             </button>
           ) : (
-            <button
-              onClick={handleFinish}
-              className="px-4 py-2 bg-green-500 rounded"
-            >
+            <button onClick={handleFinish} className="px-4 py-2 bg-green-500 rounded">
               Завершить тест
             </button>
           )}

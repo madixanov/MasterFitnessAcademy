@@ -1,71 +1,34 @@
 import Cookies from "js-cookie";
-import { refreshToken } from "./auth/refreshToken";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 if (!BASE_URL) throw new Error("NEXT_PUBLIC_API_URL не задан");
 
 export interface ApiOptions extends RequestInit {
   headers?: Record<string, string>;
-  skipAuth?: boolean; // 🔥 важно
+  skipAuth?: boolean;          
+  includeCredentials?: boolean; // оставляем только для refresh токена
 }
-
-let isRefreshing = false;
-let refreshQueue: ((token: string) => void)[] = [];
 
 export async function apiClient<T>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> {
-  const token = Cookies.get("token");
+  // получаем токен из cookie
+  const token = Cookies.get("accessToken");
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...options.headers,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 
-  if (token && !options.skipAuth) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  const fetchOptions: RequestInit = {
     ...options,
     headers,
-  });
+    credentials: options.includeCredentials ? "include" : "same-origin",
+  };
 
-  // ✅ токен протух
-  if (res.status === 401 && !options.skipAuth) {
-    if (!isRefreshing) {
-      isRefreshing = true;
-
-      try {
-        const newToken = await refreshToken();
-        refreshQueue.forEach(cb => cb(newToken));
-        refreshQueue = [];
-      } catch (e) {
-        Cookies.remove("token");
-        Cookies.remove("refreshToken");
-        window.location.href = "/auth";
-        throw e;
-      } finally {
-        isRefreshing = false;
-      }
-    }
-
-    // ⏳ ждём, пока обновится токен
-    return new Promise<T>(resolve => {
-      refreshQueue.push((newToken: string) => {
-        resolve(
-          apiClient<T>(endpoint, {
-            ...options,
-            headers: {
-              ...headers,
-              Authorization: `Bearer ${newToken}`,
-            },
-          })
-        );
-      });
-    });
-  }
+  const res = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
 
   let data: T | null = null;
   try {
@@ -73,6 +36,13 @@ export async function apiClient<T>(
   } catch {}
 
   if (!res.ok) {
+    if (res.status === 401 && !options.skipAuth) {
+      // ⚡️ редирект на клиенте
+      if (typeof window !== "undefined") {
+        window.location.href = "/auth";
+        return new Promise(() => {}); // чтобы код дальше не выполнялся
+      }
+    }
     throw new Error((data as any)?.message || "Произошла ошибка");
   }
 

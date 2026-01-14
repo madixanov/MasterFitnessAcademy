@@ -1,5 +1,5 @@
-import { apiClient } from "../apiClient";
 import Cookies from "js-cookie";
+import { apiClient } from "../apiClient";
 
 export type SubmissionStatus = "PENDING" | "CHECKED" | "REJECTED";
 
@@ -45,11 +45,15 @@ export interface Homework extends HomeworkPayload {
   createdAt: string;
 }
 
-export async function getHomeworkByLesson(
-  lessonId: string
-): Promise<Homework[]> {
+/**
+ * Получить домашки по уроку
+ */
+export async function getHomeworkByLesson(lessonId: string): Promise<Homework[]> {
   try {
-    return await apiClient<Homework[]>(`/homework-tasks/lesson/${lessonId}`);
+    const token = Cookies.get("accessToken");
+    return await apiClient<Homework[]>(`/homework-tasks/lesson/${lessonId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
   } catch (err: any) {
     console.error("Ошибка при получении homework:", err.message);
     return [];
@@ -61,14 +65,10 @@ export async function getHomeworkByLesson(
  */
 export async function getMyHomeworkSubmissions(): Promise<HomeworkSubmission[]> {
   try {
-    // Берём токен из cookies (или другого хранилища)
-    const token = Cookies.get("token") || "";
-
+    const token = Cookies.get("accessToken");
     return await apiClient<HomeworkSubmission[]>("/homework-submissions/my", {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
   } catch (err: any) {
     console.error("Ошибка при получении моих submissions:", err.message);
@@ -76,17 +76,17 @@ export async function getMyHomeworkSubmissions(): Promise<HomeworkSubmission[]> 
   }
 }
 
-export async function submitHomework(
-  payload: HomeworkSubmissionPayload
-): Promise<HomeworkSubmission | null> {
+/**
+ * Отправка домашнего задания
+ */
+export async function submitHomework(payload: HomeworkSubmissionPayload): Promise<HomeworkSubmission | null> {
   try {
-    const token = Cookies.get("token") || "";
-
+    const token = Cookies.get("accessToken");
     return await apiClient<HomeworkSubmission>("/homework-submissions/", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(payload),
     });

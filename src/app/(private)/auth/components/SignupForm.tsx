@@ -1,21 +1,23 @@
 "use client";
 
 import PasswordField from "./PasswordField";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { signup, sendOtp, SignupPayload, sendOtpPayload } from "@/services/auth/auth.api";
+import {
+  signup,
+  sendOtp,
+  SignupPayload,
+  SendOtpPayload,
+} from "@/services/auth/auth.api";
 import Toast from "@/components/UI/toast";
-import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [isEmailExists, setIsEmailExists] = useState(false);
   const [savedEmail, setSavedEmail] = useState("");
-
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const router = useRouter();
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
@@ -41,22 +43,22 @@ export default function SignupForm() {
     }
 
     try {
+      // 🔹 signup теперь сам выставляет HTTP-only accessToken и refreshToken
       await signup(signupPayload);
+
+      // Отправка OTP для подтверждения email
       await sendOtp({ to: signupPayload.email, subject: "Verification Code" });
 
+      // Сохраняем email временно для перехода на страницу подтверждения
       if (typeof window !== "undefined") {
         window.localStorage.setItem("pendingEmail", signupPayload.email);
       }
 
       showToast("Регистрация прошла успешно! Проверьте почту для OTP.", "success");
 
-      setTimeout(() => {
-        window.location.href = "/auth/verify-otp";
-      }, 1000);
+      setTimeout(() => router.push("/auth/verify-otp"), 1000);
     } catch (err: any) {
-      // Разбираем ошибку из API
-      const data = err?.response?.data || err; // для fetch: err.json() может быть async
-      const details = data?.details || data?.error || data?.message || "";
+      const details = err?.response?.data?.message || err?.message || "Ошибка регистрации";
 
       if (details.includes("Email уже используется") || details.includes("already exists")) {
         setIsEmailExists(true);
@@ -68,29 +70,22 @@ export default function SignupForm() {
 
         showToast("Email уже зарегистрирован, активируйте аккаунт.", "error");
       } else {
-        showToast(details || "Ошибка регистрации", "error");
+        showToast(details, "error");
       }
     } finally {
       setLoading(false);
     }
   };
 
-
-
   const handleActivateAccount = async () => {
     if (!savedEmail) return;
-    const payload: sendOtpPayload = {
-      to: savedEmail,
-      subject: "Verification Code",
-    };
+    const payload: SendOtpPayload = { to: savedEmail, subject: "Verification Code" };
 
     setLoading(true);
     try {
       await sendOtp(payload);
       showToast("Код подтверждения отправлен на email!", "success");
-      setTimeout(() => {
-        window.location.href = "/auth/verify-otp";
-      }, 1000);
+      setTimeout(() => router.push("/auth/verify-otp"), 1000);
     } catch {
       showToast("Ошибка отправки кода подтверждения", "error");
     } finally {
@@ -102,17 +97,10 @@ export default function SignupForm() {
     <>
       {/* Toast container */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       </div>
 
       <form className="flex flex-col" onSubmit={handleSubmit}>
-        {/* поля формы */}
         <label htmlFor="name" className="mb-5 flex flex-col gap-1">
           Имя и фамилия
           <input

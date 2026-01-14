@@ -1,5 +1,5 @@
-import { apiClient } from "@/services/apiClient";
 import Cookies from "js-cookie";
+import { apiClient } from "@/services/apiClient";
 
 export interface OrderPayload {
   courseId: string;
@@ -18,7 +18,6 @@ export interface Payment {
   createdAt: string;
 }
 
-
 export interface OrderCourse {
   id: string;
   name: string;
@@ -29,42 +28,45 @@ export interface OrderCourse {
   date: string;
 }
 
-
 export interface Order {
   id: string;
   courseId: string;
   userId: string;
-  status: "ACTIVE" | "PENDING" | "CANCELED";
+  status: OrderStatus;
   createdAt: string;
 
   course: OrderCourse;
   payments: Payment[];
 }
 
+/** ------------------------
+ * Создание нового заказа
+ * ------------------------ */
 export const createOrder = async (payload: OrderPayload) => {
-  const token = Cookies.get("token"); // или как у тебя называется
-
-  if (!token) throw new Error("Нет токена для авторизации");
+  const token = Cookies.get("accessToken");
 
   return apiClient("/orders", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(payload),
   });
 };
 
+/** ------------------------
+ * Получение всех моих заказов
+ * ------------------------ */
 export const getMyOrders = async (): Promise<Order[]> => {
-  const token = Cookies.get("token");
+  const token = Cookies.get("accessToken");
 
-  if (!token) throw new Error("Нет токена");
-
-  return apiClient<Order[]>("/orders", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    return await apiClient<Order[]>("/orders", {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+  } catch (err: any) {
+    console.error("Ошибка при получении моих заказов:", err.message);
+    return [];
+  }
 };
-

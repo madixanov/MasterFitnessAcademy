@@ -1,31 +1,22 @@
 // services/auth/refreshToken.ts
-import Cookies from "js-cookie";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 interface RefreshResponse {
-  accessToken: string;
-  refreshToken?: string;
+  message: string;
 }
 
-export async function refreshToken(): Promise<string> {
-  const refresh = Cookies.get("refreshToken");
-  if (!refresh) throw new Error("Нет refreshToken");
-
+// Функция просто вызывает endpoint, сервер обновляет httpOnly cookies
+export async function refreshToken(): Promise<void> {
   const res = await fetch(`${BASE_URL}/auth/refresh`, {
     method: "POST",
+    credentials: "include", // важно: отправляем cookies автоматически
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken: refresh }),
   });
 
-  if (!res.ok) throw new Error("Refresh token истёк");
+  if (!res.ok) throw new Error("Refresh token истёк или отсутствует");
 
+  // Сервер может вернуть сообщение или данные, если нужно
   const data: RefreshResponse = await res.json();
-
-  Cookies.set("token", data.accessToken, { path: "/" });
-  if (data.refreshToken) {
-    Cookies.set("refreshToken", data.refreshToken, { path: "/" });
-  }
-
-  return data.accessToken;
+  return;
 }

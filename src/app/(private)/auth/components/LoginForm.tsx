@@ -1,42 +1,36 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import PasswordField from "./PasswordField"
-import { LogIn, Loader2 } from "lucide-react"
-import { useState, useEffect } from "react"
-import { login } from "@/services/auth/auth.api"
-import Cookies from "js-cookie"
-import { useRouter } from "next/navigation"
+import Link from "next/link";
+import PasswordField from "./PasswordField";
+import { LogIn, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { login } from "@/services/auth/auth.api";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [rememberMe, setRememberMe] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    const token = Cookies.get("token") // ✅ только cookie
-    if (token) {
-      router.push("/profile")
-    }
-  }, [router])
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const res = await login({ email, password }, rememberMe);
-      router.push("/profile");
+      // login теперь сам ставит HTTP-only cookies
+      await login({ email, password });
+      router.push("/profile"); // после успешного входа редиректим
     } catch (err: any) {
-      setError("Неверный email или пароль")
+      console.error("Ошибка при логине:", err);
+      setError("Неверный email или пароль");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form className="flex flex-col" onSubmit={handleSubmit}>
@@ -80,11 +74,18 @@ export default function LoginForm() {
       {error && <p className="text-red-500 mt-2">{error}</p>}
 
       <button
+        type="submit"
         disabled={loading}
         className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50 gap-2"
       >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><LogIn className="w-5 h-5 mr-4" /> Войти</>}
+        {loading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : (
+          <>
+            <LogIn className="w-5 h-5 mr-4" /> Войти
+          </>
+        )}
       </button>
     </form>
-  )
+  );
 }
