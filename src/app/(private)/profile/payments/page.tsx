@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getMyOrders, Order } from "@/services/orders/orders.api";
+import PaymentModal from "@/components/UI/payment/PaymentModal";
 
 type Filter = "ALL" | "PAID" | "UNPAID";
 
@@ -9,6 +10,7 @@ export default function PaymentsList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>("ALL");
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchOrders() {
@@ -117,7 +119,7 @@ export default function PaymentsList() {
                   {order.status === "PENDING" && (
                     <>
                       <button
-                        onClick={() => handlePay(order)}
+                        onClick={() => setModalOpen(true)}
                         className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
                       >
                         Оплатить
@@ -139,7 +141,11 @@ export default function PaymentsList() {
               </div>
             );
           })}
-
+      
+        <PaymentModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+        />
       </div>
     </div>
   );
