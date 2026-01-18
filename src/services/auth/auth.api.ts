@@ -25,12 +25,12 @@ export async function signup(data: SignupPayload): Promise<SignupResponse> {
 // ------------------------
 // SEND OTP
 // ------------------------
-export interface SendOtpPayload {
+export interface sendOtpPayload {
   to: string;
   subject: string;
 }
 
-export async function sendOtp(data: SendOtpPayload): Promise<{ success: boolean }> {
+export async function sendOtp(data: sendOtpPayload): Promise<{ success: boolean }> {
   if (!data) throw new Error("Email или телефон не указан");
 
   return apiClient<{ success: boolean }>("/auth/send-otp", {
@@ -40,7 +40,7 @@ export async function sendOtp(data: SendOtpPayload): Promise<{ success: boolean 
   });
 }
 
-export async function sendResetOtp(data: SendOtpPayload): Promise<{ success: boolean }> {
+export async function sendResetOtp(data: sendOtpPayload): Promise<{ success: boolean }> {
   if (!data) throw new Error("Email или телефон не указан");
 
   return apiClient<{ success: boolean }>("/auth/send-otp-reset", {
