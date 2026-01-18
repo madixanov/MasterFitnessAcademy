@@ -135,9 +135,17 @@ export async function newPassword(data: NewPasswordPayload): Promise<NewPassword
 // LOGOUT
 // ------------------------
 export async function logout() {
+  // 1. Извлекаем токен из кук
+  const token = Cookies.get("token");
+
   try {
     await apiClient("/auth/logout", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // 2. Добавляем токен в заголовки, если он существует
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
     });
   } catch (err) {
     console.warn("Ошибка при logout на сервере:", err);
