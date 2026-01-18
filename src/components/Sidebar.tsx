@@ -17,6 +17,7 @@ import {
   BookMarked,
 } from "lucide-react";
 import { getMyOrders, Order } from "@/services/orders/orders.api";
+import { logout } from "@/services/auth/auth.api";
 
 type OrderStatus = "ACTIVE" | "PENDING" | "CANCELED";
 
@@ -62,8 +63,7 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     Cookies.remove("token");
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+    logout();
     sessionStorage.removeItem("welcomeToastShown");
     router.push("/auth");
   };
