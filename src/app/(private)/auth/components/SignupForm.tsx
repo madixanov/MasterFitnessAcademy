@@ -7,7 +7,7 @@ import {
   signup,
   sendOtp,
   SignupPayload,
-  SendOtpPayload,
+  sendOtpPayload,
 } from "@/services/auth/auth.api";
 import Toast from "@/components/UI/toast";
 import { useRouter } from "next/navigation";
@@ -79,7 +79,7 @@ export default function SignupForm() {
 
   const handleActivateAccount = async () => {
     if (!savedEmail) return;
-    const payload: SendOtpPayload = { to: savedEmail, subject: "Verification Code" };
+    const payload: sendOtpPayload = { to: savedEmail, subject: "Verification Code" };
 
     setLoading(true);
     try {
