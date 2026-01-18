@@ -136,7 +136,7 @@ export async function newPassword(data: NewPasswordPayload): Promise<NewPassword
 // ------------------------
 export async function logout() {
   // 1. Извлекаем токен из кук
-  const token = Cookies.get("token");
+  const token = Cookies.get("accessToken");
 
   try {
     await apiClient("/auth/logout", {

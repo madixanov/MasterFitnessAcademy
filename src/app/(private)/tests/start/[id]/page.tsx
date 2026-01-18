@@ -231,7 +231,7 @@ export default function TestStartPage() {
   const seconds = timeLeft % 60;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6 mt-6">
+    <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between mb-4">
         <span>Ученик: {userName}</span>
         <span>

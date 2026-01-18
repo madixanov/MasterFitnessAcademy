@@ -63,7 +63,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      Cookies.remove("token");
+      Cookies.remove("accessToken");
       sessionStorage.removeItem("welcomeToastShown");
 
       await logout(); 
