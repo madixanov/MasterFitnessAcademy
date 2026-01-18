@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
 import { getProfile } from "@/services/auth/user.api";
 import {
@@ -16,6 +16,8 @@ const STORAGE_KEY = "test-progress";
 
 export default function TestStartPage() {
   const router = useRouter();
+  const params = useParams(); // 🔹 Получаем параметры из URL
+  const testIdFromUrl = params.id as string; // 🔹 Это и есть ваш динамический ID
 
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
@@ -50,17 +52,19 @@ export default function TestStartPage() {
 
   /* ================= LOAD TEST ================= */
   useEffect(() => {
-    if (!userId) return;
+    // 🔹 Добавили проверку на наличие testId из URL
+    if (!userId || !testIdFromUrl) return;
 
     const loadTest = async () => {
       setLoadingTest(true);
       try {
-        const test = await getTestById("first-test"); // 🔹 замените на реальный id или логику выбора теста
+        // 🔹 Используем ID из ссылки вместо статичного "first-test"
+        const test = await getTestById(testIdFromUrl); 
         setSelectedTest(test);
 
-        // Проверка, сдавал ли пользователь тест за последние 24 часа
         const results = await getUserTestResults(userId);
         const filtered = results.filter((r) => r.testId === test.id);
+        
         if (filtered.length > 0) {
           const latest = filtered.reduce((prev, cur) =>
             new Date(cur.date) > new Date(prev.date) ? cur : prev
@@ -71,7 +75,6 @@ export default function TestStartPage() {
           return;
         }
 
-        // Проверка прогресса в localStorage
         const saved = localStorage.getItem(`${STORAGE_KEY}-${test.id}-${userId}`);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -80,13 +83,11 @@ export default function TestStartPage() {
           setAnswers(parsed.answers || {});
           setTimeLeft(parsed.timeLeft || test.duration * 60);
         } else {
-          const shuffled = [...test.questions].sort(() => 0.5 - Math.random());
-          const count = Math.min(test.quantity, test.questions.length);
-          setQuestions(shuffled.slice(0, count));
+          // Инициализация нового теста (пока без вопросов, они создадутся при нажатии "Начать")
           setTimeLeft(test.duration * 60);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Ошибка загрузки теста:", err);
       } finally {
         setLoading(false);
         setLoadingTest(false);
@@ -94,15 +95,18 @@ export default function TestStartPage() {
     };
 
     loadTest();
-  }, [userId]);
+  }, [userId, testIdFromUrl]);
 
   /* ================= TIMER ================= */
   useEffect(() => {
-    if (timeLeft <= 0 || alreadyPassed) return;
+    if (timeLeft <= 0 || alreadyPassed || !selectedTest || !userId) return;
+    
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         const next = Math.max(prev - 1, 0);
-        if (selectedTest && userId) {
+        
+        // Оптимизация: сохраняем в localStorage только если тест запущен
+        if (questions.length > 0) {
           localStorage.setItem(
             `${STORAGE_KEY}-${selectedTest.id}-${userId}`,
             JSON.stringify({ questions, currentIndex, answers, timeLeft: next })
@@ -111,6 +115,7 @@ export default function TestStartPage() {
         return next;
       });
     }, 1000);
+    
     return () => clearInterval(interval);
   }, [timeLeft, selectedTest, userId, questions, answers, currentIndex, alreadyPassed]);
 
