@@ -61,11 +61,17 @@ export default function Sidebar() {
     };
   }, [isOpen]);
 
-  const handleLogout = () => {
-    Cookies.remove("token");
-    logout();
-    sessionStorage.removeItem("welcomeToastShown");
-    router.push("/auth");
+  const handleLogout = async () => {
+    try {
+      Cookies.remove("token");
+      sessionStorage.removeItem("welcomeToastShown");
+
+      await logout(); 
+    } catch (error) {
+      console.error("Ошибка при логауте на сервере:", error);
+    } finally {
+      router.push("/auth");
+    }
   };
 
   return (
