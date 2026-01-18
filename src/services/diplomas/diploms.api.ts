@@ -1,16 +1,18 @@
 import { apiClient } from "../apiClient";
 
-// Полная структура диплома, включая вложенные данные
+// Полная структура диплома с вложенными объектами
 export interface Diploma {
   id?: string;
   codeDiplom: string;
   courseId: string;
   teacherId: string;
   userId: string;
-  img: string[]; // массив ссылок на файлы (pdf, картинки)
+  img: string[]; // ссылки на pdf или картинки
   createdAt?: string;
+  issuedAt?: string;
+  courseFinishedAt?: string;
 
-  // Вложенные объекты
+  // Вложенные данные
   course?: {
     id: string;
     name: string;
@@ -51,9 +53,15 @@ export interface Diploma {
     status?: string;
     createdAt?: string;
   };
-};
+}
 
 // Получить все дипломы с вложенными данными
 export const getDiplomas = async (): Promise<Diploma[]> => {
   return apiClient<Diploma[]>("/diploms");
 };
+
+// Получить диплом по id
+export const getDiplomaById = async (id: string): Promise<Diploma> => {
+  return apiClient<Diploma>(`/diploms/${id}`);
+};
+

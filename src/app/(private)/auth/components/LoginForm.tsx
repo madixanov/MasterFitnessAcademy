@@ -3,9 +3,10 @@
 import Link from "next/link";
 import PasswordField from "./PasswordField";
 import { LogIn, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login } from "@/services/auth/auth.api";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -15,15 +16,33 @@ export default function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
 
+  // ===== Загрузка почты из куки при монтировании =====
+  useEffect(() => {
+    const savedEmail = Cookies.get("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      // login теперь сам ставит HTTP-only cookies
+      // login ставит HTTP-only cookie для токена
       await login({ email, password });
-      router.push("/profile"); // после успешного входа редиректим
+
+      // ===== Если запомнить почту =====
+      if (rememberMe) {
+        // Кука на 30 дней
+        Cookies.set("rememberedEmail", email, { expires: 30 });
+      } else {
+        Cookies.remove("rememberedEmail");
+      }
+
+      router.push("/profile"); // редирект после успешного входа
     } catch (err: any) {
       console.error("Ошибка при логине:", err);
       setError("Неверный email или пароль");
@@ -64,7 +83,7 @@ export default function LoginForm() {
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
           />
-          Запомнить меня
+          Запомнить почту
         </label>
         <Link href="/auth/reset-password">
           <p className="text-[#FF7A00] cursor-pointer">Забыли пароль?</p>

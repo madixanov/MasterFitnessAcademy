@@ -63,7 +63,7 @@ export default function WelcomingContainer() {
             >
               <Link href="/courses">
                 <button className="text-white cursor-pointer bg-[#FF6600] w-50 py-2 font-semibold text-lg rounded-lg lg:w-60 lg:h-15 transition-all duration-300 hover:bg-white hover:text-[#FF6600]">
-                  КУРСЫ
+                  СПИСОК КУРСОВ
                 </button>
               </Link>
             </motion.div>

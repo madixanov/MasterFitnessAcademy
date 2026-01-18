@@ -1,3 +1,4 @@
+// PaymentBannerContainer.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,16 +24,15 @@ export default function PaymentBannerContainer() {
 
   useEffect(() => {
     getMyOrders()
-      .then(orders => {
-        // приоритет: PENDING → ACTIVE
+      .then((orders) => {
         const relevantOrder =
-          orders.find(o => o.status === "PENDING") ??
-          orders.find(o => o.status === "ACTIVE") ??
+          orders.find((o) => o.status === "PENDING") ??
+          orders.find((o) => o.status === "ACTIVE") ??
           null;
 
         setOrder(relevantOrder);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Ошибка загрузки ордеров:", err);
         setOrder(null);
       })
@@ -42,24 +42,12 @@ export default function PaymentBannerContainer() {
   if (loading || !order) return null;
 
   return (
-    <PaymentBanner
-      order={order}
-      paying={paying}
-      setPaying={setPaying}
-    />
+    <PaymentBanner order={order} paying={paying} setPaying={setPaying} />
   );
 }
 
 interface PaymentBannerProps {
-  order: {
-    id: string;
-    status: "ACTIVE" | "PENDING" | "CANCELED";
-    course: {
-      id: string;
-      name: string;
-      price: number;
-    };
-  };
+  order: Order;
   paying: boolean;
   setPaying: (value: boolean) => void;
 }
@@ -76,9 +64,7 @@ function PaymentBanner({ order, paying, setPaying }: PaymentBannerProps) {
           {isCanceled ? "Заказ отменён" : "Курс не оплачен"}
         </h3>
 
-        <p className="text-white font-medium">
-          {order.course.name}
-        </p>
+        <p className="text-white font-medium">{order.course.name}</p>
 
         <p className="text-[#999]">
           {isCanceled
@@ -102,9 +88,13 @@ function PaymentBanner({ order, paying, setPaying }: PaymentBannerProps) {
           {paying ? "Создание платежа..." : "Оплатить"}
         </button>
       )}
+
+      {/* Передаем orderId в модалку */}
       <PaymentModal
         open={open}
         onClose={() => setOpen(false)}
+        orderId={order.id}
+        setPaying={setPaying}
       />
     </div>
   );

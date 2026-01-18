@@ -10,6 +10,7 @@ import { useCourseStore } from "@/store/courseStore";
 import { createOrder } from "@/services/orders/orders.api"; 
 import Toast from "@/components/UI/toast";
 import { motion } from "framer-motion";
+import { getSocialNetworks, SocialNetwork } from "@/services/socials/socials.api";
 
 // Skeleton курса
 function CourseSkeleton() {
@@ -53,6 +54,8 @@ export default function CourseInfoPage() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const showToast = (message: string, type: "success" | "error") => setToast({ message, type });
 
+  const [consultingLink, setConsultingLink] = useState<string | null>(null);
+
   // Флаг, чтобы предотвратить двойное создание заказа
   const orderCreatedRef = useRef(false);
 
@@ -72,11 +75,29 @@ export default function CourseInfoPage() {
   // Проверка статуса курса
   useEffect(() => {
     if (!course) return;
-
     if (course.status === "INACTIVE") {
-      router.push("/courses"); // курс не активен, редирект на список
+      router.push("/courses");
     }
   }, [course, router]);
+
+  // Получаем ссылку на консультацию
+  useEffect(() => {
+    const fetchConsultingLink = async () => {
+      try {
+        const socials = await getSocialNetworks();
+        const consulting = socials.find(
+          (item) => item.name.toLowerCase() === "consulting"
+        );
+        if (consulting) {
+          setConsultingLink(consulting.url);
+        }
+      } catch (e) {
+        console.error("Ошибка загрузки consulting:", e);
+      }
+    };
+
+    fetchConsultingLink();
+  }, []);
 
   const handleCreateOrder = async () => {
     if (!id || orderCreatedRef.current) return;
@@ -85,12 +106,12 @@ export default function CourseInfoPage() {
     orderCreatedRef.current = true;
 
     try {
-      await createOrder({ courseId: id }); // токены идут автоматически через httpOnly cookie
+      await createOrder({ courseId: id });
       showToast("Заказ успешно создан!", "success");
     } catch (e) {
       console.error(e);
       showToast("Ошибка при создании заказа", "error");
-      orderCreatedRef.current = false; // сброс при ошибке
+      orderCreatedRef.current = false;
     } finally {
       setCreatingOrder(false);
     }
@@ -131,7 +152,11 @@ export default function CourseInfoPage() {
         >
           <span className="bg-[#FF7A00] px-3 rounded-sm py-0.5 text-sm">Новый курс</span>
           <h1 className="text-4xl my-5">{course.name}</h1>
-          <p className="text-[#999] max-w-2xl">{course.description}</p>
+          {course.description.split("\n\n").map((para, idx) => (
+            <p key={idx} className="text-[#999] max-w-2xl mb-4">
+              {para}
+            </p>
+          ))}
         </motion.article>
 
         {/* Основные параметры */}
@@ -195,12 +220,17 @@ export default function CourseInfoPage() {
           transition={{ duration: 0.5, delay: 1.5 }}
           className="flex flex-col md:flex-row justify-center items-center w-full mt-20 gap-4"
         >
-          <button
-            onClick={() => id && router.push(`/courses/enroll/${id}`)}
-            className="bg-[#1a1a1a] px-10 py-5 rounded-md font-medium cursor-pointer text-[#FF7A00]"
-          >
-            Записаться на консультацию
-          </button>
+          {/* Кнопка консультации из socials */}
+          {consultingLink && (
+            <a
+              href={consultingLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#1a1a1a] px-10 py-5 rounded-md font-medium text-[#FF7A00] transition hover:bg-[#222]"
+            >
+              Консультация
+            </a>
+          )}
 
           {course.status === "ACTIVE" && (
             <div className="p-4 bg-yellow-800 text-white rounded-md text-center">

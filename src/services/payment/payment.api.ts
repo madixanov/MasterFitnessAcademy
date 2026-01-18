@@ -1,20 +1,29 @@
 import { apiClient } from "@/services/apiClient";
+import Cookies from "js-cookie";
 
 export interface PaymentPayload {
-  courseId: string;
-  amount: number;
+  orderId: string;
+  redirect_url_front: string;
 }
 
 /** ------------------------
  * Создание платежа
  * ------------------------ */
-export const createPayment = async (
-  payload: PaymentPayload,
-  includeCredentials = false // 🔹 по умолчанию false, можно включить при необходимости
-): Promise<{ paymentUrl: string }> => {
-  return apiClient<{ paymentUrl: string }>("/payments/test-click/prepare", {
+const token = Cookies.get("accessToken");
+
+export const createPayment = async (payload: PaymentPayload): Promise<string> => {
+  const response = await fetch("/api/payments/redirect", { // предполагаю, что внутри apiClient обычный fetch
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(payload),
-    includeCredentials,
   });
+
+  // Если сервер возвращает просто строку, используйте .text(), а не .json()
+  const paymentUrl = await response.text(); 
+
+  console.log("URL из ответа:", paymentUrl);
+  return paymentUrl;
 };

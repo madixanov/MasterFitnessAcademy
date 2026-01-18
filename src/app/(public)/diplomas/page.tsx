@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion, Transition } from "framer-motion";
 import { FileText } from "lucide-react";
 import { getDiplomas, Diploma } from "@/services/diplomas/diploms.api";
+import { getCourses, Course } from "@/services/courses/courses.api";
 
 // Анимация карточек
 const cardVariants = {
@@ -38,43 +39,65 @@ function DiplomaSkeleton() {
   );
 }
 
+// Вспомогательная функция для красивой даты
+const formatDate = (date?: string) => {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("ru-RU");
+};
+
 export default function DiplomasPage() {
   const [diplomas, setDiplomas] = useState<Diploma[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [search, setSearch] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // Пагинация
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9; // <-- показываем по 9 дипломов на страницу
+  const itemsPerPage = 9;
 
   useEffect(() => {
-    const fetchDiplomas = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
-        const data = await getDiplomas();
-        // Сортируем по дате создания по убыванию
-        const sorted = data.sort(
-          (a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()
+        const [diplomasData, coursesData] = await Promise.all([
+          getDiplomas(),
+          getCourses(),
+        ]);
+
+        const sortedDiplomas = diplomasData.sort(
+          (a, b) =>
+            new Date(b.createdAt || "").getTime() -
+            new Date(a.createdAt || "").getTime()
         );
-        setDiplomas(sorted);
+
+        setDiplomas(sortedDiplomas);
+        setCourses(coursesData);
       } catch (err) {
-        console.error("Ошибка загрузки дипломов:", err);
+        console.error("Ошибка загрузки данных:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchDiplomas();
+    fetchData();
   }, []);
 
-  // Фильтр поиска
-  const filteredDiplomas = diplomas.filter(
-    (d) =>
-      d.codeDiplom?.toLowerCase().includes(search.toLowerCase()) ||
-      d.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      d.course?.name?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Фильтрация по поиску и курсу
+  const filteredDiplomas = diplomas.filter((d) => {
+    const courseName = d.course?.name || "";
+    const userName = d.user?.name || "";
 
-  // Пагинация: текущие элементы
+    const matchesSearch =
+      courseName.toLowerCase().includes(search.toLowerCase()) ||
+      userName.toLowerCase().includes(search.toLowerCase()) ||
+      d.codeDiplom.toLowerCase().includes(search.toLowerCase());
+
+    const matchesCourse = !selectedCourseId || d.courseId === selectedCourseId;
+
+    return matchesSearch && matchesCourse;
+  });
+
+  // Пагинация
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentDiplomas = filteredDiplomas.slice(indexOfFirst, indexOfLast);
@@ -85,15 +108,28 @@ export default function DiplomasPage() {
       <div className="absolute inset-0 bg-black/60 z-10"></div>
 
       <MainContainer>
-        {/* Поиск */}
-        <div className="mb-10 w-full max-w-md mx-auto z-20 relative">
+        {/* Поиск и фильтр */}
+        <div className="mb-10 flex flex-col md:flex-row gap-4 max-w-4xl mx-auto z-20 relative">
           <input
             type="text"
             placeholder="Поиск диплома, студента или курса..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-white/10 placeholder-white/70 text-white outline-none focus:ring-2 focus:ring-[#FF7A00] transition-all duration-200"
+            className="w-full md:w-2/3 px-4 py-3 rounded-xl bg-white/10 placeholder-white/70 text-white outline-none focus:ring-2 focus:ring-[#FF7A00] transition-all duration-200"
           />
+
+          <select
+            className="w-full md:w-1/3 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-[#FF7A00] transition-all duration-200"
+            value={selectedCourseId}
+            onChange={(e) => setSelectedCourseId(e.target.value)}
+          >
+            <option value="">Все курсы</option>
+            {courses.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Сетка дипломов */}
@@ -128,7 +164,7 @@ export default function DiplomasPage() {
                     </div>
 
                     {/* Текст */}
-                    <div className="p-4 flex flex-col justify-between h-40">
+                    <div className="p-4 flex flex-col justify-between h-50">
                       <div>
                         <h3 className="text-white text-lg font-semibold mb-1">
                           {diploma.user?.name || "—"}
@@ -137,18 +173,25 @@ export default function DiplomasPage() {
                         <p className="text-sm text-[#FF7A00]">{diploma.course?.name || "—"}</p>
                       </div>
 
-                      {/* Кнопка скачать */}
-                      {diploma.img && diploma.img.length > 0 && (
-                        <div className="mt-4">
+                      {/* Кнопки */}
+                      <div className="mt-2 flex flex-col gap-2">
+                        {diploma.img && diploma.img.length > 0 && (
                           <Link
                             href={diploma.img[0]}
                             target="_blank"
-                            className="block text-center px-4 py-2 bg-[#FF7A00] hover:bg-[#f79235] text-white font-medium rounded-lg transition-colors duration-200"
+                            className="flex-1 text-center px-3 py-1 bg-[#FF7A00] hover:bg-[#f79235] text-white font-medium rounded-lg transition-colors duration-200"
                           >
                             Скачать
                           </Link>
-                        </div>
-                      )}
+                        )}
+
+                        <Link
+                          href={`/diplomas/${diploma.id}`}
+                          className="flex-1 text-center px-3 py-1 border border-white text-white rounded-lg hover:bg-white/10 transition-colors duration-200"
+                        >
+                          Подробнее
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
