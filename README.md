@@ -1,4 +1,4 @@
-<img width="2546" height="1282" alt="image" src="https://github.com/user-attachments/assets/6879a303-3349-4166-9783-d71eddef16ad" /># 🏋️‍♂️ Master Fitness Academy LMS
+# 🏋️‍♂️ Master Fitness Academy LMS
 
 **Master Fitness Academy** is a modern, high-performance Learning Management System (LMS) designed for professional education and certification of fitness trainers. The platform covers the entire learning journey — from course enrollment to final assessment and issuance of verifiable digital diplomas.
 Website: https://master-fitness.netlify.app/
@@ -20,8 +20,8 @@ To deliver premium-quality fitness education led by experienced industry profess
 ## 📸 Platform Screenshots
 
 ![Home Page](https://github.com/user-attachments/assets/fd65e026-e4cf-40d8-88ba-dcdf3d73335c)
-![Diploma Catalog]([./assets/catalog.png](https://github.com/user-attachments/assets/53fd7a3a-2fe4-4e2e-b6b3-3580fec171bb))
-![Student Dashboard]([./assets/dashboard.png](https://github.com/user-attachments/assets/b10c8a8b-766b-40e3-a9c8-74a7bfaf643f))
+![Diploma Catalog](https://github.com/user-attachments/assets/53fd7a3a-2fe4-4e2e-b6b3-3580fec171bb)
+![Student Dashboard](https://github.com/user-attachments/assets/b10c8a8b-766b-40e3-a9c8-74a7bfaf643f)
 
 ### 👤 Student Profile (Dashboard)
 Each student has a personal dashboard with:
