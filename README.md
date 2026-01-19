@@ -1,36 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img width="2546" height="1282" alt="image" src="https://github.com/user-attachments/assets/6879a303-3349-4166-9783-d71eddef16ad" /># 🏋️‍♂️ Master Fitness Academy LMS
 
-## Getting Started
+**Master Fitness Academy** is a modern, high-performance Learning Management System (LMS) designed for professional education and certification of fitness trainers. The platform covers the entire learning journey — from course enrollment to final assessment and issuance of verifiable digital diplomas.
+Website: https://master-fitness.netlify.app/
+---
 
-First, run the development server:
+## 🎯 Objective
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+To deliver premium-quality fitness education led by experienced industry professionals, followed by official certification and professional recognition for graduates.
+
+---
+
+## ✨ Key Features
+
+### 📚 Course Catalog
+- Professional training programs
+- Categories include personal training, functional training, rehabilitation, nutrition, and more
+- Courses are created and delivered by certified expert instructors
+
+## 📸 Platform Screenshots
+
+![Home Page](https://github.com/user-attachments/assets/fd65e026-e4cf-40d8-88ba-dcdf3d73335c)
+![Diploma Catalog]([./assets/catalog.png](https://github.com/user-attachments/assets/53fd7a3a-2fe4-4e2e-b6b3-3580fec171bb))
+![Student Dashboard]([./assets/dashboard.png](https://github.com/user-attachments/assets/b10c8a8b-766b-40e3-a9c8-74a7bfaf643f))
+
+### 👤 Student Profile (Dashboard)
+Each student has a personal dashboard with:
+- active and completed courses
+- learning progress tracking
+- test and exam results
+- homework grades and feedback
+
+### 🎓 Learning Ecosystem
+
+#### 🎥 Video Lessons
+- Structured video lessons (theory + practice)
+- Progressive access based on course flow
+
+#### 📝 Homework (Assignments)
+- Homework submission (text, files, videos)
+- Instructor review and personalized feedback
+
+#### 🧠 Automated Testing
+- Quizzes for knowledge checks
+- Final exams
+- Exam access conditions based on progress and assignments
+
+#### 👨‍🏫 Instructor Guidance
+- Direct instructor feedback
+- Homework evaluation and comments
+- Ongoing academic support
+
+### 🪪 Digital Diplomas & Public Registry
+- Digital diplomas issued upon successful course completion
+- Each diploma has a unique verification ID
+- **Public Diploma Registry**:
+  - anyone can verify a diploma at any time
+  - displays graduate name, course, issue date, and status
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **State Management:** Store-based architecture (Auth, Courses, Lessons, Progress)
+- **Styling:** Tailwind CSS + PostCSS
+- **Security:**
+  - Middleware-based route protection
+  - Role-based access control (Student / Instructor / Admin)
+- **Architecture:** Modular and scalable system design
+
+---
+
+## 📂 Project Structure
+
+```txt
+src/
+├── app/
+│   ├── (auth)/          # authentication (login / register)
+│   ├── dashboard/       # student profile
+│   ├── courses/         # course catalog & course pages
+│   ├── lessons/         # lessons and video content
+│   ├── tests/           # quizzes and final exams
+│   ├── diplomas/        # public diploma registry
+│   └── admin/           # admin panel
+│
+├── components/          # reusable UI components
+├── services/            # API services and business logic
+├── store/               # global state stores
+├── lib/                 # utilities and helpers
+├── styles/              # global styles
+└── middleware.ts        # route protection
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👥 User Roles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Student** — learning, homework, tests, diplomas
+- **Instructor** — course management, homework review, student feedback
+- **Admin** — platform management, users, courses, diplomas
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Platform Vision
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Master Fitness Academy aims to become a benchmark online education platform for professional fitness trainers, offering transparent certification, industry trust, and real career opportunities for graduates.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 📌 Future Plans
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Online payments and subscriptions
+- Multilingual support
+- Mobile-first experience
+- Integration with fitness clubs and employers
+- Blockchain / NFT-based diploma verification
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+**Master Fitness Academy** — educating professionals, validating excellence.
+
