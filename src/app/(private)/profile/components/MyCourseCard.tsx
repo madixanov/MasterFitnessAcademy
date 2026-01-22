@@ -8,6 +8,7 @@ import { useMyCoursesStore } from "@/store/myCourseStore";
 import { getCourseById, Course } from "@/services/courses/courses.api";
 
 import MyCourseCardSkeleton from "./MyCourseCardSkeleton";
+import Image from "next/image";
 
 interface CourseWithMeta {
   myCourse: any;
@@ -16,9 +17,7 @@ interface CourseWithMeta {
 
 function CourseCard({
     course,
-    myCourse,
     isActive,
-    isCompleted,
   }: {
     course: Course;
     myCourse: any;
@@ -37,7 +36,7 @@ function CourseCard({
       >
         <article className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
           {course.image?.[0] && (
-            <img
+            <Image
               src={course.image[0]}
               alt={course.name}
               className="w-full h-[200px] object-cover rounded-lg"

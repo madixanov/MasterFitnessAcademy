@@ -53,9 +53,9 @@ interface PaymentBannerProps {
 }
 
 function PaymentBanner({ order, paying, setPaying }: PaymentBannerProps) {
+  const [open, setOpen] = useState(false);
   if (order.status === "ACTIVE") return null;
   const isCanceled = order.status === "CANCELED";
-  const [open, setOpen] = useState(false);
 
   return (
     <div className="w-full bg-[#1A1A1A] border border-[#FF7A00] rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-10">
