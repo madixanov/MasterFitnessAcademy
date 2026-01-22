@@ -10,7 +10,7 @@ import { useCourseStore } from "@/store/courseStore";
 import { createOrder } from "@/services/orders/orders.api"; 
 import Toast from "@/components/UI/toast";
 import { motion } from "framer-motion";
-import { getSocialNetworks, SocialNetwork } from "@/services/socials/socials.api";
+import { getSocialNetworks } from "@/services/socials/socials.api";
 
 // Skeleton курса
 function CourseSkeleton() {
@@ -165,7 +165,7 @@ export default function CourseInfoPage() {
             { icon: <Clock className="w-7 h-7 text-[#FF7A00]" />, value: course.Course_duration, label: "Длительность" },
             { icon: <BookOpen className="w-7 h-7 text-[#FF7A00]" />, value: course.Number_of_lessons, label: "Количество часов" },
             { icon: <Users className="w-7 h-7 text-[#FF7A00]" />, value: course.Training_format, label: "Формат обучения" },
-            { icon: <DollarSign className="w-7 h-7 text-[#FF7A00]" />, value: course.price, label: "Стоимость" },
+            { icon: <DollarSign className="w-7 h-7 text-[#FF7A00]" />, value: course.price, label: "Стоимость в UZS" },
           ].map((item, index) => (
             <motion.div
               key={index}
