@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import MainContainer from "@/components/MainContainer";
 import LessonModules, { Module } from "./components/LessonModulesList";
-import { CircleCheckBig, Clock, BookOpen, Users, DollarSign } from "lucide-react";
+import { CircleCheckBig, Clock, BookOpen, Users, ShoppingCart } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getCourseById, Course } from "@/services/courses/courses.api";
 import { useCourseStore } from "@/store/courseStore";
@@ -165,7 +165,7 @@ export default function CourseInfoPage() {
             { icon: <Clock className="w-7 h-7 text-[#FF7A00]" />, value: course.Course_duration, label: "Длительность" },
             { icon: <BookOpen className="w-7 h-7 text-[#FF7A00]" />, value: course.Number_of_lessons, label: "Количество часов" },
             { icon: <Users className="w-7 h-7 text-[#FF7A00]" />, value: course.Training_format, label: "Формат обучения" },
-            { icon: <DollarSign className="w-7 h-7 text-[#FF7A00]" />, value: course.price, label: "Стоимость в UZS" },
+            { icon: <ShoppingCart className="w-7 h-7 text-[#FF7A00]" />, value: course.price, label: "Стоимость в UZS" },
           ].map((item, index) => (
             <motion.div
               key={index}
