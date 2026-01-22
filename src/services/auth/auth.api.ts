@@ -106,7 +106,7 @@ export async function login(data: LoginPayload): Promise<LoginResponse> {
 
   if (res.accessToken) {
     // сохраняем токен в cookie на 7 дней
-    Cookies.set("accessToken", res.accessToken, { expires: 7, secure: true, sameSite: "strict" });
+    Cookies.set("accessToken", res.accessToken, { expires: 1, secure: true, sameSite: "strict" });
   }
 
   return res;
