@@ -13,29 +13,29 @@ import {
 
 export default function TestsPage() {
   const router = useRouter();
+
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
   const [tests, setTests] = useState<Test[]>([]);
   const [results, setResults] = useState<UserTestResult[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* ======== Загрузка профиля ======== */
+  /* ======== Профиль ======== */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getProfile(); // 🔹 token берется автоматически через HTTP-only cookie
+        const data = await getProfile();
         setUserId(data.id);
         setUserName(`${data.name} ${data.surname || ""}`.trim());
-      } catch (err) {
-        console.error(err);
-        router.push("/auth"); // не авторизован
+      } catch {
+        router.push("/auth");
       }
     };
 
     fetchProfile();
   }, [router]);
 
-  /* ======== Загрузка тестов и результатов ======== */
+  /* ======== Тесты и результаты ======== */
   useEffect(() => {
     if (!userId) return;
 
@@ -49,8 +49,6 @@ export default function TestsPage() {
         ]);
         setTests(allTests);
         setResults(userResults);
-      } catch (err) {
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -59,28 +57,21 @@ export default function TestsPage() {
     fetchData();
   }, [userId]);
 
-  /* ======== Загрузка ======== */
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-        <div className="flex space-x-2 mb-6">
-          <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce delay-0"></div>
-          <div className="w-4 h-4 bg-green-500 rounded-full animate-bounce delay-150"></div>
-          <div className="w-4 h-4 bg-yellow-400 rounded-full animate-bounce delay-300"></div>
-        </div>
-        <p className="text-xl font-semibold animate-pulse">Загрузка тестов...</p>
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+        <p className="text-xl animate-pulse">Загрузка тестов...</p>
       </div>
     );
   }
 
-  /* ======== Список тестов ======== */
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-semibold">Все тесты</h1>
         <button
           onClick={() => router.push("/profile")}
-          className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 transition font-medium"
+          className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"
         >
           Назад в профиль
         </button>
@@ -90,11 +81,19 @@ export default function TestsPage() {
 
       <div className="grid gap-4">
         {tests.map((test) => {
-          const userTestAttempts = results
+          const attempts = results
             .filter((r) => r.testId === test.id)
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            .sort(
+              (a, b) =>
+                new Date(b.date).getTime() -
+                new Date(a.date).getTime()
+            );
 
-          const latestResult = userTestAttempts[0];
+          const latestResult = attempts[0];
+          const hasResult = Boolean(latestResult);
+
+          // 🔑 ГЛАВНАЯ ЛОГИКА
+          const isActive = test.status === "PUBLISHED";
 
           return (
             <div
@@ -107,26 +106,40 @@ export default function TestsPage() {
                   {test.quantity} вопросов • {test.duration} минут
                 </p>
 
-                {latestResult ? (
+                {hasResult ? (
                   <p className="text-sm mt-1 text-green-400">
-                    Последний результат: {latestResult.score} / {latestResult.total} (
+                    Последний результат: {latestResult.score} /{" "}
+                    {latestResult.total} (
                     {new Date(latestResult.date).toLocaleString()})
                   </p>
                 ) : (
-                  <p className="text-sm mt-1 text-yellow-300">Тест доступен для сдачи</p>
+                  <p className="text-sm mt-1 text-yellow-300">
+                    Нет попыток
+                  </p>
+                )}
+
+                {!isActive && (
+                  <p className="text-sm mt-1 text-red-400">
+                    Тест неактивен
+                  </p>
                 )}
               </div>
 
-              <button
-                onClick={() => router.push(`/tests/start/${test.id}`)}
-                className={`px-4 py-2 rounded font-medium transition ${
-                  latestResult
-                    ? "bg-blue-500 hover:bg-blue-600"
-                    : "bg-green-500 hover:bg-green-600"
-                }`}
-              >
-                {latestResult ? "Пересдать / Смотреть" : "Начать тест"}
-              </button>
+              {/* ======== КНОПКА ======== */}
+              {isActive && (
+                <button
+                  onClick={() =>
+                    router.push(`/tests/start/${test.id}`)
+                  }
+                  className={`px-4 py-2 rounded font-medium transition ${
+                    hasResult
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-green-500 hover:bg-green-600"
+                  }`}
+                >
+                  {hasResult ? "Пересдать / Смотреть" : "Начать тест"}
+                </button>
+              )}
             </div>
           );
         })}
