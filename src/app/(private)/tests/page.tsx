@@ -20,7 +20,7 @@ export default function TestsPage() {
   const [results, setResults] = useState<UserTestResult[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* ======== Профиль ======== */
+  /* ======== Загрузка профиля ======== */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -35,7 +35,7 @@ export default function TestsPage() {
     fetchProfile();
   }, [router]);
 
-  /* ======== Тесты и результаты ======== */
+  /* ======== Загрузка тестов и результатов ======== */
   useEffect(() => {
     if (!userId) return;
 
@@ -81,6 +81,7 @@ export default function TestsPage() {
 
       <div className="grid gap-4">
         {tests.map((test) => {
+          // Находим результаты пользователя для этого теста
           const attempts = results
             .filter((r) => r.testId === test.id)
             .sort(
@@ -92,7 +93,7 @@ export default function TestsPage() {
           const latestResult = attempts[0];
           const hasResult = Boolean(latestResult);
 
-          // 🔑 ГЛАВНАЯ ЛОГИКА
+          // 🔑 Статус теста берём только из Test
           const isActive = test.status === "PUBLISHED";
 
           return (
@@ -108,8 +109,8 @@ export default function TestsPage() {
 
                 {hasResult ? (
                   <p className="text-sm mt-1 text-green-400">
-                    Последний результат: {latestResult.score} /{" "}
-                    {latestResult.total} (
+                    Последний результат:{" "}
+                    {Math.round(latestResult.score)} / {latestResult.total} (
                     {new Date(latestResult.date).toLocaleString()})
                   </p>
                 ) : (
@@ -119,9 +120,7 @@ export default function TestsPage() {
                 )}
 
                 {!isActive && (
-                  <p className="text-sm mt-1 text-red-400">
-                    Тест неактивен
-                  </p>
+                  <p className="text-sm mt-1 text-red-400">Тест неактивен</p>
                 )}
               </div>
 

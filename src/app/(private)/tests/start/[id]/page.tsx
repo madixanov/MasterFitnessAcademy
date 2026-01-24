@@ -193,7 +193,7 @@ export default function TestStartPage() {
         <h1 className="text-3xl mb-4">{selectedTest.name}</h1>
         <p className="text-xl mb-2">Тест уже сдан</p>
         <p className="text-xl mb-4">
-          Результат: <span className="text-green-400">{result.score}</span>
+          Результат: <span className="text-green-400">{Math.round(result.score)}</span>
         </p>
         <p className="text-yellow-300 mb-4">Пересдача будет доступна через 24 часа.</p>
         <button
