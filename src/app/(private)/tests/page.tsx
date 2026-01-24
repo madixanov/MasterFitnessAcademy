@@ -94,7 +94,7 @@ export default function TestsPage() {
           const hasResult = Boolean(latestResult);
 
           // 🔑 Статус теста берём только из Test
-          const isActive = test.status === "PUBLISHED";
+          const isActive = test.status === "ACTIVE";
 
           return (
             <div
