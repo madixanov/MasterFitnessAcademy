@@ -1,4 +1,3 @@
-import { apiClient } from "@/services/apiClient";
 import Cookies from "js-cookie";
 
 export interface PaymentPayload {
@@ -6,13 +5,19 @@ export interface PaymentPayload {
   redirect_url_front: string;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL!;
+if (!BASE_URL) throw new Error("NEXT_PUBLIC_API_URL не задан");
+
 /** ------------------------
  * Создание платежа
  * ------------------------ */
-const token = Cookies.get("accessToken");
+export const createPayment = async (
+  payload: PaymentPayload
+): Promise<string> => {
+  // ⚠️ токен берём ВНУТРИ функции
+  const token = Cookies.get("accessToken");
 
-export const createPayment = async (payload: PaymentPayload): Promise<string> => {
-  const response = await fetch("/api/payments/redirect", { // предполагаю, что внутри apiClient обычный fetch
+  const response = await fetch(`${BASE_URL}/api/payments/redirect`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -21,8 +26,13 @@ export const createPayment = async (payload: PaymentPayload): Promise<string> =>
     body: JSON.stringify(payload),
   });
 
-  // Если сервер возвращает просто строку, используйте .text(), а не .json()
-  const paymentUrl = await response.text(); 
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Ошибка создания платежа");
+  }
+
+  // сервер возвращает plain text (URL)
+  const paymentUrl = await response.text();
 
   console.log("URL из ответа:", paymentUrl);
   return paymentUrl;
