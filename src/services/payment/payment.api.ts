@@ -17,7 +17,7 @@ export const createPayment = async (
   // ⚠️ токен берём ВНУТРИ функции
   const token = Cookies.get("accessToken");
 
-  const response = await fetch(`${BASE_URL}/api/payments/redirect`, {
+  const response = await fetch(`${BASE_URL}/payments/redirect`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
