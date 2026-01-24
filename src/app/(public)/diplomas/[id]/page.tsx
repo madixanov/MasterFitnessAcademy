@@ -148,7 +148,7 @@ export default function SingleDiplomaPage() {
                   )}
                   {diploma.course.Number_of_lessons && (
                     <p>
-                      <span className="font-semibold text-[#FF7A00]">Количество уроков:</span>{" "}
+                      <span className="font-semibold text-[#FF7A00]">Количество часов:</span>{" "}
                       {diploma.course.Number_of_lessons}
                     </p>
                   )}
