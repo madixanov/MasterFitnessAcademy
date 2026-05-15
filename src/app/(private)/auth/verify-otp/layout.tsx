@@ -19,14 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${montserrat.variable} antialiased bg-black overflow-x-hidden text-white flex flex-col justify-center items-center`}
-      >
-        <Suspense fallback={<div>Загрузка...</div>}>
+    <>
+      <Suspense fallback={<div>Загрузка...</div>}>
           {children}
-        </Suspense>
-      </body>
-    </html>
+      </Suspense>
+    </>
   );
 }

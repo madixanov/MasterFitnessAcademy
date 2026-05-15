@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import "../../globals.css";
 import Sidebar from "@/components/Sidebar";
 import PaymentBanner from "@/components/PaymentBanner";
 import TestStartBanner from "@/components/TestCard";
@@ -21,9 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${montserrat.variable} antialiased bg-black overflow-x-hidden text-white`}
+      <div
+        className={`${montserrat.variable} antialiased bg-black overflow-x-hidden text-white `}
       >
         <div className="flex">
           <Sidebar />
@@ -37,7 +35,6 @@ export default function RootLayout({
             </main>
           </div>
         </div>
-      </body>
-    </html>
+      </div>
   );
 }

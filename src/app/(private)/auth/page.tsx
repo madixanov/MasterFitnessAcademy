@@ -4,7 +4,7 @@ import SignupForm from "./components/SignupForm";
 
 export default function AuthPage() {
   return (
-    <main className="min-h-[calc(100vh-200px)] p-6">
+    <main className="p-6">
       <section className="bg-[#1A1A1A] border border-[#2A2A2A] p-5 rounded-lg flex flex-col justify-center items-center">
         <article className="flex flex-col justify-center items-center pb-5">
           <h2 className="font-medium text-2xl">Добро пожаловать</h2>
