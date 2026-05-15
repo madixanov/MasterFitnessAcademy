@@ -119,7 +119,7 @@ export default function DiplomasPage() {
           />
 
           <select
-            className="w-full md:w-1/3 px-4 py-3 rounded-xl bg-white/10 text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-[#FF7A00] transition-all duration-200"
+            className="w-full md:w-1/3 px-4 py-3 rounded-xl bg-white/10 text-black placeholder-white/70 outline-none focus:ring-2 focus:ring-[#FF7A00] transition-all duration-200"
             value={selectedCourseId}
             onChange={(e) => setSelectedCourseId(e.target.value)}
           >

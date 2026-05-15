@@ -109,7 +109,7 @@ export default function TestsPage() {
 
                 {latestResult ? (
                   <p className="text-sm mt-1 text-green-400">
-                    Последний результат: {latestResult.score} / {latestResult.total} (
+                    Последний результат: {latestResult.score.toFixed(1)} / {latestResult.total} (
                     {new Date(latestResult.date).toLocaleString()})
                   </p>
                 ) : (

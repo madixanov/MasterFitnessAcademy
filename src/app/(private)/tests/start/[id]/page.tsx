@@ -16,8 +16,8 @@ const STORAGE_KEY = "test-progress";
 
 export default function TestStartPage() {
   const router = useRouter();
-  const params = useParams(); // 🔹 Получаем параметры из URL
-  const testIdFromUrl = params.id as string; // 🔹 Это и есть ваш динамический ID
+  const params = useParams();
+  const testIdFromUrl = params.id as string;
 
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
@@ -52,27 +52,29 @@ export default function TestStartPage() {
 
   /* ================= LOAD TEST ================= */
   useEffect(() => {
-    // 🔹 Добавили проверку на наличие testId из URL
     if (!userId || !testIdFromUrl) return;
 
     const loadTest = async () => {
       setLoadingTest(true);
       try {
-        // 🔹 Используем ID из ссылки вместо статичного "first-test"
-        const test = await getTestById(testIdFromUrl); 
+        const test = await getTestById(testIdFromUrl);
         setSelectedTest(test);
 
         const results = await getUserTestResults(userId);
         const filtered = results.filter((r) => r.testId === test.id);
-        
+
         if (filtered.length > 0) {
           const latest = filtered.reduce((prev, cur) =>
             new Date(cur.date) > new Date(prev.date) ? cur : prev
           );
-          setResult(latest);
+          
           const diff = Date.now() - new Date(latest.date).getTime();
-          setAlreadyPassed(diff < 24 * 60 * 60 * 1000);
-          return;
+          // Если прошло меньше 24 часов (или вашего лимита), считаем сданным
+          if (diff < 24 * 60 * 60 * 1000) {
+             setResult(latest);
+             setAlreadyPassed(true);
+             return;
+          }
         }
 
         const saved = localStorage.getItem(`${STORAGE_KEY}-${test.id}-${userId}`);
@@ -83,7 +85,7 @@ export default function TestStartPage() {
           setAnswers(parsed.answers || {});
           setTimeLeft(parsed.timeLeft || test.duration * 60);
         } else {
-          // Инициализация нового теста (пока без вопросов, они создадутся при нажатии "Начать")
+          // Важно: устанавливаем время сразу, чтобы при старте timeLeft не был 0
           setTimeLeft(test.duration * 60);
         }
       } catch (err) {
@@ -99,31 +101,22 @@ export default function TestStartPage() {
 
   /* ================= TIMER ================= */
   useEffect(() => {
-    if (timeLeft <= 0 || alreadyPassed || !selectedTest || !userId) return;
-    
+    // Таймер работает только если вопросы загружены (тест начат)
+    if (timeLeft <= 0 || alreadyPassed || !selectedTest || !userId || questions.length === 0) return;
+
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         const next = Math.max(prev - 1, 0);
-        
-        // Оптимизация: сохраняем в localStorage только если тест запущен
-        if (questions.length > 0) {
-          localStorage.setItem(
-            `${STORAGE_KEY}-${selectedTest.id}-${userId}`,
-            JSON.stringify({ questions, currentIndex, answers, timeLeft: next })
-          );
-        }
+        localStorage.setItem(
+          `${STORAGE_KEY}-${selectedTest.id}-${userId}`,
+          JSON.stringify({ questions, currentIndex, answers, timeLeft: next })
+        );
         return next;
       });
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [timeLeft, selectedTest, userId, questions, answers, currentIndex, alreadyPassed]);
-
-  /* ================= ANSWER ================= */
-  const handleAnswer = (questionId: string, answerId: string) => {
-    const updated = { ...answers, [questionId]: answerId };
-    setAnswers(updated);
-  };
 
   /* ================= FINISH ================= */
   const handleFinish = useCallback(async () => {
@@ -142,47 +135,64 @@ export default function TestStartPage() {
       const results = await getUserTestResults(userId);
       const latest = results.filter((r) => r.testId === selectedTest.id)
         .reduce((prev, cur) => new Date(cur.date) > new Date(prev.date) ? cur : prev);
+      
       setResult(latest);
       setAlreadyPassed(true);
       localStorage.removeItem(`${STORAGE_KEY}-${selectedTest.id}-${userId}`);
     } catch (err) {
-      console.error(err);
+      console.error("Ошибка при отправке теста:", err);
       submittedRef.current = false;
     }
   }, [answers, selectedTest, userId]);
 
+  // Автозавершение по таймеру
   useEffect(() => {
-    if (timeLeft === 0 && questions.length) handleFinish();
-  }, [timeLeft, questions, handleFinish]);
+    // Добавлена проверка timeLeft > 0 в логику старта, чтобы это не срабатывало мгновенно
+    if (questions.length > 0 && timeLeft === 0 && !submittedRef.current && !alreadyPassed) {
+      handleFinish();
+    }
+  }, [timeLeft, questions.length, handleFinish, alreadyPassed]);
+
+  /* ================= START TEST HANDLER ================= */
+  const startTest = () => {
+    if (!selectedTest) return;
+    
+    // Сбрасываем флаг отправки для возможности пересдачи
+    submittedRef.current = false;
+    
+    const shuffled = [...selectedTest.questions].sort(() => 0.5 - Math.random());
+    const selectedQuestions = shuffled.slice(0, selectedTest.quantity);
+    
+    setAnswers({});
+    setCurrentIndex(0);
+    setQuestions(selectedQuestions);
+    setTimeLeft(selectedTest.duration * 60); // Установка времени ДО срабатывания эффектов
+  };
 
   /* ================= UNLOAD ================= */
   useEffect(() => {
     const handleUnload = () => {
-      if (!selectedTest || !userId || alreadyPassed || submittedRef.current) return;
-      navigator.sendBeacon(
-        "/user-test-result/submit",
-        new Blob(
-          [
-            JSON.stringify({
-              testId: selectedTest.id,
-              userId,
-              answers: Object.entries(answers).map(([qId, aId]) => ({ questionId: qId, answerId: aId })),
-            }),
-          ],
-          { type: "application/json" }
-        )
-      );
+      if (!selectedTest || !userId || alreadyPassed || submittedRef.current || !questions.length) return;
+      
+      const payload = JSON.stringify({
+        testId: selectedTest.id,
+        userId,
+        answers: Object.entries(answers).map(([qId, aId]) => ({ questionId: qId, answerId: aId })),
+      });
+      
+      navigator.sendBeacon("/user-test-result/submit", new Blob([payload], { type: "application/json" }));
       localStorage.removeItem(`${STORAGE_KEY}-${selectedTest.id}-${userId}`);
     };
+
     window.addEventListener("beforeunload", handleUnload);
     return () => window.removeEventListener("beforeunload", handleUnload);
-  }, [selectedTest, userId, answers, alreadyPassed]);
+  }, [selectedTest, userId, answers, alreadyPassed, questions.length]);
 
-  /* ================= UI ================= */
+  /* ================= UI RENDERING ================= */
   if (loading || loadingTest) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-        <p className="text-xl animate-pulse">Загрузка теста...</p>
+        <p className="text-xl animate-pulse">Загрузка данных...</p>
       </div>
     );
   }
@@ -190,18 +200,20 @@ export default function TestStartPage() {
   if (alreadyPassed && result) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
-        <h1 className="text-3xl mb-4">{selectedTest.name}</h1>
-        <p className="text-xl mb-2">Тест уже сдан</p>
-        <p className="text-xl mb-4">
-          Результат: <span className="text-green-400">{result.score}</span>
-        </p>
-        <p className="text-yellow-300 mb-4">Пересдача будет доступна через 24 часа.</p>
-        <button
-          onClick={() => router.push("/tests")}
-          className="px-6 py-3 bg-blue-500 rounded-lg hover:bg-blue-600 transition"
-        >
-          Назад к тестам
-        </button>
+        <h1 className="text-3xl mb-4">{selectedTest?.name}</h1>
+        <div className="bg-gray-800 p-8 rounded-2xl shadow-xl text-center border border-gray-700">
+          <p className="text-xl mb-2">Тест уже сдан</p>
+          <p className="text-4xl font-bold mb-4 text-green-400">
+            {result.score.toFixed(1)}%
+          </p>
+          <p className="text-yellow-300 mb-6">Следующая попытка будет доступна позже.</p>
+          <button
+            onClick={() => router.push("/tests")}
+            className="px-6 py-3 bg-blue-500 rounded-lg hover:bg-blue-600 transition"
+          >
+            Назад к списку
+          </button>
+        </div>
       </div>
     );
   }
@@ -209,76 +221,107 @@ export default function TestStartPage() {
   if (!questions.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-6">
-        <h1 className="text-3xl mb-4">{selectedTest?.name}</h1>
-        <p className="text-lg mb-2">Количество вопросов: {selectedTest?.quantity}</p>
-        <p className="text-lg mb-2">Продолжительность: {selectedTest?.duration} минут</p>
-        <p className="text-lg mb-4 text-yellow-300">Тест можно пройти один раз в день</p>
-        <button
-          onClick={() => {
-            const shuffled = [...selectedTest.questions].sort(() => 0.5 - Math.random());
-            setQuestions(shuffled.slice(0, selectedTest.quantity));
-          }}
-          className="px-6 py-3 bg-green-500 rounded-lg hover:bg-green-600 transition"
-        >
-          Начать тест
-        </button>
+        <h1 className="text-4xl font-bold mb-6">{selectedTest?.name}</h1>
+        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-md">
+          <p className="text-lg mb-2">Вопросов: <span className="text-blue-400">{selectedTest?.quantity}</span></p>
+          <p className="text-lg mb-4">Время: <span className="text-blue-400">{selectedTest?.duration} мин.</span></p>
+          <button
+            onClick={startTest}
+            className="w-full px-6 py-4 bg-green-600 rounded-xl font-bold text-xl hover:bg-green-500 transition-all shadow-lg active:scale-95"
+          >
+            Начать тест
+          </button>
+        </div>
       </div>
     );
   }
 
   const q = questions[currentIndex];
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const formatTime = (s: number) => {
+    const min = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      <div className="flex justify-between mb-4">
-        <span>Ученик: {userName}</span>
-        <span>
-          Таймер: {minutes.toString().padStart(2, "0")}:{seconds.toString().padStart(2, "0")}
-        </span>
-      </div>
+      <header className="max-w-3xl mx-auto flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-lg border border-gray-700">
+        <div className="flex flex-col">
+          <span className="text-gray-400 text-xs uppercase tracking-wider">Студент</span>
+          <span className="font-medium">{userName}</span>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-gray-400 text-xs uppercase tracking-wider">Осталось времени</span>
+          <span className={`font-mono text-xl ${timeLeft < 60 ? "text-red-500 animate-pulse" : "text-green-400"}`}>
+            {formatTime(timeLeft)}
+          </span>
+        </div>
+      </header>
 
-      <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-xl">
-        <p className="mb-2">
-          Вопрос {currentIndex + 1} / {questions.length}
-        </p>
-        <h2 className="text-xl mb-6">{q.question}</h2>
+      <main className="max-w-3xl mx-auto">
+        <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700">
+          <div className="flex justify-between items-center mb-6">
+            <span className="bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-700">
+              Вопрос {currentIndex + 1} из {questions.length}
+            </span>
+            <div className="w-1/2 bg-gray-700 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-blue-500 h-full transition-all duration-300" 
+                style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+              />
+            </div>
+          </div>
 
-        <div className="grid gap-3">
-          {q.answers.map((a) => (
+          <h2 className="text-2xl font-semibold mb-8 leading-tight">{q.question}</h2>
+
+          <div className="grid gap-4">
+            {q.answers.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => setAnswers(prev => ({ ...prev, [q.id]: a.id }))}
+                className={`group p-4 text-left border-2 rounded-xl transition-all duration-200 flex justify-between items-center ${
+                  answers[q.id] === a.id 
+                    ? "bg-blue-600/20 border-blue-500 ring-2 ring-blue-500/20" 
+                    : "border-gray-700 hover:border-gray-500 hover:bg-gray-700/50"
+                }`}
+              >
+                <span className="text-lg">{a.text}</span>
+                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  answers[q.id] === a.id ? "border-white bg-white" : "border-gray-600"
+                }`}>
+                  {answers[q.id] === a.id && <div className="w-2 h-2 bg-blue-600 rounded-full" />}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <footer className="flex justify-between mt-10 pt-6 border-t border-gray-700">
             <button
-              key={a.id}
-              onClick={() => handleAnswer(q.id, a.id)}
-              className={`p-3 border rounded transition ${
-                answers[q.id] === a.id ? "bg-green-600 border-green-500" : "border-white/20 hover:bg-gray-700"
-              }`}
+              disabled={currentIndex === 0}
+              onClick={() => setCurrentIndex((i) => i - 1)}
+              className="px-6 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 disabled:opacity-30 transition"
             >
-              {a.text}
+              Назад
             </button>
-          ))}
-        </div>
 
-        <div className="flex justify-between mt-6">
-          <button
-            disabled={currentIndex === 0}
-            onClick={() => setCurrentIndex((i) => i - 1)}
-            className="px-4 py-2 bg-gray-600 rounded disabled:opacity-50"
-          >
-            Назад
-          </button>
-
-          {currentIndex < questions.length - 1 ? (
-            <button onClick={() => setCurrentIndex((i) => i + 1)} className="px-4 py-2 bg-blue-500 rounded">
-              Далее
-            </button>
-          ) : (
-            <button onClick={handleFinish} className="px-4 py-2 bg-green-500 rounded">
-              Завершить тест
-            </button>
-          )}
+            {currentIndex < questions.length - 1 ? (
+              <button 
+                onClick={() => setCurrentIndex((i) => i + 1)} 
+                className="px-8 py-2 bg-blue-600 rounded-lg hover:bg-blue-500 font-semibold transition"
+              >
+                Далее
+              </button>
+            ) : (
+              <button 
+                onClick={handleFinish} 
+                className="px-8 py-2 bg-green-600 rounded-lg hover:bg-green-500 font-semibold transition shadow-lg shadow-green-900/20"
+              >
+                Завершить
+              </button>
+            )}
+          </footer>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
