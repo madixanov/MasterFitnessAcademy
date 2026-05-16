@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { createPayment } from "@/services/payment/payment.api";
+import { getSocialNetworks } from "@/services/socials/socials.api";
+import { getQrCodes } from "@/services/qr/qr.api";
 
 interface PaymentModalProps {
   open: boolean;
@@ -21,6 +23,53 @@ export default function PaymentModal({ open, onClose, orderId, setPaying }: Paym
   const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(5);
   const [showQr, setShowQr] = useState(false);
+  const [telegramUrl, setTelegramUrl] = useState("");
+  const [qrCode, setQrCode] = useState<{
+    title: string;
+    photo_url: string;
+  } | null>(null);
+
+  useEffect(() => {
+  const loadTelegram = async () => {
+    try {
+      const socials = await getSocialNetworks();
+
+      const consulting = socials.find(
+        (item) => item.name.toLowerCase() === "consulting"
+      );
+
+      if (consulting?.url) {
+        setTelegramUrl(consulting.url);
+      }
+    } catch (err) {
+      console.error("Ошибка загрузки соцсетей:", err);
+    }
+  };
+
+  loadTelegram();
+  }, []);
+
+  useEffect(() => {
+    const loadQr = async () => {
+      try {
+        const data = await getQrCodes();
+
+        if (data && data.length > 0) {
+          setQrCode({
+            title: data[0].title,
+            photo_url: data[0].photo_url,
+          });
+        } else {
+          setQrCode(null);
+        }
+      } catch (err) {
+        console.error("Ошибка загрузки QR:", err);
+        setQrCode(null);
+      }
+    };
+
+    loadQr();
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -141,16 +190,57 @@ export default function PaymentModal({ open, onClose, orderId, setPaying }: Paym
             </h3>
 
             {/* Instruction */}
-            <ol className="space-y-2 text-sm text-gray-300 list-decimal list-inside">
-              <li>Отсканируйте QR-код через банковское приложение</li>
-              <li>Совершите оплату</li>
-              <li>Сохраните чек</li>
-              <li>Отправьте чек в Telegram администратору</li>
-              <li>Ожидайте подтверждения</li>
-            </ol>
+            <div className="w-full bg-[#1b1b1b] border border-red-500/30 rounded-xl p-4">
+              <div className="mb-4 text-center">
+                <p className="text-red-500 font-bold text-lg">
+                  ⚠️ ВАЖНО
+                </p>
 
-            <div className="text-xs text-gray-400 border-t border-gray-700 pt-3 text-center">
-              ⚠️ Без отправленного чека заказ не будет обработан
+                <p className="text-sm text-gray-300 mt-2">
+                  После оплаты ОБЯЗАТЕЛЬНО отправьте чек администратору.
+                </p>
+
+                <p className="text-xs text-red-400 mt-2">
+                  Без чека заказ НЕ будет подтвержден и НЕ будет обработан.
+                </p>
+              </div>
+
+              <ol className="space-y-3 text-sm text-gray-300 list-decimal list-inside">
+                <li>
+                  Отсканируйте QR-код через банковское приложение
+                </li>
+
+                <li>
+                  Совершите оплату
+                </li>
+
+                <li className="text-orange-400 font-medium">
+                  Обязательно сохраните чек или скриншот оплаты
+                </li>
+
+                <a
+                  href={telegramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full mt-4 bg-[#229ED9] hover:opacity-90 transition rounded-xl py-3 text-center font-semibold flex items-center justify-center gap-2"
+                >
+                  📩 Отправить чек администратору
+                </a>
+
+                <li className="text-red-400 font-semibold">
+                  Сразу отправьте чек администратору в Telegram
+                </li>
+
+                <li>
+                  Ожидайте подтверждения оплаты
+                </li>
+              </ol>
+
+              <div className="mt-4 border-t border-red-500/20 pt-3 text-center">
+                <p className="text-xs text-red-500 font-semibold">
+                  ❗ Если чек не будет отправлен — заказ автоматически считается неоплаченным
+                </p>
+              </div>
             </div>
 
             {/* Timer */}
@@ -163,14 +253,37 @@ export default function PaymentModal({ open, onClose, orderId, setPaying }: Paym
 
             {/* QR */}
             {showQr && (
-              <Image
-                src="/payment/qr.jpg"
-                alt="QR Code"
-                width={260}
-                height={260}
-                className="w-full max-w-[180px] sm:max-w-[220px] md:max-w-[260px] object-contain mt-2 mx-auto"
-              />
+              <div className="flex flex-col items-center gap-2 mt-2">
+                {qrCode?.photo_url ? (
+                  <Image
+                    src={qrCode.photo_url}
+                    alt={qrCode.title || "QR Code"}
+                    width={260}
+                    height={260}
+                    className="w-full max-w-[180px] sm:max-w-[220px] md:max-w-[260px] object-contain mx-auto"
+                  />
+                ) : (
+                  <div className="w-[180px] h-[180px] bg-[#1f1f1f] border border-gray-700 rounded-xl flex items-center justify-center text-gray-400 text-sm text-center p-3">
+                    QR код временно недоступен
+                  </div>
+                )}
+
+                {qrCode?.title && (
+                  <p className="text-xs text-gray-400 text-center">
+                    {qrCode.title}
+                  </p>
+                )}
+              </div>
             )}
+
+            <a
+              href={telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full mt-4 bg-[#229ED9] hover:opacity-90 transition rounded-xl py-3 text-center font-semibold flex items-center justify-center gap-2"
+            >
+              📩 Отправить чек администратору
+            </a>
           </div>
         </div>
 
