@@ -7,16 +7,21 @@ import {
   signup,
   sendOtp,
   SignupPayload,
-  sendOtpPayload,
 } from "@/services/auth/auth.api";
 import Toast from "@/components/UI/toast";
 import { useRouter } from "next/navigation";
 
+type AuthState = "idle" | "loading" | "email_exists";
+
 export default function SignupForm() {
   const [loading, setLoading] = useState(false);
-  const [isEmailExists, setIsEmailExists] = useState(false);
+  const [authState, setAuthState] = useState<AuthState>("idle");
   const [savedEmail, setSavedEmail] = useState("");
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
 
   const router = useRouter();
 
@@ -24,7 +29,6 @@ export default function SignupForm() {
     setToast({ message, type });
   };
 
-  // ✅ универсальный парсер ошибки
   const getErrorMessage = (err: any) => {
     return (
       err?.response?.data?.details ||
@@ -33,6 +37,23 @@ export default function SignupForm() {
       err?.message ||
       "Ошибка регистрации"
     );
+  };
+
+  const handleSendOtp = async (email: string) => {
+    await sendOtp({
+      to: email,
+      subject: "Verification Code",
+    });
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("pendingEmail", email);
+    }
+
+    showToast("Код отправлен на email", "success");
+
+    setTimeout(() => {
+      router.push("/auth/verify-otp");
+    }, 1000);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -59,60 +80,31 @@ export default function SignupForm() {
     try {
       await signup(signupPayload);
 
-      await sendOtp({
-        to: signupPayload.email,
-        subject: "Verification Code",
-      });
+      await handleSendOtp(signupPayload.email);
 
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem("pendingEmail", signupPayload.email);
-      }
-
-      showToast("Регистрация прошла успешно! Проверьте почту.", "success");
-
-      setTimeout(() => router.push("/auth/verify-otp"), 1000);
+      showToast("Регистрация успешна", "success");
     } catch (err: any) {
       const details = getErrorMessage(err);
 
-      // ✅ обработка "email уже существует"
-      if (
-        details.toLowerCase().includes("email уже используется") ||
-        details.toLowerCase().includes("already exists")
-      ) {
-        setIsEmailExists(true);
+      const isEmailExists =
+        err?.response?.status === 409 ||
+        details?.toLowerCase().includes("email уже используется") ||
+        details?.toLowerCase().includes("already exists");
+
+      if (isEmailExists) {
         setSavedEmail(signupPayload.email);
+        setAuthState("email_exists");
 
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem("pendingEmail", signupPayload.email);
+        showToast("Email уже зарегистрирован. Отправляем код...", "error");
+
+        try {
+          await handleSendOtp(signupPayload.email);
+        } catch {
+          showToast("Не удалось отправить код", "error");
         }
-
-        showToast("Email уже зарегистрирован. Активируйте аккаунт.", "error");
       } else {
         showToast(details, "error");
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleActivateAccount = async () => {
-    if (!savedEmail) return;
-
-    setLoading(true);
-
-    const payload: sendOtpPayload = {
-      to: savedEmail,
-      subject: "Verification Code",
-    };
-
-    try {
-      await sendOtp(payload);
-
-      showToast("Код подтверждения отправлен на email!", "success");
-
-      setTimeout(() => router.push("/auth/verify-otp"), 1000);
-    } catch {
-      showToast("Ошибка отправки кода подтверждения", "error");
     } finally {
       setLoading(false);
     }
@@ -132,6 +124,7 @@ export default function SignupForm() {
       </div>
 
       <form className="flex flex-col" onSubmit={handleSubmit}>
+        {/* NAME */}
         <label className="mb-5 flex flex-col gap-1">
           Имя и фамилия
           <input
@@ -143,6 +136,7 @@ export default function SignupForm() {
           />
         </label>
 
+        {/* EMAIL */}
         <label className="mb-5 flex flex-col gap-1">
           Email
           <input
@@ -154,6 +148,7 @@ export default function SignupForm() {
           />
         </label>
 
+        {/* PHONE */}
         <label className="mb-5 flex flex-col gap-1">
           Телефон
           <input
@@ -165,43 +160,33 @@ export default function SignupForm() {
           />
         </label>
 
+        {/* PASSWORD */}
         <label className="mb-5 flex flex-col gap-1">
           Пароль
           <PasswordField id="password" name="password" />
         </label>
 
+        {/* REPEAT PASSWORD */}
         <label className="mb-5 flex flex-col gap-1">
           Подтвердите пароль
           <PasswordField id="repeat-password" name="repeat-password" />
         </label>
 
-        {!isEmailExists && (
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 gap-2 disabled:opacity-50"
-          >
-            {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-            Зарегистрироваться
-          </button>
-        )}
+        {/* SUBMIT */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 gap-2 disabled:opacity-50"
+        >
+          {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+          Зарегистрироваться
+        </button>
 
-        {isEmailExists && (
-          <div className="mt-5 p-4 border border-red-400 bg-red-900/20 rounded-md text-center">
-            <p className="mb-3 text-red-300">
-              Этот email уже зарегистрирован, но не активирован.
-            </p>
-
-            <button
-              type="button"
-              onClick={handleActivateAccount}
-              disabled={loading}
-              className="flex justify-center items-center w-full py-2 bg-[#FF7A00] rounded-lg gap-2 disabled:opacity-50"
-            >
-              {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-              Активировать аккаунт
-            </button>
-          </div>
+        {/* EMAIL EXISTS INFO (just UX hint, optional) */}
+        {authState === "email_exists" && (
+          <p className="mt-4 text-center text-yellow-400 text-sm">
+            Если email уже зарегистрирован — мы отправили код для входа
+          </p>
         )}
       </form>
     </>
