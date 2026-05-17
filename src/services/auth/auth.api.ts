@@ -99,14 +99,21 @@ export interface LoginResponse {
 }
 
 export async function login(data: LoginPayload): Promise<LoginResponse> {
-  const res = await apiClient<LoginResponse & { accessToken: string }>("/auth/signin", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+  const res = await apiClient<LoginResponse & { accessToken: string }>(
+    "/auth/signin",
+    {
+      method: "POST",
+      skipAuth: true,
+      body: JSON.stringify(data),
+    }
+  );
 
   if (res.accessToken) {
-    // сохраняем токен в cookie на 7 дней
-    Cookies.set("accessToken", res.accessToken, { expires: 7, secure: true, sameSite: "strict" });
+    Cookies.set("accessToken", res.accessToken, {
+      expires: 7,
+      secure: true,
+      sameSite: "strict",
+    });
   }
 
   return res;

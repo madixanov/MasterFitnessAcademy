@@ -47,7 +47,7 @@ export default function Footer() {
         setSocials(socialsOnly);
 
         // Телефон ищем отдельно
-        const phone = data.find((s) => s.name.startsWith("+998"));
+        const phone = data.find((s) => s.url.startsWith("+998"));
         setPhoneSocial(phone || null);
       } catch (error) {
         console.error("Ошибка загрузки соцсетей:", error);
@@ -130,7 +130,7 @@ export default function Footer() {
             {/* Показать номер отдельным текстом */}
             {phoneSocial && (
               <span className="font-semibold text-3xl mt-2">
-                {phoneSocial.name}
+                {phoneSocial.url}
               </span>
             )}
           </div>

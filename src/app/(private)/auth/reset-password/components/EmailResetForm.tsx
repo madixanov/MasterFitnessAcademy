@@ -40,10 +40,10 @@ export default function EmailResetForm() {
         />
       </label>
 
-      <p className="text-[#999]">Мы отправим ссылку для сброса пароля на ваш email</p>
+      <p className="text-[#999]">Мы отправим код для сброса пароля на ваш email</p>
 
       <button className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7">
-        <Mail className="w-5 h-5 mr-4" /> Отправить ссылку
+        <Mail className="w-5 h-5 mr-4" /> Отправить код
       </button>
       <Link href="/auth">
         <button className="flex justify-center items-center w-full bg-[#0A0A0A] border border-[#2A2A2A] py-2 rounded-lg mt-7">
