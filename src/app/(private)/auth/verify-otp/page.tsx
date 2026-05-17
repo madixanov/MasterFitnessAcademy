@@ -149,6 +149,12 @@ export default function OTPPage() {
               className="mb-6 px-4 py-2 text-center text-lg border border-[#2A2A2A] rounded-md focus:ring-2 focus:ring-[#FF7A00]"
             />
 
+            <p className="mb-6 text-sm text-gray-400 text-center leading-snug">
+              Мы отправили код на вашу почту.  
+              Если письмо не пришло — проверьте папку{" "}
+              <span className="text-white font-medium">«Спам»</span>.
+            </p>
+
             {/* Submit */}
             <Button
               type="submit"

@@ -1,7 +1,7 @@
 "use client";
 
 import PasswordField from "./PasswordField";
-import { UserPlus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import {
   signup,
@@ -17,10 +17,22 @@ export default function SignupForm() {
   const [isEmailExists, setIsEmailExists] = useState(false);
   const [savedEmail, setSavedEmail] = useState("");
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
   const router = useRouter();
 
   const showToast = (message: string, type: "success" | "error") => {
     setToast({ message, type });
+  };
+
+  // ✅ универсальный парсер ошибки
+  const getErrorMessage = (err: any) => {
+    return (
+      err?.response?.data?.details ||
+      err?.response?.data?.message ||
+      err?.response?.data?.error ||
+      err?.message ||
+      "Ошибка регистрации"
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,6 +40,7 @@ export default function SignupForm() {
     setLoading(true);
 
     const form = new FormData(e.currentTarget);
+
     const signupPayload: SignupPayload = {
       name: form.get("name") as string,
       email: form.get("email") as string,
@@ -36,6 +49,7 @@ export default function SignupForm() {
     };
 
     const repeatPassword = form.get("repeat-password") as string;
+
     if (signupPayload.password !== repeatPassword) {
       showToast("Пароли не совпадают", "error");
       setLoading(false);
@@ -43,24 +57,28 @@ export default function SignupForm() {
     }
 
     try {
-      // 🔹 signup теперь сам выставляет HTTP-only accessToken и refreshToken
       await signup(signupPayload);
 
-      // Отправка OTP для подтверждения email
-      await sendOtp({ to: signupPayload.email, subject: "Verification Code" });
+      await sendOtp({
+        to: signupPayload.email,
+        subject: "Verification Code",
+      });
 
-      // Сохраняем email временно для перехода на страницу подтверждения
       if (typeof window !== "undefined") {
         window.localStorage.setItem("pendingEmail", signupPayload.email);
       }
 
-      showToast("Регистрация прошла успешно! Проверьте почту для OTP.", "success");
+      showToast("Регистрация прошла успешно! Проверьте почту.", "success");
 
       setTimeout(() => router.push("/auth/verify-otp"), 1000);
     } catch (err: any) {
-      const details = err?.response?.data?.message || err?.message || "Ошибка регистрации";
+      const details = getErrorMessage(err);
 
-      if (details.includes("Email уже используется") || details.includes("already exists")) {
+      // ✅ обработка "email уже существует"
+      if (
+        details.toLowerCase().includes("email уже используется") ||
+        details.toLowerCase().includes("already exists")
+      ) {
         setIsEmailExists(true);
         setSavedEmail(signupPayload.email);
 
@@ -68,7 +86,7 @@ export default function SignupForm() {
           window.localStorage.setItem("pendingEmail", signupPayload.email);
         }
 
-        showToast("Email уже зарегистрирован, активируйте аккаунт.", "error");
+        showToast("Email уже зарегистрирован. Активируйте аккаунт.", "error");
       } else {
         showToast(details, "error");
       }
@@ -79,12 +97,19 @@ export default function SignupForm() {
 
   const handleActivateAccount = async () => {
     if (!savedEmail) return;
-    const payload: sendOtpPayload = { to: savedEmail, subject: "Verification Code" };
 
     setLoading(true);
+
+    const payload: sendOtpPayload = {
+      to: savedEmail,
+      subject: "Verification Code",
+    };
+
     try {
       await sendOtp(payload);
+
       showToast("Код подтверждения отправлен на email!", "success");
+
       setTimeout(() => router.push("/auth/verify-otp"), 1000);
     } catch {
       showToast("Ошибка отправки кода подтверждения", "error");
@@ -95,54 +120,57 @@ export default function SignupForm() {
 
   return (
     <>
-      {/* Toast container */}
+      {/* Toast */}
       <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
 
       <form className="flex flex-col" onSubmit={handleSubmit}>
-        <label htmlFor="name" className="mb-5 flex flex-col gap-1">
+        <label className="mb-5 flex flex-col gap-1">
           Имя и фамилия
           <input
-            id="name"
             name="name"
             type="text"
             placeholder="Иван Петров"
             required
-            className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
+            className="border border-[#2A2A2A] px-5 py-2 rounded-md"
           />
         </label>
 
-        <label htmlFor="email" className="mb-5 flex flex-col gap-1">
+        <label className="mb-5 flex flex-col gap-1">
           Email
           <input
-            id="email"
             name="email"
             type="email"
             placeholder="example@mail.com"
             required
-            className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
+            className="border border-[#2A2A2A] px-5 py-2 rounded-md"
           />
         </label>
 
-        <label htmlFor="phone" className="mb-5 flex flex-col gap-1">
+        <label className="mb-5 flex flex-col gap-1">
           Телефон
           <input
-            id="phone"
             name="phone"
             type="text"
             placeholder="+998"
             required
-            className="border border-[#2A2A2A] px-5 py-2 rounded-md focus:outline-none"
+            className="border border-[#2A2A2A] px-5 py-2 rounded-md"
           />
         </label>
 
-        <label htmlFor="password" className="mb-5 flex flex-col gap-1 relative">
+        <label className="mb-5 flex flex-col gap-1">
           Пароль
           <PasswordField id="password" name="password" />
         </label>
 
-        <label htmlFor="repeat-password" className="mb-5 flex flex-col gap-1 relative">
+        <label className="mb-5 flex flex-col gap-1">
           Подтвердите пароль
           <PasswordField id="repeat-password" name="repeat-password" />
         </label>
@@ -151,7 +179,7 @@ export default function SignupForm() {
           <button
             type="submit"
             disabled={loading}
-            className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 disabled:opacity-50 gap-2"
+            className="flex justify-center items-center w-full bg-[#FF7A00] py-2 rounded-lg mt-7 gap-2 disabled:opacity-50"
           >
             {loading && <Loader2 className="w-5 h-5 animate-spin" />}
             Зарегистрироваться
@@ -161,7 +189,7 @@ export default function SignupForm() {
         {isEmailExists && (
           <div className="mt-5 p-4 border border-red-400 bg-red-900/20 rounded-md text-center">
             <p className="mb-3 text-red-300">
-              Этот email уже зарегистрирован, но аккаунт не активирован.
+              Этот email уже зарегистрирован, но не активирован.
             </p>
 
             <button
