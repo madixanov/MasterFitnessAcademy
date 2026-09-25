@@ -129,7 +129,7 @@ export default function CourseInfoPage() {
   })) || [];
 
   return (
-    <main className="my-30">
+    <main className="min-h-screen mt-30">
       <MainContainer>
         {/* Toast */}
         <div className="fixed top-4 right-4 z-50 flex flex-col gap-3">

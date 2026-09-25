@@ -83,7 +83,7 @@ export default function Courses() {
         />
       </Head>
 
-      <main className="relative bg-[url('/courses/bg-photo.jpg')] bg-center bg-cover bg-no-repeat py-25 lg:py-30 xl:py-40 flex justify-center items-center min-h-[calc(100vh-140px)] w-full">
+      <main className="relative min-h-[calc(100vh-90px)] bg-[url('/courses/bg-photo.jpg')] bg-center bg-cover bg-no-repeat py-25 lg:py-30 xl:py-40 flex justify-center items-center w-full">
         <div className="hidden lg:block absolute inset-0 z-10 overflow-hidden">
           <div className="w-full h-full rotate-90">
             <Image
@@ -100,40 +100,56 @@ export default function Courses() {
 
         {/* Контент поверх */}
         <MainContainer>
-          <section className="relative z-20 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {loading
-              ? Array.from({ length: 6 }).map((_, i) => (
-                  <CourseSkeleton key={i} />
-                ))
-              : courses.map((course, i) => (
-                  <motion.div
-                    key={course.id}
-                    custom={i}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.2 }}
-                    variants={cardVariants}
-                  >
-                    <Link href={`/courses/info?id=${course.id}`}>
-                      <ProductContainer
-                        title="Курс"
-                        description={
-                          <>
-                            <div>{course.name}</div>
-                            <span
-                              className={`mt-2 inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                                course.status
-                              )}`}
-                            >
-                              {getStatusText(course.status)}
-                            </span>
-                          </>
-                        }
-                        image={course.image?.[0] || "/courses/default.jpg"}
-                      />
-                    </Link>
-                  </motion.div>
-                ))}
+          <section className="relative z-20 w-full">
+            {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                      <CourseSkeleton key={i} />
+                  ))}
+                </div>
+            ) : courses.length === 0 ? (
+                <div className="min-h-[300px] flex flex-col items-center justify-center text-center">
+                  <h2 className="text-2xl font-medium text-white">
+                    Курсов пока нет
+                  </h2>
+                  <p className="mt-3 text-[#999] max-w-md">
+                    Сейчас доступных курсов нет. Загляните позже — новые курсы
+                    появятся здесь.
+                  </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {courses.map((course, i) => (
+                      <motion.div
+                          key={course.id}
+                          custom={i}
+                          initial="hidden"
+                          whileInView="visible"
+                          viewport={{ once: true, amount: 0.2 }}
+                          variants={cardVariants}
+                      >
+                        <Link href={`/courses/info?id=${course.id}`}>
+                          <ProductContainer
+                              title="Курс"
+                              description={
+                                <>
+                                  <div>{course.name}</div>
+                                  <span
+                                      className={`mt-2 inline-block px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                                          course.status
+                                      )}`}
+                                  >
+                    {getStatusText(course.status)}
+                  </span>
+                                </>
+                              }
+                              image={course.image?.[0] || "/courses/default.jpg"}
+                          />
+                        </Link>
+                      </motion.div>
+                  ))}
+                </div>
+            )}
           </section>
         </MainContainer>
       </main>

@@ -1,19 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleAlert, Video, Calendar, Clock } from "lucide-react";
 import { LessonFull } from "../page";
 
 interface Props {
   lessons: LessonFull[];
+  variant?: "upcoming" | "active";
 }
 
-export default function UpcomingLessons({ lessons }: Props) {
-  const now = Date.now();
+export default function UpcomingLessons({ lessons, variant = "upcoming" }: Props) {
+  const [now, setNow] = useState<number>(() => Date.now());
 
-  // будущие уроки без фильтра по статусу
-  const upcomingLessons = lessons
-    .filter((l) => new Date(l.startsAt).getTime() > now)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const visibleLessons = lessons
+    .filter((lesson) => {
+      const start = new Date(lesson.startsAt).getTime();
+      const end = start + lesson.duration * 60 * 1000;
+
+      if (variant === "active") {
+        return start <= now && now < end;
+      }
+
+      return start > now;
+    })
     .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
 
   // состояние для показа материалов для каждого урока
@@ -26,13 +43,17 @@ export default function UpcomingLessons({ lessons }: Props) {
     }));
   };
 
-  if (!upcomingLessons.length) {
-    return <div className="text-gray-400">Ближайших уроков нет</div>;
+  if (!visibleLessons.length) {
+    return (
+      <div className="text-gray-400">
+        {variant === "active" ? "Сейчас уроков нет" : "Ближайших уроков нет"}
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-5 w-full">
-      {upcomingLessons.map((lesson: LessonFull) => {
+      {visibleLessons.map((lesson: LessonFull) => {
         const startsAtDate = new Date(lesson.startsAt);
 
         return (
@@ -45,9 +66,15 @@ export default function UpcomingLessons({ lessons }: Props) {
               <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-5">
                 <span className="px-5 bg-[#FF7A00] rounded-lg">{lesson.name}</span>
 
-                <span className="inline-flex items-center gap-2 text-[#FDC700] bg-[#F0B100]/20 px-4 py-1 rounded-xl text-xs md:text-sm font-medium border border-[#F0B100]/30">
+                <span
+                  className={`inline-flex items-center gap-2 px-4 py-1 rounded-xl text-xs md:text-sm font-medium border ${
+                    variant === "active"
+                      ? "text-[#7DBBFF] bg-[#3B82F6]/20 border border-[#3B82F6]/30"
+                      : "text-[#FDC700] bg-[#F0B100]/20 border border-[#F0B100]/30"
+                  }`}
+                >
                   <CircleAlert className="w-4 h-4" />
-                  Ожидается
+                  {variant === "active" ? "Идет сейчас" : "Ожидается"}
                 </span>
               </div>
 
