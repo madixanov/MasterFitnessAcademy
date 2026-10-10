@@ -7,5 +7,5 @@ export interface QrCode {
 
 // Получить QR-коды (для основного сайта)
 export const getQrCodes = async (): Promise<QrCode[]> => {
-  return apiClient<QrCode[]>("/qrcode");
+  return apiClient<QrCode[]>("/qr-code");
 };
