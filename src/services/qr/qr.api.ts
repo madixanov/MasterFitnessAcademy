@@ -2,8 +2,7 @@ import { apiClient } from "../apiClient";
 
 export interface QrCode {
   id?: string;
-  title: string;
-  photo_url: string;
+  url: string;
 }
 
 // Получить QR-коды (для основного сайта)
