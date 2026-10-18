@@ -192,7 +192,7 @@ export default function CourseInfoPage() {
         <div className="w-full flex flex-col md:flex-row gap-5 mt-10">
           {[
             { icon: <Clock className="w-7 h-7 text-[#FF7A00]" />, value: course.Course_duration, label: "Длительность" },
-            { icon: <BookOpen className="w-7 h-7 text-[#FF7A00]" />, value: course.Number_of_lessons, label: "Количество часов" },
+            { icon: <BookOpen className="w-7 h-7 text-[#FF7A00]" />, value: course.Number_of_lessons, label: "Количество академических часов" },
             { icon: <Users className="w-7 h-7 text-[#FF7A00]" />, value: course.Training_format, label: "Формат обучения" },
           ].map((item, index) => (
             <motion.div
