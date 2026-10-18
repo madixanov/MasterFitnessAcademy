@@ -167,17 +167,17 @@ export default function DiplomasPage() {
                   <div className="bg-white/10 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col">
                     {/* Иконка документа */}
                     <div className="flex items-center justify-center w-full h-48 bg-white/5">
-                      {diploma.img && diploma.img[0]?.endsWith(".pdf") ? (
-                        <FileText className="text-white/70 w-16 h-16" />
-                      ) : diploma.img && diploma.img[0] ? (
-                        <img
-                          src={diploma.img[0]}
-                          alt={diploma.codeDiplom}
-                          className="w-32 h-32 object-contain rounded-md"
-                        />
-                      ) : (
-                        <FileText className="text-white/70 w-16 h-16" />
-                      )}
+                      {
+                         diploma.course?.image && diploma.course.image[0] ? (
+                          <img
+                            src={diploma.course.image[0]}
+                            alt={diploma.codeDiplom}
+                            className="w-32 h-32 object-contain rounded-md"
+                          />
+                        ) : (
+                          <FileText className="text-white/70 w-16 h-16" />
+                        )
+                      }
                     </div>
 
                     {/* Текст */}
@@ -192,16 +192,6 @@ export default function DiplomasPage() {
 
                       {/* Кнопки */}
                       <div className="mt-2 flex flex-col gap-2">
-                        {diploma.img && diploma.img.length > 0 && (
-                          <Link
-                            href={diploma.img[0]}
-                            target="_blank"
-                            className="flex-1 text-center px-3 py-1 bg-[#FF7A00] hover:bg-[#f79235] text-white font-medium rounded-lg transition-colors duration-200"
-                          >
-                            Скачать
-                          </Link>
-                        )}
-
                         <Link
                           href={`/diplomas/${diploma.id}`}
                           className="flex-1 text-center px-3 py-1 border border-white text-white rounded-lg hover:bg-white/10 transition-colors duration-200"

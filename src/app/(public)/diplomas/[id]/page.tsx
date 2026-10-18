@@ -119,17 +119,17 @@ export default function SingleDiplomaPage() {
         >
           {/* Верхняя часть — иконка или изображение диплома */}
           <div className="flex items-center justify-center w-full h-64 bg-white/5">
-            {diploma.img && diploma.img[0]?.endsWith(".pdf") ? (
-              <FileText className="text-white/70 w-20 h-20" />
-            ) : diploma.img && diploma.img[0] ? (
+            {
+              diploma.course?.image && diploma.course.image[0] ? (
               <img
-                src={diploma.img[0]}
+                src={diploma.course.image[0]}
                 alt={diploma.codeDiplom}
                 className="w-40 h-40 object-contain rounded-md"
               />
             ) : (
               <FileText className="text-white/70 w-20 h-20" />
-            )}
+            )
+            }
           </div>
 
           {/* Информация о дипломе */}
@@ -159,11 +159,6 @@ export default function SingleDiplomaPage() {
                       {diploma.course.description}
                     </p>
                   )}
-                  {diploma.course.price && (
-                    <p>
-                      <span className="font-semibold text-[#FF7A00]">Цена:</span> {diploma.course.price} UZS
-                    </p>
-                  )}
                   {diploma.course.Course_duration && (
                     <p>
                       <span className="font-semibold text-[#FF7A00]">Длительность:</span>{" "}
@@ -172,7 +167,7 @@ export default function SingleDiplomaPage() {
                   )}
                   {diploma.course.Number_of_lessons && (
                     <p>
-                      <span className="font-semibold text-[#FF7A00]">Количество уроков:</span>{" "}
+                      <span className="font-semibold text-[#FF7A00]">Количество академических часов:</span>{" "}
                       {diploma.course.Number_of_lessons}
                     </p>
                   )}
@@ -180,7 +175,7 @@ export default function SingleDiplomaPage() {
               )}
 
               <p>
-                <span className="font-semibold text-[#FF7A00]">Учитель:</span>{" "}
+                <span className="font-semibold text-[#FF7A00]">Куратор:</span>{" "}
                 {diploma.teacher?.name || "—"}
               </p>
               <p>
@@ -192,17 +187,6 @@ export default function SingleDiplomaPage() {
                 {formatDate(diploma.issuedAt)}
               </p>
             </div>
-
-            {/* Кнопка скачать */}
-            {diploma.img && diploma.img.length > 0 && (
-              <Link
-                href={diploma.img[0]}
-                target="_blank"
-                className="inline-block px-6 py-3 bg-[#FF7A00] hover:bg-[#f79235] text-white font-medium rounded-lg transition-colors duration-200 mr-2"
-              >
-                Скачать диплом
-              </Link>
-            )}
 
             <button
               onClick={() => router.back()}

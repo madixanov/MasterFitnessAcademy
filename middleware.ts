@@ -35,6 +35,8 @@ export function middleware(req: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix)
   );
+  const isDiplomaRoute =
+    pathname === "/diplomas" || pathname.startsWith("/diplomas/");
 
   // 🔒 Нет accessToken — нельзя заходить в защищённые маршруты
   if (isProtected && !accessToken) {
@@ -42,7 +44,7 @@ export function middleware(req: NextRequest) {
   }
 
   // 🔁 Есть accessToken — не пускаем на публичные страницы (кроме "/")
-  if (accessToken && isPublic && pathname !== "/") {
+  if (accessToken && isPublic && pathname !== "/" && !isDiplomaRoute) {
     return NextResponse.redirect(new URL("/profile", req.url));
   }
 

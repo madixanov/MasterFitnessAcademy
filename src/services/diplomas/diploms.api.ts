@@ -28,7 +28,6 @@ export interface Diploma {
     Course_Benefits_Sheet?: string;
     createdAt?: string;
     userId?: string | null;
-  };
 
   teacher?: {
     id: string;
