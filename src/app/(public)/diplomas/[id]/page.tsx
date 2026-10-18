@@ -124,7 +124,7 @@ export default function SingleDiplomaPage() {
               <img
                 src={diploma.course.image[0]}
                 alt={diploma.codeDiplom}
-                className="w-40 h-40 object-contain rounded-md"
+                className="h-full w-full object-cover"
               />
             ) : (
               <FileText className="text-white/70 w-20 h-20" />
