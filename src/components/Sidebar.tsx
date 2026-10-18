@@ -50,7 +50,6 @@ export default function Sidebar() {
       })
       .catch((err) => {
         console.error("Ошибка загрузки ордеров:", err);
-        setHasCourseOrOrder(false);
       });
   }, []);
 

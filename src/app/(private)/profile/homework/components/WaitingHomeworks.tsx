@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Clock, Upload, FileText, X, Trash2 } from "lucide-react";
+import { Clock, Upload, X, Trash2 } from "lucide-react";
 import { Homework } from "@/services/homework/homework.api";
 import { HomeworkSubmissionPayload, submitHomework } from "@/services/homework/homework.api";
 import { uploadFiles } from "@/services/upload/upload.api";
@@ -75,7 +75,12 @@ export default function WaitingHomeworks({ homeworks, onSubmitSuccess }: Waiting
       onSubmitSuccess?.();
     } catch (err) {
       console.error(err);
-      addToast("Ошибка при отправке домашки.", "error");
+      addToast(
+        err instanceof Error
+          ? `Ошибка при отправке домашки: ${err.message}`
+          : "Ошибка при отправке домашки.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }

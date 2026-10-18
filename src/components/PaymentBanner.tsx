@@ -21,6 +21,8 @@ export default function PaymentBannerContainer() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     getMyOrders()
@@ -34,12 +36,31 @@ export default function PaymentBannerContainer() {
       })
       .catch((err) => {
         console.error("Ошибка загрузки ордеров:", err);
-        setOrder(null);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить заказ");
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [retryCount]);
 
-  if (loading || !order) return null;
+  if (loading) return null;
+  if (error) {
+    return (
+      <div role="alert" className="mb-10 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300">
+        <p>Не удалось проверить статус заказа: {error}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            setRetryCount((count) => count + 1);
+          }}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
+    );
+  }
+  if (!order) return null;
 
   return (
     <PaymentBanner order={order} paying={paying} setPaying={setPaying} />
@@ -53,9 +74,10 @@ interface PaymentBannerProps {
 }
 
 function PaymentBanner({ order, paying, setPaying }: PaymentBannerProps) {
+  const [open, setOpen] = useState(false);
+
   if (order.status === "ACTIVE") return null;
   const isCanceled = order.status === "CANCELED";
-  const [open, setOpen] = useState(false);
 
   return (
     <div className="w-full bg-[#1A1A1A] border border-[#FF7A00] rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-10">

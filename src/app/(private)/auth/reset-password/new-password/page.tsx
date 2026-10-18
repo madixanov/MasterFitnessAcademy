@@ -16,8 +16,12 @@ export default function EmailResetForm() {
     try {
       await newPassword(payload);
       window.location.href = "/auth";
-    } catch (err: any) {
-      alert("Ошибка сохранении нового пароля");
+    } catch (err: unknown) {
+      alert(
+        err instanceof Error
+          ? `Ошибка сохранения нового пароля: ${err.message}`
+          : "Ошибка сохранения нового пароля"
+      );
     }
   }
   

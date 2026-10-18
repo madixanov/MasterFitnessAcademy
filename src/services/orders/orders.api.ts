@@ -65,8 +65,8 @@ export const getMyOrders = async (): Promise<Order[]> => {
     return await apiClient<Order[]>("/orders", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-  } catch (err: any) {
-    console.error("Ошибка при получении моих заказов:", err.message);
-    return [];
+  } catch (err: unknown) {
+    console.error("Ошибка при получении моих заказов:", err);
+    throw err;
   }
 };

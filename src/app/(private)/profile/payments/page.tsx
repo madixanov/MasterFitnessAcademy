@@ -9,6 +9,8 @@ type Filter = "ALL" | "PAID" | "UNPAID";
 export default function PaymentsList() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [filter, setFilter] = useState<Filter>("ALL");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -16,17 +18,20 @@ export default function PaymentsList() {
 
   useEffect(() => {
     async function fetchOrders() {
+      setLoading(true);
+      setError(null);
       try {
         const data = await getMyOrders();
         setOrders(data);
       } catch (err) {
         console.error("Ошибка загрузки ордеров:", err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить заказы");
       } finally {
         setLoading(false);
       }
     }
     fetchOrders();
-  }, []);
+  }, [retryCount]);
 
   const filteredOrders = orders.filter((order) => {
     if (filter === "PAID") return order.status === "ACTIVE";
@@ -45,6 +50,20 @@ export default function PaymentsList() {
   };
 
   if (loading) return <p>Загрузка ордеров...</p>;
+  if (error) {
+    return (
+      <div role="alert" className="rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+        <p>Не удалось загрузить платежи: {error}</p>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
+    );
+  }
   if (!orders.length) return <p>Пока нет ордеров</p>;
 
   const getStatusProps = (status: string) => {

@@ -31,8 +31,8 @@ export async function getMyCourses(): Promise<MyCourse[]> {
     return await apiClient<MyCourse[]>("/mycourse/my", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-  } catch (err: any) {
-    console.error("Ошибка при получении моих курсов:", err.message);
-    return [];
+  } catch (err: unknown) {
+    console.error("Ошибка при получении моих курсов:", err);
+    throw err;
   }
 }

@@ -5,11 +5,10 @@ import { LessonFull } from "../page";
 
 interface Props {
   lessons: LessonFull[];
+  now: number;
 }
 
-export default function FinishedLessons({ lessons }: Props) {
-  const now = Date.now();
-
+export default function FinishedLessons({ lessons, now }: Props) {
   // завершённые уроки по дате
   const finishedLessons = lessons
     .filter((l) => new Date(l.startsAt).getTime() <= now)

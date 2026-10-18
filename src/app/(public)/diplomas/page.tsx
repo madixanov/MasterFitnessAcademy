@@ -51,6 +51,8 @@ export default function DiplomasPage() {
   const [search, setSearch] = useState("");
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Пагинация
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +61,7 @@ export default function DiplomasPage() {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const [diplomasData, coursesData] = await Promise.all([
           getDiplomas(),
@@ -75,12 +78,13 @@ export default function DiplomasPage() {
         setCourses(coursesData);
       } catch (err) {
         console.error("Ошибка загрузки данных:", err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить дипломы");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    void fetchData();
+  }, [retryCount]);
 
   // Фильтрация по поиску и курсу
   const filteredDiplomas = diplomas.filter((d) => {
@@ -136,6 +140,19 @@ export default function DiplomasPage() {
         <section className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-3 gap-8 z-20 relative">
           {isLoading
             ? Array.from({ length: itemsPerPage }).map((_, i) => <DiplomaSkeleton key={i} />)
+            : error
+            ? (
+              <div role="alert" className="col-span-full rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-center text-red-300">
+                <p>Не удалось загрузить дипломы: {error}</p>
+                <button
+                  type="button"
+                  onClick={() => setRetryCount((count) => count + 1)}
+                  className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+                >
+                  Повторить
+                </button>
+              </div>
+            )
             : currentDiplomas.length === 0
             ? <p className="text-white col-span-full text-center">Дипломы не найдены</p>
             : currentDiplomas.map((diploma, i) => (

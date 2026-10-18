@@ -5,6 +5,7 @@ import PasswordField from "./PasswordField";
 import { LogIn, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { login } from "@/services/auth/auth.api";
+import { ApiError } from "@/services/apiClient";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
@@ -43,9 +44,15 @@ export default function LoginForm() {
       }
 
       router.push("/profile"); // редирект после успешного входа
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Ошибка при логине:", err);
-      setError("Неверный email или пароль");
+      setError(
+        err instanceof ApiError && err.status === 401
+          ? "Неверный email или пароль"
+          : err instanceof Error
+            ? err.message
+            : "Не удалось выполнить вход"
+      );
     } finally {
       setLoading(false);
     }

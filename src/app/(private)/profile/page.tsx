@@ -26,15 +26,13 @@ export default function Profile() {
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem("welcomeToastShown");
     if (!hasSeenWelcome) {
-      setToast({ message: "Добро пожаловать в Личный Кабинет!", type: "success" });
       sessionStorage.setItem("welcomeToastShown", "true");
+      const timer = window.setTimeout(() => {
+        setToast({ message: "Добро пожаловать в Личный Кабинет!", type: "success" });
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
   }, []);
-
-  // 🔹 toast при ошибке загрузки
-  useEffect(() => {
-    if (coursesError) setToast({ message: coursesError, type: "error" });
-  }, [coursesError]);
 
   // 🔹 пока проверка авторизации идёт — показываем Skeleton
   if (loadingAuth) {
@@ -70,6 +68,23 @@ export default function Profile() {
       {/* Skeleton при загрузке курсов */}
       {coursesLoading && <p className="text-[#999]">Загрузка курсов...</p>}
 
+      {coursesError && (
+        <div
+          role="alert"
+          className="mb-6 flex flex-col gap-3 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p>{coursesError}</p>
+          <button
+            type="button"
+            onClick={fetchMyCourses}
+            disabled={coursesLoading}
+            className="self-start rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30 disabled:opacity-50 sm:self-auto"
+          >
+            {coursesLoading ? "Загрузка..." : "Повторить"}
+          </button>
+        </div>
+      )}
+
       <LatestLesson />
       <LessonseList />
 
@@ -80,4 +95,3 @@ export default function Profile() {
     </main>
   );
 }
-

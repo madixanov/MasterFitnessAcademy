@@ -1,5 +1,29 @@
 import { apiClient } from "../apiClient";
 import type { Trainer } from "../coaches/coaches.api";
+import type { Test } from "../test/test.api";
+import type { Homework } from "../homework/homework.api";
+
+export interface CourseLesson {
+  id: string;
+  name: string;
+  title: string;
+  desc: string;
+  video: string;
+  img: string[];
+  duration: number;
+  startsAt: string;
+  subject?: string;
+  task?: string;
+  grade?: string;
+  homeworks?: Homework[];
+}
+
+export interface CourseModule {
+  id: string;
+  name: string;
+  desc: string;
+  lessons?: CourseLesson[];
+}
 
 export interface Course {
   id: string;
@@ -21,8 +45,8 @@ export interface Course {
 
   /** relations */
   trainer?: Trainer;
-  modules?: any[];
-  tests?: any[]
+  modules?: CourseModule[];
+  tests?: Test[]
 }
 
 /** Получить все курсы */

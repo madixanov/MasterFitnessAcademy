@@ -46,21 +46,26 @@ const fadeUpVariants: Variants = {
 export default function Contacts() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const fetchBranches = async () => {
+      setIsLoading(true);
+      setError(null);
       try {
         const data = await getBranches();
         setBranches(data);
       } catch (err) {
         console.error("Ошибка загрузки филиалов:", err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить филиалы");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchBranches();
-  }, []);
+    void fetchBranches();
+  }, [retryCount]);
 
   return (
     <div className="relative mb-15">
@@ -78,6 +83,17 @@ export default function Contacts() {
 
         {isLoading ? (
           <BranchSkeleton />
+        ) : error ? (
+          <div role="alert" className="rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+            <p>Не удалось загрузить список филиалов: {error}</p>
+            <button
+              type="button"
+              onClick={() => setRetryCount((count) => count + 1)}
+              className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+            >
+              Повторить
+            </button>
+          </div>
         ) : (
           branches.map((branch, i) => (
             <motion.div

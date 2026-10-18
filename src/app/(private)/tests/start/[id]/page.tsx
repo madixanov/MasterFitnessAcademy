@@ -8,6 +8,7 @@ import {
   getTestById,
   submitUserTestResult,
   getUserTestResults,
+  Test,
   TestQuestion,
   UserTestResult,
 } from "@/services/test/test.api";
@@ -21,7 +22,7 @@ export default function TestStartPage() {
 
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState("");
-  const [selectedTest, setSelectedTest] = useState<any | null>(null);
+  const [selectedTest, setSelectedTest] = useState<Test | null>(null);
 
   const [questions, setQuestions] = useState<TestQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,6 +31,9 @@ export default function TestStartPage() {
 
   const [loading, setLoading] = useState(true);
   const [loadingTest, setLoadingTest] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const [result, setResult] = useState<UserTestResult | null>(null);
   const [alreadyPassed, setAlreadyPassed] = useState(false);
@@ -52,10 +56,17 @@ export default function TestStartPage() {
 
   /* ================= LOAD TEST ================= */
   useEffect(() => {
-    if (!userId || !testIdFromUrl) return;
+    if (!testIdFromUrl) {
+      setLoadError("Не указан ID теста");
+      setLoading(false);
+      return;
+    }
+    if (!userId) return;
 
     const loadTest = async () => {
+      setLoading(true);
       setLoadingTest(true);
+      setLoadError(null);
       try {
         const test = await getTestById(testIdFromUrl);
         setSelectedTest(test);
@@ -90,6 +101,9 @@ export default function TestStartPage() {
         }
       } catch (err) {
         console.error("Ошибка загрузки теста:", err);
+        setLoadError(
+          err instanceof Error ? err.message : "Не удалось загрузить тест"
+        );
       } finally {
         setLoading(false);
         setLoadingTest(false);
@@ -97,7 +111,7 @@ export default function TestStartPage() {
     };
 
     loadTest();
-  }, [userId, testIdFromUrl]);
+  }, [userId, testIdFromUrl, retryCount]);
 
   /* ================= TIMER ================= */
   useEffect(() => {
@@ -123,6 +137,7 @@ export default function TestStartPage() {
     if (!selectedTest || !userId || submittedRef.current) return;
 
     submittedRef.current = true;
+    setSubmitError(null);
 
     const payload = Object.entries(answers).map(([questionId, answerId]) => ({
       questionId,
@@ -130,17 +145,20 @@ export default function TestStartPage() {
     }));
 
     try {
-      await submitUserTestResult({ testId: selectedTest.id, userId, answers: payload });
+      const submittedResult = await submitUserTestResult({
+        testId: selectedTest.id,
+        userId,
+        answers: payload,
+      });
 
-      const results = await getUserTestResults(userId);
-      const latest = results.filter((r) => r.testId === selectedTest.id)
-        .reduce((prev, cur) => new Date(cur.date) > new Date(prev.date) ? cur : prev);
-      
-      setResult(latest);
+      setResult(submittedResult);
       setAlreadyPassed(true);
       localStorage.removeItem(`${STORAGE_KEY}-${selectedTest.id}-${userId}`);
     } catch (err) {
       console.error("Ошибка при отправке теста:", err);
+      setSubmitError(
+        err instanceof Error ? err.message : "Не удалось отправить результат теста"
+      );
       submittedRef.current = false;
     }
   }, [answers, selectedTest, userId]);
@@ -193,6 +211,32 @@ export default function TestStartPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
         <p className="text-xl animate-pulse">Загрузка данных...</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-900 p-6 text-white">
+        <p role="alert" className="text-center text-red-300">
+          Не удалось загрузить тест: {loadError}
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setRetryCount((count) => count + 1)}
+            className="rounded bg-blue-600 px-5 py-2 font-medium hover:bg-blue-500"
+          >
+            Повторить
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/tests")}
+            className="rounded bg-gray-700 px-5 py-2 font-medium hover:bg-gray-600"
+          >
+            Назад к тестам
+          </button>
+        </div>
       </div>
     );
   }
@@ -259,6 +303,11 @@ export default function TestStartPage() {
       </header>
 
       <main className="max-w-3xl mx-auto">
+        {submitError && (
+          <p role="alert" className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300">
+            Не удалось отправить результат: {submitError}
+          </p>
+        )}
         <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl border border-gray-700">
           <div className="flex justify-between items-center mb-6">
             <span className="bg-blue-900/50 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-700">

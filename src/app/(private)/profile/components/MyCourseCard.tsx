@@ -10,20 +10,15 @@ import { getCourseById, Course } from "@/services/courses/courses.api";
 import MyCourseCardSkeleton from "./MyCourseCardSkeleton";
 
 interface CourseWithMeta {
-  myCourse: any;
   course: Course;
 }
 
 function CourseCard({
     course,
-    myCourse,
     isActive,
-    isCompleted,
   }: {
     course: Course;
-    myCourse: any;
     isActive?: boolean;
-    isCompleted?: boolean;
   }) {
     const courseUrl = `/courses/info?id=${course.id}`;
 
@@ -104,6 +99,8 @@ export default function MyCourseCard() {
   const [activeCourse, setActiveCourse] = useState<CourseWithMeta | null>(null);
   const [completedCourses, setCompletedCourses] = useState<CourseWithMeta[]>([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!courses.length) return;
@@ -113,34 +110,54 @@ export default function MyCourseCard() {
 
     async function loadCourses() {
       setLoadingCourses(true);
+      setError(null);
 
       try {
         if (active) {
           const course = await getCourseById(active.courseId);
-          setActiveCourse({ myCourse: active, course });
+          setActiveCourse({ course });
         } else {
           setActiveCourse(null);
         }
 
         const completedFull = await Promise.all(
           completed.map(async c => ({
-            myCourse: c,
             course: await getCourseById(c.courseId),
           }))
         );
 
         setCompletedCourses(completedFull);
+      } catch (err) {
+        console.error("Ошибка загрузки курсов пользователя:", err);
+        setError(
+          err instanceof Error ? err.message : "Не удалось загрузить курсы"
+        );
       } finally {
         setLoadingCourses(false);
       }
     }
 
-    loadCourses();
-  }, [courses]);
+    void loadCourses();
+  }, [courses, retryCount]);
 
   /* skeleton */
   if (loading || loadingCourses) {
     return <MyCourseCardSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div role="alert" className="mb-10 rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+        <p>Не удалось загрузить курсы: {error}</p>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
+    );
   }
 
   if (!activeCourse && completedCourses.length === 0) {
@@ -153,7 +170,6 @@ export default function MyCourseCard() {
       {activeCourse && (
         <CourseCard
           course={activeCourse.course}
-          myCourse={activeCourse.myCourse}
           isActive
         />
       )}
@@ -163,12 +179,10 @@ export default function MyCourseCard() {
         <div className="flex flex-col gap-6">
           <h3 className="text-2xl font-medium">Завершённые курсы</h3>
 
-          {completedCourses.map(({ course, myCourse }) => (
+          {completedCourses.map(({ course }) => (
             <CourseCard
               key={course.id}
               course={course}
-              myCourse={myCourse}
-              isCompleted
             />
           ))}
         </div>

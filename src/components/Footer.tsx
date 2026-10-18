@@ -26,6 +26,8 @@ export default function Footer() {
 
   const [socials, setSocials] = useState<SocialNetwork[]>([]);
   const [phoneSocial, setPhoneSocial] = useState<SocialNetwork | null>(null);
+  const [socialError, setSocialError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   const scrollOrRedirect = (id: string) => {
     if (pathname !== "/") {
@@ -39,23 +41,26 @@ export default function Footer() {
     const fetchSocialNetworks = async () => {
       try {
         const data = await getSocialNetworks();
+        setSocialError(null);
 
-        // Соцсети без телефона
         const socialsOnly = data.filter((social) =>
-          ["telegram", "instagram", "facebook", "whatsapp"].includes(social.name.toLowerCase())
+          ALLOWED_SOCIALS.includes(social.name.toLowerCase()) &&
+          social.name.toLowerCase() !== "number"
         );
         setSocials(socialsOnly);
 
-        // Телефон ищем отдельно
         const phone = data.find((s) => s.url.startsWith("+998"));
         setPhoneSocial(phone || null);
       } catch (error) {
         console.error("Ошибка загрузки соцсетей:", error);
+        setSocialError(
+          error instanceof Error ? error.message : "Не удалось загрузить контакты"
+        );
       }
     };
 
-    fetchSocialNetworks();
-  }, []);
+    void fetchSocialNetworks();
+  }, [retryCount]);
 
   return (
     <footer className="relative z-10 overflow-hidden backdrop-blur-sm bg-black/25 border border-white/10 shadow-[inset_0_3px_6px_rgba(255,255,255,0.1),_inset_0_-4px_12px_rgba(0,0,0,0.4),_0_8px_20px_rgba(0,0,0,0.3)] py-5">
@@ -132,6 +137,18 @@ export default function Footer() {
               <span className="font-semibold text-3xl mt-2">
                 {phoneSocial.url}
               </span>
+            )}
+            {socialError && (
+              <div role="alert" className="mt-2 text-center text-sm text-red-300">
+                <p>Не удалось загрузить контакты: {socialError}</p>
+                <button
+                  type="button"
+                  onClick={() => setRetryCount((count) => count + 1)}
+                  className="mt-2 underline hover:text-white"
+                >
+                  Повторить
+                </button>
+              </div>
             )}
           </div>
 

@@ -49,6 +49,8 @@ export default function CourseInfoPage() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [courseError, setCourseError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [creatingOrder, setCreatingOrder] = useState(false);
 
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -61,16 +63,27 @@ export default function CourseInfoPage() {
 
   // Загрузка курса
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setCourseError("Не указан ID курса");
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
+    setCourseError(null);
     getCourseById(id)
       .then((data) => {
         setCourse(data);
         setCourseStore(data);
       })
-      .catch((err) => console.error("Ошибка загрузки курса:", err))
+      .catch((err) => {
+        console.error("Ошибка загрузки курса:", err);
+        setCourseError(
+          err instanceof Error ? err.message : "Не удалось загрузить курс"
+        );
+      })
       .finally(() => setLoading(false));
-  }, [id, setCourseStore]);
+  }, [id, retryCount, setCourseStore]);
 
   // Проверка статуса курса
   useEffect(() => {
@@ -117,7 +130,23 @@ export default function CourseInfoPage() {
     }
   };
 
-  if (loading || !course) return <CourseSkeleton />;
+  if (loading) return <CourseSkeleton />;
+  if (courseError || !course) {
+    return (
+      <MainContainer>
+        <div role="alert" className="my-20 rounded-lg border border-red-500/40 bg-red-500/10 p-6 text-red-300">
+          <p>Не удалось загрузить курс: {courseError || "Курс не найден"}</p>
+          <button
+            type="button"
+            onClick={() => setRetryCount((count) => count + 1)}
+            className="mt-4 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+          >
+            Повторить
+          </button>
+        </div>
+      </MainContainer>
+    );
+  }
 
   const advantages = course.Course_Benefits_Sheet
     ? course.Course_Benefits_Sheet.split("\n\n").map((a) => a.trim()).filter(Boolean)

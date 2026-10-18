@@ -32,8 +32,8 @@ export default function ResetOTPPage() {
       alert(res.message || "Код подтверждён");
       window.localStorage.removeItem("resetPasswordEmail");
       router.push("/auth/reset-password/new-password");
-    } catch (err: any) {
-      alert(err.message || "Ошибка подтверждения");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Ошибка подтверждения");
     } finally {
       setLoading(false);
     }
@@ -54,8 +54,8 @@ export default function ResetOTPPage() {
     try {
       const res = await sendResetOtp(payload);
       if (res.success) alert("Код отправлен повторно");
-    } catch (err: any) {
-      alert("Ошибка отправки");
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : "Ошибка отправки");
     } finally {
       setResendLoading(false);
     }

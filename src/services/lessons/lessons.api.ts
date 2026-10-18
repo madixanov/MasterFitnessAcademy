@@ -1,4 +1,5 @@
 import { apiClient } from "../apiClient";
+import type { Homework } from "../homework/homework.api";
 
 // ------------------------------------
 // Payload для создания / обновления урока
@@ -22,7 +23,7 @@ export interface LessonPayload {
 export interface Lesson extends LessonPayload {
   id: string;
   createdAt: string;
-  homeworks?: any[];
+  homeworks?: Homework[];
   modul?: {
     id: string;
     name: string;
@@ -90,9 +91,9 @@ export async function getLessonsByModule(
 ): Promise<Lesson[]> {
   try {
     return await apiClient<Lesson[]>(`/lessons/module/${moduleId}`);
-  } catch (err: any) {
-    console.error("Ошибка при получении уроков:", err.message);
-    return [];
+  } catch (err: unknown) {
+    console.error("Ошибка при получении уроков:", err);
+    throw err;
   }
 }
 
@@ -102,9 +103,9 @@ export async function getLessonsByModule(
 export async function getLessonById(id: string): Promise<Lesson | null> {
   try {
     return await apiClient<Lesson>(`/lessons/${id}`);
-  } catch (err: any) {
-    console.error("Ошибка при получении урока:", err.message);
-    return null;
+  } catch (err: unknown) {
+    console.error("Ошибка при получении урока:", err);
+    throw err;
   }
 }
 
@@ -118,8 +119,8 @@ export async function deleteLesson(id: string): Promise<boolean> {
       method: "DELETE",
     });
     return true;
-  } catch (err: any) {
-    console.error(`Ошибка при удалении урока ${id}:`, err.message);
-    return false;
+  } catch (err: unknown) {
+    console.error(`Ошибка при удалении урока ${id}:`, err);
+    throw err;
   }
 }

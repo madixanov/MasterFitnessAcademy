@@ -19,29 +19,34 @@ export default function TestsPage() {
   const [tests, setTests] = useState<Test[]>([]);
   const [results, setResults] = useState<UserTestResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   /* ======== Загрузка профиля ======== */
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setError(null);
         const data = await getProfile();
 
         setUserId(data.id);
         setUserName(`${data.name} ${data.surname || ""}`.trim());
       } catch (err) {
         console.error(err);
-        router.push("/auth");
+        setError(err instanceof Error ? err.message : "Не удалось загрузить профиль");
+        setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [router]);
+  }, [retryCount]);
 
   /* ======== Загрузка тестов и результатов ======== */
   useEffect(() => {
     if (!userId) return;
 
     setLoading(true);
+    setError(null);
 
     const fetchData = async () => {
       try {
@@ -53,14 +58,35 @@ export default function TestsPage() {
         setTests(allTests);
         setResults(userResults);
       } catch (err) {
-        console.error(err);
+        console.error("Ошибка загрузки тестов:", err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить тесты");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, retryCount]);
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-900 p-6 text-white">
+        <p role="alert" className="text-center text-red-300">
+          Не удалось загрузить данные тестов: {error}
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoading(true);
+            setRetryCount((count) => count + 1);
+          }}
+          className="rounded bg-blue-600 px-5 py-2 font-medium hover:bg-blue-500"
+        >
+          Повторить
+        </button>
+      </div>
+    );
+  }
 
   /* ======== Загрузка ======== */
   if (loading) {

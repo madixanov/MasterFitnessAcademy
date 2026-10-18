@@ -21,8 +21,12 @@ export default function EmailResetForm() {
         window.localStorage.setItem("resetPasswordEmail", email);
       }
       window.location.href = "/auth/reset-password/verify-otp";
-    } catch (err: any) {
-      alert("Ошибка отправки кода подтверждения");
+    } catch (err: unknown) {
+      alert(
+        err instanceof Error
+          ? `Ошибка отправки кода подтверждения: ${err.message}`
+          : "Ошибка отправки кода подтверждения"
+      );
     }
   }
   

@@ -47,29 +47,53 @@ export default function SingleDiplomaPage() {
 
   const [diploma, setDiploma] = useState<Diploma | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
-    if (!diplomaId) return;
+    if (!diplomaId) {
+      setError("Не указан ID диплома");
+      setIsLoading(false);
+      return;
+    }
 
     const fetchDiploma = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const data = await getDiplomaById(diplomaId);
         setDiploma(data);
       } catch (err) {
         console.error("Ошибка загрузки диплома:", err);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить диплом");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDiploma();
-  }, [diplomaId]);
+    void fetchDiploma();
+  }, [diplomaId, retryCount]);
 
   if (isLoading)
     return (
       <MainContainer>
         <DiplomaSkeleton />
+      </MainContainer>
+    );
+
+  if (error)
+    return (
+      <MainContainer>
+        <div role="alert" className="flex min-h-96 flex-col items-center justify-center gap-4 text-red-300">
+          <p>Не удалось загрузить диплом: {error}</p>
+          <button
+            type="button"
+            onClick={() => setRetryCount((count) => count + 1)}
+            className="rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+          >
+            Повторить
+          </button>
+        </div>
       </MainContainer>
     );
 

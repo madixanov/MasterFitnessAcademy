@@ -19,10 +19,13 @@ export default function EnrollForm({ courseId }: EnrollFormProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
+    setSuccess(false);
 
     const payload: EnrollFormPayload = {
       courseId,
@@ -33,11 +36,15 @@ export default function EnrollForm({ courseId }: EnrollFormProps) {
 
     try {
       // Здесь делаем запрос на ваш API
-      await fetch("/api/enroll", {
+      const response = await fetch("/api/enroll", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Ошибка отправки заявки (${response.status})`);
+      }
 
       setSuccess(true);
       setName("");
@@ -45,6 +52,7 @@ export default function EnrollForm({ courseId }: EnrollFormProps) {
       setEmail("");
     } catch (err) {
       console.error("Ошибка отправки заявки:", err);
+      setError(err instanceof Error ? err.message : "Не удалось отправить заявку");
     } finally {
       setLoading(false);
     }
@@ -107,6 +115,11 @@ export default function EnrollForm({ courseId }: EnrollFormProps) {
       {success && (
         <p className="mt-4 text-green-400">
           Ваша заявка успешно отправлена!
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="mt-4 text-red-400">
+          {error}
         </p>
       )}
     </form>

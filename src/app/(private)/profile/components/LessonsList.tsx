@@ -16,10 +16,13 @@ export default function LessonseList() {
   const { courses, loading: coursesLoading } = useMyCoursesStore();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     async function loadLessons() {
       setLoading(true);
+      setError(null);
 
       const activeCourse = courses.find((c) => c.status === "ACTIVE");
       if (!activeCourse) {
@@ -34,7 +37,7 @@ export default function LessonseList() {
         let allLessons: Lesson[] = [];
 
         fullCourse.modules?.forEach((module) => {
-          module.lessons?.forEach((lesson: any) => {
+          module.lessons?.forEach((lesson) => {
             allLessons.push({
               id: lesson.id,
               title: lesson.name,
@@ -55,7 +58,7 @@ export default function LessonseList() {
         setLessons(allLessons);
       } catch (err) {
         console.error("Не удалось загрузить уроки:", err);
-        setLessons([]);
+        setError(err instanceof Error ? err.message : "Не удалось загрузить уроки");
       } finally {
         setLoading(false);
       }
@@ -64,7 +67,7 @@ export default function LessonseList() {
     if (!coursesLoading) {
       loadLessons();
     }
-  }, [courses, coursesLoading]);
+  }, [courses, coursesLoading, retryCount]);
 
   const getStatusLabel = (startsAt: string) => {
     const now = new Date();
@@ -75,6 +78,21 @@ export default function LessonseList() {
   if (coursesLoading || loading) {
     return (
       <div className="mb-10 rounded-lg border p-5 bg-[#1A1A1A] animate-pulse h-[300px]" />
+    );
+  }
+
+  if (error) {
+    return (
+      <div role="alert" className="mb-10 rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+        <p>Не удалось загрузить уроки: {error}</p>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
     );
   }
 

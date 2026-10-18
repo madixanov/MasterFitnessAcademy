@@ -151,7 +151,11 @@ export default function PaymentModal({
       }
     } catch (err) {
       console.error("Ошибка при создании платежа:", err);
-      alert("Не удалось создать платеж. Попробуйте снова.");
+      alert(
+        err instanceof Error
+          ? `Не удалось создать платеж: ${err.message}`
+          : "Не удалось создать платеж. Попробуйте снова."
+      );
     } finally {
       setLoading(false);
       setPaying?.(false);

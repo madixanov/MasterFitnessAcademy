@@ -27,6 +27,7 @@ export interface HomeworkPayload {
   lessonId: string;
   title: string;
   description: string;
+  secondaryTask?: string;
   files: string[];
   deadline: string; // ISO
 }
@@ -54,9 +55,9 @@ export async function getHomeworkByLesson(lessonId: string): Promise<Homework[]>
     return await apiClient<Homework[]>(`/homework-tasks/lesson/${lessonId}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-  } catch (err: any) {
-    console.error("Ошибка при получении homework:", err.message);
-    return [];
+  } catch (err: unknown) {
+    console.error("Ошибка при получении homework:", err);
+    throw err;
   }
 }
 
@@ -70,16 +71,16 @@ export async function getMyHomeworkSubmissions(): Promise<HomeworkSubmission[]> 
       method: "GET",
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
-  } catch (err: any) {
-    console.error("Ошибка при получении моих submissions:", err.message);
-    return [];
+  } catch (err: unknown) {
+    console.error("Ошибка при получении моих submissions:", err);
+    throw err;
   }
 }
 
 /**
  * Отправка домашнего задания
  */
-export async function submitHomework(payload: HomeworkSubmissionPayload): Promise<HomeworkSubmission | null> {
+export async function submitHomework(payload: HomeworkSubmissionPayload): Promise<HomeworkSubmission> {
   try {
     const token = Cookies.get("accessToken");
     return await apiClient<HomeworkSubmission>("/homework-submissions/", {
@@ -90,8 +91,8 @@ export async function submitHomework(payload: HomeworkSubmissionPayload): Promis
       },
       body: JSON.stringify(payload),
     });
-  } catch (err: any) {
-    console.error("Ошибка при отправке домашки:", err.message);
-    return null;
+  } catch (err: unknown) {
+    console.error("Ошибка при отправке домашки:", err);
+    throw err;
   }
 }

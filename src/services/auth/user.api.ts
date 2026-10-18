@@ -1,5 +1,15 @@
 import Cookies from "js-cookie";
-import { apiClient } from "@/services/apiClient";
+import { ApiError, apiClient } from "@/services/apiClient";
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  surname?: string;
+  email: string;
+  phoneNumber?: string;
+  img?: string | null;
+  createdAt: string;
+}
 
 export interface UpdateUserPayload {
   name?: string;
@@ -10,9 +20,9 @@ export interface UpdateUserPayload {
 /**
  * Получение профиля пользователя
  */
-export const getProfile = async (): Promise<any> => {
+export const getProfile = async (): Promise<UserProfile> => {
   const token = Cookies.get("accessToken");
-  return apiClient<any>("/auth/me", {
+  return apiClient<UserProfile>("/auth/me", {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
 };
@@ -20,7 +30,7 @@ export const getProfile = async (): Promise<any> => {
 /**
  * Загрузка фото профиля
  */
-export async function uploadProfilePhoto(file: File) {
+export async function uploadProfilePhoto(file: File): Promise<unknown> {
   const token = Cookies.get("accessToken");
 
   const formData = new FormData();
@@ -33,7 +43,21 @@ export async function uploadProfilePhoto(file: File) {
   });
 
   if (!res.ok) {
-    throw new Error("Ошибка при загрузке фото");
+    const body = await res.text();
+    let message = body;
+    try {
+      const payload = JSON.parse(body) as { message?: unknown; error?: unknown };
+      message =
+        (typeof payload.message === "string" && payload.message) ||
+        (typeof payload.error === "string" && payload.error) ||
+        body;
+    } catch {
+      // Non-JSON error responses use their text body as the message.
+    }
+    throw new ApiError(
+      message || "Ошибка при загрузке фото",
+      res.status
+    );
   }
 
   return res.json();
@@ -45,10 +69,10 @@ export async function uploadProfilePhoto(file: File) {
 export async function patchUser(
   userId: string,
   payload: UpdateUserPayload
-): Promise<any> {
+): Promise<UserProfile> {
   const token = Cookies.get("accessToken");
 
-  return apiClient<any>(`/user/user/${userId}`, {
+  return apiClient<UserProfile>(`/user/user/${userId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",

@@ -84,8 +84,11 @@ export default function OTPPage() {
       setTimeout(() => {
         window.location.href = "/auth/";
       }, 800);
-    } catch (err: any) {
-      showToast(err?.message || "Ошибка подтверждения", "error");
+    } catch (err: unknown) {
+      showToast(
+        err instanceof Error ? err.message : "Ошибка подтверждения",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -111,8 +114,11 @@ export default function OTPPage() {
 
       showToast("Код отправлен повторно", "success");
       setSecondsLeft(RESEND_TIMEOUT); // 🔁 сброс таймера
-    } catch {
-      showToast("Ошибка отправки", "error");
+    } catch (err) {
+      showToast(
+        err instanceof Error ? err.message : "Ошибка отправки",
+        "error"
+      );
     } finally {
       setResendLoading(false);
     }

@@ -17,11 +17,10 @@ export function useRequireAuth() {
       const token = Cookies.get("accessToken"); // берём токен из cookie
 
       if (!token) {
-        // если токена нет — редирект на /auth
         router.replace("/auth");
+        return;
       }
 
-      // если токен есть — считаем пользователя авторизованным
       setLoading(false);
     };
 

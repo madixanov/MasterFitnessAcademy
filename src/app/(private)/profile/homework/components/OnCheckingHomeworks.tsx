@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Download, CircleAlert, FileText, Upload, X } from "lucide-react";
-import { HomeworkSubmission, HomeworkSubmissionPayload, submitHomework } from "@/services/homework/homework.api";
+import { Download, CircleAlert, FileText, Upload, X } from "lucide-react";
+import { Homework, HomeworkSubmission, HomeworkSubmissionPayload, submitHomework } from "@/services/homework/homework.api";
 import { uploadFiles } from "@/services/upload/upload.api";
 import Toast from "@/components/UI/toast";
 
 interface OnCheckingHomeworksProps {
-  homeworks: (HomeworkSubmission & { homework: any })[];
+  homeworks: (HomeworkSubmission & { homework: Homework })[];
   onSubmitSuccess?: () => void;
 }
 
@@ -67,7 +67,12 @@ export default function OnCheckingHomeworks({ homeworks, onSubmitSuccess }: OnCh
       onSubmitSuccess?.();
     } catch (err) {
       console.error(err);
-      addToast("Ошибка при отправке домашки.", "error");
+      addToast(
+        err instanceof Error
+          ? `Ошибка при отправке домашки: ${err.message}`
+          : "Ошибка при отправке домашки.",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -105,7 +110,7 @@ export default function OnCheckingHomeworks({ homeworks, onSubmitSuccess }: OnCh
       {/* Сами домашки */}
       <div className="flex flex-col gap-7">
         {filteredHomeworks.length === 0 && (
-          <p className="text-[#999] text-center">Ничего не найдено по запросу "{query}".</p>
+          <p className="text-[#999] text-center">Ничего не найдено по запросу &quot;{query}&quot;.</p>
         )}
 
         {filteredHomeworks.map((hw) => (

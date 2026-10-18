@@ -5,7 +5,7 @@ import { Pen, Save, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import Toast from "@/components/UI/toast";
 import ProfileSkeleton from "@/components/ProfileSkeleton";
-import { getProfile, uploadProfilePhoto, patchUser, UpdateUserPayload } from "@/services/auth/user.api";
+import { getProfile, uploadProfilePhoto, patchUser, UpdateUserPayload, UserProfile } from "@/services/auth/user.api";
 
 interface ToastMessage {
   id: number;
@@ -14,7 +14,7 @@ interface ToastMessage {
 }
 
 export default function ProfileInfo() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -47,7 +47,12 @@ export default function ProfileInfo() {
         setEditData({ name: data.name || "", phoneNumber: data.phoneNumber || "" });
       } catch (err) {
         console.error(err);
-        addToast("Не удалось загрузить данные профиля", "error");
+        addToast(
+          err instanceof Error
+            ? `Не удалось загрузить данные профиля: ${err.message}`
+            : "Не удалось загрузить данные профиля",
+          "error"
+        );
       } finally {
         setLoading(false);
       }
@@ -86,7 +91,10 @@ export default function ProfileInfo() {
       addToast("Фото профиля обновлено", "success");
     } catch (err) {
       console.error(err);
-      addToast("Ошибка загрузки фото", "error");
+      addToast(
+        err instanceof Error ? `Ошибка загрузки фото: ${err.message}` : "Ошибка загрузки фото",
+        "error"
+      );
     } finally {
       setUploading(false);
     }
@@ -94,6 +102,7 @@ export default function ProfileInfo() {
 
   const handleEditClick = () => setIsEditing(true);
   const handleCancelEdit = () => {
+    if (!user) return;
     setIsEditing(false);
     setEditData({ name: user.name || "", phoneNumber: user.phoneNumber || "" });
   };
@@ -120,9 +129,12 @@ export default function ProfileInfo() {
       setUser(updatedUser);
       setIsEditing(false);
       addToast("Данные обновлены", "success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      addToast(err.message || "Ошибка обновления данных", "error");
+      addToast(
+        err instanceof Error ? err.message : "Ошибка обновления данных",
+        "error"
+      );
     } finally {
       setUpdating(false);
     }

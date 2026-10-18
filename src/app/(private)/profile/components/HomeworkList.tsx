@@ -15,15 +15,17 @@ export default function HomeworkList() {
   const { courses, loading: coursesLoading } = useMyCoursesStore();
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     async function loadHomeworks() {
       setLoading(true);
+      setError(null);
 
       const activeCourse = courses.find((c) => c.status === "ACTIVE");
 
       if (!activeCourse) {
-        // Если нет активного курса — очищаем список и ставим loading в false
         setHomeworks([]);
         setLoading(false);
         return;
@@ -34,7 +36,7 @@ export default function HomeworkList() {
         let hwList: Homework[] = [];
 
         fullCourse.modules?.forEach((module) => {
-          module.lessons?.forEach((lesson: any) => {
+          module.lessons?.forEach((lesson) => {
             hwList.push({
               id: lesson.id,
               subject: lesson.subject || lesson.name,
@@ -50,9 +52,13 @@ export default function HomeworkList() {
         setHomeworks(hwList);
       } catch (err) {
         console.error("Не удалось загрузить домашние задания:", err);
-        setHomeworks([]); // на случай ошибки очищаем
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Не удалось загрузить домашние задания"
+        );
       } finally {
-        setLoading(false); // важно ставить loading в false всегда
+        setLoading(false);
       }
     }
 
@@ -60,12 +66,27 @@ export default function HomeworkList() {
     if (!coursesLoading) {
       loadHomeworks();
     }
-  }, [courses, coursesLoading]);
+  }, [courses, coursesLoading, retryCount]);
 
   // Skeleton / Загрузка
   if (coursesLoading || loading) {
     return (
       <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse h-[300px]" />
+    );
+  }
+
+  if (error) {
+    return (
+      <div role="alert" className="w-full rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+        <p>Не удалось загрузить домашние задания: {error}</p>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
     );
   }
 

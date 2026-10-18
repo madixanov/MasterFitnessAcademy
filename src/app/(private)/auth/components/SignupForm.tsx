@@ -10,6 +10,7 @@ import {
 } from "@/services/auth/auth.api";
 import Toast from "@/components/UI/toast";
 import { useRouter } from "next/navigation";
+import { ApiError } from "@/services/apiClient";
 
 type AuthState = "idle" | "loading" | "email_exists";
 
@@ -29,14 +30,8 @@ export default function SignupForm() {
     setToast({ message, type });
   };
 
-  const getErrorMessage = (err: any) => {
-    return (
-      err?.response?.data?.details ||
-      err?.response?.data?.message ||
-      err?.response?.data?.error ||
-      err?.message ||
-      "Ошибка регистрации"
-    );
+  const getErrorMessage = (err: unknown) => {
+    return err instanceof Error ? err.message : "Ошибка регистрации";
   };
 
   const handleSendOtp = async (email: string) => {
@@ -83,11 +78,11 @@ export default function SignupForm() {
       await handleSendOtp(signupPayload.email);
 
       showToast("Регистрация успешна", "success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       const details = getErrorMessage(err);
 
       const isEmailExists =
-        err?.response?.status === 409 ||
+        (err instanceof ApiError && err.status === 409) ||
         details?.toLowerCase().includes("email уже используется") ||
         details?.toLowerCase().includes("already exists");
 
@@ -99,8 +94,13 @@ export default function SignupForm() {
 
         try {
           await handleSendOtp(signupPayload.email);
-        } catch {
-          showToast("Не удалось отправить код", "error");
+        } catch (otpError) {
+          showToast(
+            otpError instanceof Error
+              ? `Не удалось отправить код: ${otpError.message}`
+              : "Не удалось отправить код",
+            "error"
+          );
         }
       } else {
         showToast(details, "error");

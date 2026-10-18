@@ -7,9 +7,13 @@ import { getMyOrders, Order } from "@/services/orders/orders.api"
 export default function PaymentsList() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     async function fetchOrders() {
+      setLoading(true)
+      setError(null)
       try {
         const data = await getMyOrders()
         // сортируем по дате создания, новые сверху
@@ -20,17 +24,31 @@ export default function PaymentsList() {
         setOrders(sorted.slice(0, 5))
       } catch (err) {
         console.error("Ошибка загрузки ордеров:", err)
-        setOrders([])
+        setError(err instanceof Error ? err.message : "Не удалось загрузить заказы")
       } finally {
         setLoading(false)
       }
     }
     fetchOrders()
-  }, [])
+  }, [retryCount])
 
   if (loading)
     return (
       <div className="w-full p-5 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg animate-pulse h-[200px]" />
+    )
+
+  if (error)
+    return (
+      <div role="alert" className="w-full rounded-lg border border-red-500/40 bg-red-500/10 p-5 text-red-300">
+        <p>Не удалось загрузить платежи: {error}</p>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+          className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30"
+        >
+          Повторить
+        </button>
+      </div>
     )
 
   if (!orders.length)

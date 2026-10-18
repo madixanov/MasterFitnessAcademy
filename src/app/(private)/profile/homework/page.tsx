@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
 
 import WaitingHomeworks from "./components/WaitingHomeworks";
@@ -12,6 +12,8 @@ import { getCourseById, Course } from "@/services/courses/courses.api";
 import { getMyHomeworkSubmissions, HomeworkSubmission, Homework } from "@/services/homework/homework.api";
 
 export default function Lessons() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [allHomeworks, setAllHomeworks] = useState<Homework[]>([]);
   const [submittedHomeworks, setSubmittedHomeworks] = useState<HomeworkSubmission[]>([]);
 
@@ -19,38 +21,43 @@ export default function Lessons() {
   const [checking, setChecking] = useState<(HomeworkSubmission & { homework: Homework })[]>([]);
   const [checked, setChecked] = useState<(HomeworkSubmission & { homework: Homework })[]>([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // 1. Получаем курсы пользователя
-        const myCourses: MyCourse[] = await getMyCourses();
-        if (!myCourses.length) return;
-
-        const courseId = myCourses[0].courseId; // берём первый курс
-
-        // 2. Получаем курс с модулями и уроками
-        const course: Course = await getCourseById(courseId);
-
-        // 3. Собираем все домашки из модулей и уроков
-        const homeworks: Homework[] = [];
-        course.modules?.forEach(module => {
-          module.lessons?.forEach((lesson: any) => {
-            lesson.homeworks?.forEach((hw: Homework) => homeworks.push(hw));
-          });
-        });
-
-        setAllHomeworks(homeworks);
-
-        // 4. Получаем домашки пользователя
-        const submissions: HomeworkSubmission[] = await getMyHomeworkSubmissions();
-        setSubmittedHomeworks(submissions);
-      } catch (error) {
-        console.error(error);
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const myCourses: MyCourse[] = await getMyCourses();
+      if (!myCourses.length) {
+        setAllHomeworks([]);
+        setSubmittedHomeworks([]);
+        return;
       }
-    }
 
-    fetchData();
+      const course: Course = await getCourseById(myCourses[0].courseId);
+      const homeworks: Homework[] = [];
+      course.modules?.forEach(module => {
+        module.lessons?.forEach((lesson) => {
+          lesson.homeworks?.forEach((hw: Homework) => homeworks.push(hw));
+        });
+      });
+
+      const submissions: HomeworkSubmission[] = await getMyHomeworkSubmissions();
+      setAllHomeworks(homeworks);
+      setSubmittedHomeworks(submissions);
+    } catch (error) {
+      console.error("Ошибка загрузки домашних заданий:", error);
+      setLoadError(
+        error instanceof Error
+          ? error.message
+          : "Не удалось загрузить домашние задания"
+      );
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
 
   // 5. Разделяем домашки по статусу
   useEffect(() => {
@@ -85,6 +92,22 @@ export default function Lessons() {
     <main className="flex flex-col">
       <h2 className="text-4xl font-medium pl-15 lg:pl-0 mb-3">Домашние задания</h2>
       <p className="text-sm text-[#999] lg:text-lg">Управление учебными заданиями</p>
+
+      {loadError && (
+        <div role="alert" className="mt-6 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-300">
+          <p>{loadError}</p>
+          <button
+            type="button"
+            onClick={() => void fetchData()}
+            disabled={isLoading}
+            className="mt-3 rounded bg-red-500/20 px-4 py-2 font-medium hover:bg-red-500/30 disabled:opacity-50"
+          >
+            {isLoading ? "Загрузка..." : "Повторить"}
+          </button>
+        </div>
+      )}
+
+      {isLoading && <p className="mt-6 text-gray-400">Загрузка домашних заданий...</p>}
 
       <Tabs defaultValue="waiting" className="mt-6 flex flex-col w-full">
         <TabsList className="relative flex bg-[#2A2A2A] mb-6 justify-center md:justify-start items-center rounded-lg py-1 px-2 overflow-hidden w-full max-w-md mx-auto md:mx-0">
