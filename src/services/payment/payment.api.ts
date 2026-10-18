@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { withApiErrorToast } from "../apiErrorToast";
 
 export interface PaymentPayload {
   orderId: string;
@@ -8,7 +9,7 @@ export interface PaymentPayload {
 /** ------------------------
  * Создание платежа
  * ------------------------ */
-export const createPayment = async (payload: PaymentPayload): Promise<string> => {
+const createPaymentRequest = async (payload: PaymentPayload): Promise<string> => {
   const token = Cookies.get("accessToken");
   const response = await fetch("/api/payments/redirect", {
     method: "POST",
@@ -30,3 +31,6 @@ export const createPayment = async (payload: PaymentPayload): Promise<string> =>
 
   return paymentUrl;
 };
+
+export const createPayment = (payload: PaymentPayload): Promise<string> =>
+  withApiErrorToast(() => createPaymentRequest(payload));

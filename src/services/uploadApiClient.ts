@@ -1,8 +1,10 @@
+import { withApiErrorToast } from "./apiErrorToast";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!BASE_URL) throw new Error("NEXT_PUBLIC_API_URL не задан");
 
-export async function uploadApiClient<T>(
+async function uploadApiClientRequest<T>(
   endpoint: string,
   formData: FormData
 ): Promise<T> {
@@ -35,4 +37,11 @@ export async function uploadApiClient<T>(
   }
 
   return data as T;
+}
+
+export function uploadApiClient<T>(
+  endpoint: string,
+  formData: FormData
+): Promise<T> {
+  return withApiErrorToast(() => uploadApiClientRequest<T>(endpoint, formData));
 }

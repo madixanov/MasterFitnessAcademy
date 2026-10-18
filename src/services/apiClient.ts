@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { withApiErrorToast } from "./apiErrorToast";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 if (!BASE_URL) throw new Error("NEXT_PUBLIC_API_URL не задан");
@@ -37,7 +38,7 @@ async function readResponseBody(res: Response): Promise<unknown> {
   return body;
 }
 
-export async function apiClient<T>(
+async function apiClientRequest<T>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> {
@@ -75,4 +76,11 @@ export async function apiClient<T>(
   }
 
   return data as T;
+}
+
+export function apiClient<T>(
+  endpoint: string,
+  options: ApiOptions = {}
+): Promise<T> {
+  return withApiErrorToast(() => apiClientRequest<T>(endpoint, options));
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "../globals.css"
+import ApiErrorToaster from "@/components/ApiErrorToaster";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} antialiased bg-black overflow-x-hidden text-white`}
       >
+        <ApiErrorToaster />
         {children}
       </body>
     </html>

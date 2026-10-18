@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import { ApiError, apiClient } from "@/services/apiClient";
+import { withApiErrorToast } from "@/services/apiErrorToast";
 
 export interface UserProfile {
   id: string;
@@ -30,7 +31,7 @@ export const getProfile = async (): Promise<UserProfile> => {
 /**
  * Загрузка фото профиля
  */
-export async function uploadProfilePhoto(file: File): Promise<unknown> {
+async function uploadProfilePhotoRequest(file: File): Promise<unknown> {
   const token = Cookies.get("accessToken");
 
   const formData = new FormData();
@@ -61,6 +62,10 @@ export async function uploadProfilePhoto(file: File): Promise<unknown> {
   }
 
   return res.json();
+}
+
+export function uploadProfilePhoto(file: File): Promise<unknown> {
+  return withApiErrorToast(() => uploadProfilePhotoRequest(file));
 }
 
 /**
