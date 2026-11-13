@@ -21,6 +21,7 @@ export interface Diploma {
     image?: string[];
     level?: number;
     status?: string;
+    trainerIds?: string[];
     trainerId?: string;
     Course_duration?: string;
     Number_of_lessons?: string;

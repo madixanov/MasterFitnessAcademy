@@ -41,7 +41,8 @@ export interface Lesson extends LessonPayload {
     image: string[];
     level: number;
     status: "ACTIVE" | "INACTIVE";
-    trainerId: string;
+    trainerIds?: string[];
+    trainerId?: string;
     Course_duration: string;
     Number_of_lessons: string;
     Training_format: string;

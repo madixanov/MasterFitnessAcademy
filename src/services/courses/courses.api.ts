@@ -35,7 +35,8 @@ export interface Course {
   image: string[];
   level: number;
   status: "ACTIVE" | "INACTIVE" | string;
-  trainerId: string;
+  trainerIds?: string[];
+  trainerId?: string;
   Course_duration: string;
   Number_of_lessons: string;
   Training_format: "OFFLINE" | "ONLINE" | string;
@@ -44,6 +45,7 @@ export interface Course {
   userId: string | null;
 
   /** relations */
+  trainers?: Trainer[];
   trainer?: Trainer;
   modules?: CourseModule[];
   tests?: Test[]
