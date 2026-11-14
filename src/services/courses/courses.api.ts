@@ -35,8 +35,7 @@ export interface Course {
   image: string[];
   level: number;
   status: "ACTIVE" | "INACTIVE" | string;
-  trainerIds?: string[];
-  trainerId?: string;
+  trainerId?: string[];
   Course_duration: string;
   Number_of_lessons: string;
   Training_format: "OFFLINE" | "ONLINE" | string;

@@ -17,8 +17,7 @@ export interface MyCourse {
   Number_of_lessons: string;
   Training_format: "OFFLINE" | "ONLINE";
   level: number;
-  trainerIds?: string[];
-  trainerId?: string;
+  trainerId?: string[];
   text: string | null;
 }
 

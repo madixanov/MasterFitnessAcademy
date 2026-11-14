@@ -21,8 +21,7 @@ export interface Diploma {
     image?: string[];
     level?: number;
     status?: string;
-    trainerIds?: string[];
-    trainerId?: string;
+    trainerId?: string[];
     Course_duration?: string;
     Number_of_lessons?: string;
     Training_format?: string;
@@ -65,4 +64,3 @@ export const getDiplomas = async (): Promise<Diploma[]> => {
 export const getDiplomaById = async (id: string): Promise<Diploma> => {
   return apiClient<Diploma>(`/diploms/${id}`);
 };
-
