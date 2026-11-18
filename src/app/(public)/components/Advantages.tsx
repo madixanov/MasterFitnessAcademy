@@ -21,7 +21,7 @@ const advantagesList = [
   },
   {
     icon: "/diploma.svg",
-    text: "Возможность получения Красного и Синего диплома",
+    text: "Возможность получения сертификата и диплома",
   },
   {
     icon: "/teachers.svg",
